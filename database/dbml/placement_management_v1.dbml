@@ -1,0 +1,638 @@
+//////////////////////////////////////////////////////////////
+// CENTRALIZED PLACEMENT MANAGEMENT SYSTEM
+// FINAL DATABASE DESIGN v1.0
+// PART 1 - MASTER TABLES + AUTHENTICATION
+//////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////
+// MASTER TABLES
+//////////////////////////////////////////////////////////////
+
+Table roles {
+  role_id uuid [pk]
+
+  role_name varchar(50) [not null, unique]
+  description text
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table branches {
+
+  branch_id uuid [pk]
+
+  branch_code varchar(20) [not null, unique]
+
+  branch_name varchar(100) [not null]
+
+  department varchar(100)
+
+  created_at timestamp
+
+}
+
+Table job_roles {
+
+  job_role_id uuid [pk]
+
+  role_title varchar(100) [not null]
+
+  category varchar(100)
+
+  description text
+
+  created_at timestamp
+
+}
+
+Table skills {
+
+  skill_id uuid [pk]
+
+  skill_name varchar(100) [not null, unique]
+
+  category varchar(100)
+
+  created_at timestamp
+
+}
+
+//////////////////////////////////////////////////////////////
+// USERS
+//////////////////////////////////////////////////////////////
+
+Table users {
+
+  user_id uuid [pk]
+
+  first_name varchar(100) [not null]
+
+  last_name varchar(100)
+
+  email varchar(255) [not null, unique]
+
+  phone varchar(20)
+
+  password_hash text [not null]
+
+  profile_photo text
+
+  is_verified boolean [default: false]
+
+  email_verified_at timestamp
+
+  password_changed_at timestamp
+
+  is_active boolean [default: true]
+
+  last_login timestamp
+
+  created_at timestamp [not null]
+
+  updated_at timestamp [not null]
+
+}
+
+//////////////////////////////////////////////////////////////
+// USER ROLES (RBAC)
+//////////////////////////////////////////////////////////////
+
+Table user_roles {
+
+  user_role_id uuid [pk]
+
+  user_id uuid [not null, ref: > users.user_id]
+
+  role_id uuid [not null, ref: > roles.role_id]
+
+  assigned_at timestamp
+
+}
+
+//////////////////////////////////////////////////////////////
+// REFRESH TOKENS
+//////////////////////////////////////////////////////////////
+
+Table refresh_tokens {
+
+  refresh_token_id uuid [pk]
+
+  user_id uuid [not null, ref: > users.user_id]
+
+  token text [not null]
+
+  expires_at timestamp
+
+  revoked boolean [default: false]
+
+  created_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// STUDENT MODULE
+//////////////////////////////////////////////////////////////
+
+Table student_profiles {
+
+  student_id uuid [pk]
+
+  user_id uuid [not null, unique, ref: > users.user_id]
+
+  branch_id uuid [not null, ref: > branches.branch_id]
+
+  enrollment_no varchar(30) [not null, unique]
+
+  semester int
+
+  cgpa decimal(3,2)
+
+  graduation_year int
+
+  active_backlogs int [default: 0]
+
+  date_of_birth date
+
+  gender varchar(20)
+
+  linkedin_url text
+
+  github_url text
+
+  portfolio_url text
+
+  bio text
+
+  resume_completion_percentage int
+
+  created_at timestamp [not null]
+
+  updated_at timestamp [not null]
+
+}
+
+Table student_skills {
+
+  student_skill_id uuid [pk]
+
+  student_id uuid [not null, ref: > student_profiles.student_id]
+
+  skill_id uuid [not null, ref: > skills.skill_id]
+
+  proficiency_level varchar(30)
+
+  years_of_experience decimal(3,1)
+
+  created_at timestamp
+
+}
+
+Table projects {
+
+  project_id uuid [pk]
+
+  student_id uuid [not null, ref: > student_profiles.student_id]
+
+  title varchar(200)
+
+  description text
+
+  github_url text
+
+  live_demo_url text
+
+  start_date date
+
+  end_date date
+
+  created_at timestamp
+
+}
+Table project_skills {
+
+  project_skill_id uuid [pk]
+
+  project_id uuid [not null, ref: > projects.project_id]
+
+  skill_id uuid [not null, ref: > skills.skill_id]
+
+  created_at timestamp
+
+  Note: 'Each project can have multiple skills.'
+}
+
+Table certifications {
+
+  certificate_id uuid [pk]
+
+  student_id uuid [not null, ref: > student_profiles.student_id]
+
+  certificate_name varchar(200)
+
+  issuing_organization varchar(200)
+
+  issue_date date
+
+  expiry_date date
+
+  credential_url text
+
+  created_at timestamp
+
+}
+
+Table resumes {
+
+  resume_id uuid [pk]
+
+  student_id uuid [not null, ref: > student_profiles.student_id]
+
+  resume_file_name varchar(255) [not null]
+
+  resume_storage_path text [not null]
+
+  mime_type varchar(50) [not null]
+
+  file_size_kb int
+
+  version int [not null]
+
+  is_default boolean [default: false]
+
+  uploaded_at timestamp [not null]
+
+}
+//////////////////////////////////////////////////////////////
+// RECRUITER MODULE
+//////////////////////////////////////////////////////////////
+
+Table companies {
+
+  company_id uuid [pk]
+
+  company_name varchar(200) [not null]
+
+  industry varchar(100)
+
+  website text
+
+  email varchar(255)
+
+  phone varchar(20)
+
+  linkedin_url text
+
+  headquarters varchar(200)
+
+  company_description text
+
+  logo_url text
+
+  created_at timestamp [not null]
+
+  updated_at timestamp [not null]
+
+}
+
+Table recruiters {
+
+  recruiter_id uuid [pk]
+
+  user_id uuid [not null, unique, ref: > users.user_id]
+
+  company_id uuid [not null, ref: > companies.company_id]
+
+  designation varchar(100)
+
+  official_email varchar(255)
+
+  contact_number varchar(20)
+
+  created_at timestamp [not null]
+
+  updated_at timestamp [not null]
+
+}
+
+//////////////////////////////////////////////////////////////
+// PLACEMENT DRIVES
+//////////////////////////////////////////////////////////////
+
+Table placement_drives {
+
+  drive_id uuid [pk]
+
+  company_id uuid [not null, ref: > companies.company_id]
+
+  recruiter_id uuid [not null, ref: > recruiters.recruiter_id]
+
+  job_role_id uuid [not null, ref: > job_roles.job_role_id]
+
+  drive_title varchar(255)
+
+  job_description text
+
+  employment_type varchar(50)
+
+  work_mode varchar(50)
+
+  location varchar(150)
+
+  minimum_package_lpa decimal(6,2)
+
+  maximum_package_lpa decimal(6,2)
+
+  vacancies int
+
+  registration_deadline timestamp
+
+  drive_date timestamp
+
+  status varchar(30)
+
+  created_at timestamp [not null]
+
+  updated_at timestamp [not null]
+
+}
+
+//////////////////////////////////////////////////////////////
+// ELIGIBILITY
+//////////////////////////////////////////////////////////////
+
+Table eligibility_rules {
+
+  eligibility_rule_id uuid [pk]
+
+  drive_id uuid [not null, unique, ref: > placement_drives.drive_id]
+
+  minimum_cgpa decimal(3,2)
+
+  maximum_backlogs int
+
+  graduation_year int
+
+  minimum_tenth_percentage decimal(5,2)
+
+  minimum_twelfth_percentage decimal(5,2)
+
+  created_at timestamp
+
+}
+
+//////////////////////////////////////////////////////////////
+// ELIGIBLE BRANCHES
+//////////////////////////////////////////////////////////////
+
+Table drive_branches {
+
+  drive_branch_id uuid [pk]
+
+  drive_id uuid [not null, ref: > placement_drives.drive_id]
+
+  branch_id uuid [not null, ref: > branches.branch_id]
+
+}
+
+//////////////////////////////////////////////////////////////
+// REQUIRED SKILLS
+//////////////////////////////////////////////////////////////
+
+Table drive_skills {
+
+  drive_skill_id uuid [pk]
+
+  drive_id uuid [not null, ref: > placement_drives.drive_id]
+
+  skill_id uuid [not null, ref: > skills.skill_id]
+
+  minimum_proficiency varchar(30)
+
+}
+
+//////////////////////////////////////////////////////////////
+// APPLICATIONS
+//////////////////////////////////////////////////////////////
+
+Table applications {
+
+  application_id uuid [pk]
+
+  drive_id uuid [not null, ref: > placement_drives.drive_id]
+
+  student_id uuid [not null, ref: > student_profiles.student_id]
+
+  resume_id uuid [not null, ref: > resumes.resume_id]
+
+  application_status varchar(30)
+
+  applied_at timestamp
+
+  indexes {
+    (student_id, drive_id) [unique]
+  }
+
+}
+Table drive_documents {
+
+  drive_document_id uuid [pk]
+
+  drive_id uuid [not null, ref: > placement_drives.drive_id]
+
+  document_name varchar(255)
+
+  document_type varchar(50)
+
+  document_storage_path text
+
+  uploaded_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// INTERVIEW STAGES
+//////////////////////////////////////////////////////////////
+
+Table interview_stages {
+
+  interview_stage_id uuid [pk]
+
+  stage_name varchar(100) [not null]
+
+  sequence_no int [not null]
+
+  description text
+
+  created_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// INTERVIEW ROUNDS
+//////////////////////////////////////////////////////////////
+
+Table interview_rounds {
+
+  interview_round_id uuid [pk]
+
+  application_id uuid [not null, ref: > applications.application_id]
+
+  interview_stage_id uuid [not null, ref: > interview_stages.interview_stage_id]
+
+  interviewer_name varchar(150)
+
+  interview_date timestamp
+
+  meeting_link text
+
+  remarks text
+
+  round_status varchar(30)
+
+  score decimal(5,2)
+
+  created_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// PLACEMENT RESULTS
+//////////////////////////////////////////////////////////////
+
+Table placement_results {
+
+  placement_result_id uuid [pk]
+
+  application_id uuid [not null, unique, ref: > applications.application_id]
+
+  final_status varchar(30)
+
+  offered_package decimal(6,2)
+
+  joining_date date
+
+  offer_acceptance_date date
+
+  joining_status varchar(30)
+
+  offer_letter_path text
+
+  remarks text
+
+  created_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// AI RESUME ANALYSIS
+//////////////////////////////////////////////////////////////
+
+Table resume_analysis {
+
+  analysis_id uuid [pk]
+
+  resume_id uuid [not null, ref: > resumes.resume_id]
+
+  job_role_id uuid [ref: > job_roles.job_role_id]
+
+  ats_score decimal(5,2)
+
+  job_match_percentage decimal(5,2)
+
+  missing_keywords text
+
+  strengths text
+
+  weaknesses text
+
+  recommendations text
+
+  analyzed_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// AI SKILL GAP
+//////////////////////////////////////////////////////////////
+
+Table skill_gap_reports {
+
+  report_id uuid [pk]
+
+  student_id uuid [not null, ref: > student_profiles.student_id]
+
+  target_job_role_id uuid [ref: > job_roles.job_role_id]
+
+  missing_skills text
+
+  recommended_courses text
+
+  generated_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// MOCK INTERVIEWS
+//////////////////////////////////////////////////////////////
+
+Table mock_interviews {
+
+  mock_interview_id uuid [pk]
+
+  student_id uuid [not null, ref: > student_profiles.student_id]
+
+  job_role_id uuid [ref: > job_roles.job_role_id]
+
+  grammar_score decimal(5,2)
+
+  fluency_score decimal(5,2)
+
+  confidence_score decimal(5,2)
+
+  technical_score decimal(5,2)
+
+  overall_score decimal(5,2)
+
+  ai_feedback text
+
+  duration_minutes int
+
+  transcript_storage_path text
+
+  completed_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// AI CAREER CHAT
+//////////////////////////////////////////////////////////////
+
+Table career_chat {
+
+  chat_id uuid [pk]
+
+  student_id uuid [not null, ref: > student_profiles.student_id]
+
+  question text
+
+  answer text
+
+  created_at timestamp
+
+}
+//////////////////////////////////////////////////////////////
+// NOTIFICATIONS
+//////////////////////////////////////////////////////////////
+
+Table notifications {
+
+  notification_id uuid [pk]
+
+  user_id uuid [not null, ref: > users.user_id]
+
+  title varchar(255)
+
+  message text
+
+  notification_type varchar(30)
+
+  is_read boolean [default: false]
+
+  read_at timestamp
+
+  created_at timestamp
+
+}
