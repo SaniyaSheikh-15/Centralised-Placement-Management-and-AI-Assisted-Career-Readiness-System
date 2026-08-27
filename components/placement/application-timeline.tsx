@@ -52,7 +52,7 @@ export function ApplicationTimeline({ timeline }: ApplicationTimelineProps) {
               </div>
               {item.date ? <p className="mt-3 text-[13px] text-slate-400">{formatDate(item.date)}</p> : null}
               {item.actionLabel && item.actionHref ? (
-                <Link href={item.actionHref} className="mt-4 inline-flex rounded-[18px] border border-slate-800/60 px-4 py-2 text-[13px] font-semibold text-white transition hover:border-sky-400/40 hover:bg-slate-900">
+                <Link href={item.actionHref as never} className="mt-4 inline-flex rounded-[18px] border border-slate-800/60 px-4 py-2 text-[13px] font-semibold text-white transition hover:border-sky-400/40 hover:bg-slate-900">
                   {item.actionLabel}
                 </Link>
               ) : null}
