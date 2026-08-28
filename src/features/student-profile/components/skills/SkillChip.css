@@ -1,0 +1,33 @@
+.skill-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.skill-chip:hover {
+  border-color: rgba(22, 131, 255, 0.25);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.skill-chip-name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.skill-chip-actions {
+  display: flex;
+  gap: var(--space-1);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.skill-chip:hover .skill-chip-actions {
+  opacity: 1;
+}
