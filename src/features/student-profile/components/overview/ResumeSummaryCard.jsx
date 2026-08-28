@@ -1,5 +1,5 @@
 import { useStudentProfile } from '../../context/StudentProfileContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 /** ResumeSummaryCard — Current file info, preview, download, replace triggers */
 export default function ResumeSummaryCard() {
@@ -53,7 +53,7 @@ export default function ResumeSummaryCard() {
         </div>
       ) : (
         <span className="overview-section-empty">
-          No resume uploaded — <a href="/profile/resume">Upload PDF</a>
+          No resume uploaded — <Link to="/profile/resume">Upload PDF</Link>
         </span>
       )}
     </div>

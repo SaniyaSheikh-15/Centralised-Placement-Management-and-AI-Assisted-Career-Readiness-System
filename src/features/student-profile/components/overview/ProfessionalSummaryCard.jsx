@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useStudentProfile } from '../../context/StudentProfileContext';
 import SkillProficiencyBadge from '../skills/SkillProficiencyBadge';
 
@@ -24,7 +25,7 @@ export default function ProfessionalSummaryCard() {
             ))}
           </div>
         ) : (
-          <span className="overview-section-empty">No skills added — <a href="/profile/skills">Add skills</a></span>
+          <span className="overview-section-empty">No skills added — <Link to="/profile/skills">Add skills</Link></span>
         )}
       </div>
 

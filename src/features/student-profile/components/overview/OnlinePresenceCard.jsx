@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useStudentProfile } from '../../context/StudentProfileContext';
 
 /** OnlinePresenceCard — Clickable chips/icons for GitHub, LinkedIn, Portfolio, Coding */
@@ -39,7 +40,7 @@ export default function OnlinePresenceCard() {
         </div>
       ) : (
         <span className="overview-section-empty">
-          No social profiles added — <a href="/profile/edit">Add links</a>
+          No social profiles added — <Link to="/profile/edit">Add links</Link>
         </span>
       )}
     </div>

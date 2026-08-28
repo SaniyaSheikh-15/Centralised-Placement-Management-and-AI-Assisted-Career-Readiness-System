@@ -49,6 +49,9 @@ export default function EditProfilePage() {
   };
 
   const handleNext = () => {
+    saveDraft();
+    setSaveMessage('Draft saved!');
+    setTimeout(() => setSaveMessage(''), 2000);
     if (activeEditTab < TABS.length - 1) {
       setActiveEditTab(activeEditTab + 1);
     }
