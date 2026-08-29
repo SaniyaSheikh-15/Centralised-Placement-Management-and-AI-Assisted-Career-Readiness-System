@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
 import ProjectCard from '@/components/student-profile/projects/ProjectCard';
@@ -57,10 +56,16 @@ export default function ProjectsPage() {
     <div className="animate-fade-in">
       <div className="mb-6 flex items-center justify-between max-md:flex-col max-md:items-start max-md:gap-3">
         <div>
-          <h2 className="text-2xl font-extrabold text-[var(--text-primary)]">Projects</h2>
-          <p className="text-sm text-[var(--text-muted)]">Showcase your technical projects and contributions</p>
+          <h2 className="text-2xl font-bold text-[#F1F5F9]">Projects</h2>
+          <p className="text-sm text-[#64748B]">Showcase your real-world projects and contributions</p>
         </div>
-        <Button onClick={() => { setEditingProject(null); setShowModal(true); }}><Plus className="mr-1.5 h-4 w-4" /> Add Project</Button>
+        <button
+          onClick={() => { setEditingProject(null); setShowModal(true); }}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#1683FF] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#0D6FE0]"
+        >
+          <Plus className="h-4 w-4" />
+          Add Project
+        </button>
       </div>
 
       {projects.length === 0 ? (
@@ -72,7 +77,7 @@ export default function ProjectsPage() {
           onAction={() => { setEditingProject(null); setShowModal(true); }}
         />
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} onEdit={handleEdit} onDelete={(p) => setDeletingProject(p)} />
           ))}

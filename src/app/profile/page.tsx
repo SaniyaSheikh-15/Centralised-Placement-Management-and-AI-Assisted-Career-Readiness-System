@@ -26,12 +26,29 @@ export default function ProfileOverviewPage() {
 
   return (
     <div className="animate-fade-in">
+      {/* Profile Header */}
       <ProfileHeaderBlock />
+
+      {/* Row 1: Personal + Academic */}
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <PersonalInfoCard />
         <AcademicInfoCard />
+      </div>
+
+      {/* Divider */}
+      <div className="mt-6 border-t border-[#1A2B42]" />
+
+      {/* Row 2: Placement Readiness + Professional Summary */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <PlacementReadinessCard />
         <ProfessionalSummaryCard />
+      </div>
+
+      {/* Divider */}
+      <div className="mt-6 border-t border-[#1A2B42]" />
+
+      {/* Row 3: Online Presence + Resume */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <OnlinePresenceCard />
         <ResumeSummaryCard />
       </div>

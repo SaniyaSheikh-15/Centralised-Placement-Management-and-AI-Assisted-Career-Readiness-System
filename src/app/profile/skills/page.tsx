@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
 import SkillChip from '@/components/student-profile/skills/SkillChip';
@@ -54,10 +53,16 @@ export default function SkillsManagementPage() {
     <div className="animate-fade-in">
       <div className="mb-6 flex items-center justify-between max-md:flex-col max-md:items-start max-md:gap-3">
         <div>
-          <h2 className="text-2xl font-extrabold text-[var(--text-primary)]">Skills Management</h2>
-          <p className="text-sm text-[var(--text-muted)]">Manage your technical skills and proficiency levels</p>
+          <h2 className="text-2xl font-bold text-[#F1F5F9]">Skills Management</h2>
+          <p className="text-sm text-[#64748B]">Manage your technical skills and proficiency levels</p>
         </div>
-        <Button onClick={() => setShowAddModal(true)}><Plus className="mr-1.5 h-4 w-4" /> Add Skill</Button>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#1683FF] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#0D6FE0]"
+        >
+          <Plus className="h-4 w-4" />
+          Add Skill
+        </button>
       </div>
 
       {skills.length === 0 ? (
@@ -69,7 +74,7 @@ export default function SkillsManagementPage() {
           onAction={() => setShowAddModal(true)}
         />
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="overflow-hidden rounded-xl border border-[#1A2B42] bg-[#0E1B2E]">
           {skills.map((skill) => (
             <SkillChip key={skill.id} skill={skill} onEdit={(s) => setEditingSkill(s)} onRemove={(s) => setDeletingSkill(s)} />
           ))}

@@ -5,42 +5,42 @@
 
 /*
  * ─── Design System Tokens ────────────────────────────────────────────────
- * Exact replica of the original dark theme color palette.
+ * Exact hex-mapped dark theme palette for the CampusConnect design spec.
  * These CSS variables are used by shadcn/ui and our custom classes.
  */
 @theme inline {
-  --color-background: oklch(0.1 0.015 250);
-  --color-foreground: oklch(0.95 0.01 250);
-  --color-card: oklch(0.14 0.015 250);
-  --color-card-foreground: oklch(0.95 0.01 250);
-  --color-popover: oklch(0.14 0.015 250);
-  --color-popover-foreground: oklch(0.95 0.01 250);
-  --color-primary: oklch(0.6 0.18 250);
-  --color-primary-foreground: oklch(0.98 0 0);
-  --color-secondary: oklch(0.2 0.02 250);
-  --color-secondary-foreground: oklch(0.9 0.01 250);
-  --color-muted: oklch(0.2 0.015 250);
-  --color-muted-foreground: oklch(0.6 0.02 250);
-  --color-accent: oklch(0.22 0.02 250);
-  --color-accent-foreground: oklch(0.9 0.01 250);
-  --color-destructive: oklch(0.55 0.2 25);
-  --color-destructive-foreground: oklch(0.98 0 0);
-  --color-border: oklch(0.22 0.02 250);
-  --color-input: oklch(0.22 0.02 250);
-  --color-ring: oklch(0.6 0.18 250);
-  --color-chart-1: oklch(0.6 0.18 250);
-  --color-chart-2: oklch(0.55 0.15 150);
-  --color-chart-3: oklch(0.6 0.15 50);
-  --color-chart-4: oklch(0.55 0.15 300);
-  --color-chart-5: oklch(0.6 0.15 200);
-  --color-sidebar: oklch(0.12 0.015 250);
-  --color-sidebar-foreground: oklch(0.95 0.01 250);
-  --color-sidebar-primary: oklch(0.6 0.18 250);
-  --color-sidebar-primary-foreground: oklch(0.98 0 0);
-  --color-sidebar-accent: oklch(0.22 0.02 250);
-  --color-sidebar-accent-foreground: oklch(0.9 0.01 250);
-  --color-sidebar-border: oklch(0.22 0.02 250);
-  --color-sidebar-ring: oklch(0.6 0.18 250);
+  --color-background: #050B14;
+  --color-foreground: #F1F5F9;
+  --color-card: #0E1B2E;
+  --color-card-foreground: #F1F5F9;
+  --color-popover: #0E1B2E;
+  --color-popover-foreground: #F1F5F9;
+  --color-primary: #1683FF;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #0E1B2E;
+  --color-secondary-foreground: #F1F5F9;
+  --color-muted: #122238;
+  --color-muted-foreground: #64748B;
+  --color-accent: #122238;
+  --color-accent-foreground: #F1F5F9;
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #1A2B42;
+  --color-input: #1A2B42;
+  --color-ring: #1683FF;
+  --color-chart-1: #1683FF;
+  --color-chart-2: #10B981;
+  --color-chart-3: #F59E0B;
+  --color-chart-4: #7C5CFC;
+  --color-chart-5: #06B6D4;
+  --color-sidebar: #09111E;
+  --color-sidebar-foreground: #F1F5F9;
+  --color-sidebar-primary: #1683FF;
+  --color-sidebar-primary-foreground: #FFFFFF;
+  --color-sidebar-accent: #122238;
+  --color-sidebar-accent-foreground: #F1F5F9;
+  --color-sidebar-border: #1A2B42;
+  --color-sidebar-ring: #1683FF;
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
@@ -50,32 +50,45 @@
 
 /*
  * ─── Custom Design Variables ─────────────────────────────────────────────
- * Extended palette matching the original #050B14 dark theme exactly.
+ * Exact hex palette matching the design specification.
  */
 :root {
-  /* Exact original colors */
+  /* Canvas & surfaces */
   --bg-primary: #050B14;
-  --bg-secondary: #0A1628;
-  --bg-card: #0F1D32;
-  --bg-card-hover: #142640;
-  --border-card: #1E3045;
-  --text-primary: #EAF0F7;
-  --text-secondary: #8FA3BF;
-  --text-muted: #5A7290;
+  --bg-sidebar: #09111E;
+  --bg-card: #0E1B2E;
+  --bg-card-hover: #122238;
+  --bg-inner: #0A1524;
+  --border-card: #1A2B42;
+
+  /* Text hierarchy */
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  /* Accent colors */
   --accent-primary: #1683FF;
-  --accent-primary-hover: #3D9AFF;
-  --accent-primary-subtle: rgba(22, 131, 255, 0.08);
+  --accent-primary-hover: #0D6FE0;
+  --accent-primary-subtle: rgba(22, 131, 255, 0.10);
   --accent-secondary: #7C5CFC;
-  --color-success: #22C55E;
-  --color-success-subtle: rgba(34, 197, 94, 0.08);
+
+  /* Status colors */
+  --color-success: #10B981;
+  --color-success-subtle: rgba(16, 185, 129, 0.08);
   --color-warning: #F59E0B;
   --color-warning-subtle: rgba(245, 158, 11, 0.08);
   --color-danger: #EF4444;
   --color-danger-subtle: rgba(239, 68, 68, 0.08);
+
+  /* Shadows */
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
   --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.35);
+
+  /* Layout */
   --sidebar-width: 260px;
   --navbar-height: 60px;
+
+  /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-base: 0.25s ease;
 }

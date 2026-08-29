@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
 import CertificationItem from '@/components/student-profile/certifications/CertificationItem';
@@ -57,10 +56,16 @@ export default function CertificationsPage() {
     <div className="animate-fade-in">
       <div className="mb-6 flex items-center justify-between max-md:flex-col max-md:items-start max-md:gap-3">
         <div>
-          <h2 className="text-2xl font-extrabold text-[var(--text-primary)]">Certifications</h2>
-          <p className="text-sm text-[var(--text-muted)]">Manage your professional certifications and credentials</p>
+          <h2 className="text-2xl font-bold text-[#F1F5F9]">Certifications</h2>
+          <p className="text-sm text-[#64748B]">Manage your professional certifications and credentials</p>
         </div>
-        <Button onClick={() => { setEditingCert(null); setShowModal(true); }}><Plus className="mr-1.5 h-4 w-4" /> Add Certification</Button>
+        <button
+          onClick={() => { setEditingCert(null); setShowModal(true); }}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#1683FF] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#0D6FE0]"
+        >
+          <Plus className="h-4 w-4" />
+          Add Certification
+        </button>
       </div>
 
       {certifications.length === 0 ? (
@@ -72,7 +77,7 @@ export default function CertificationsPage() {
           onAction={() => { setEditingCert(null); setShowModal(true); }}
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {certifications.map((cert) => (
             <CertificationItem key={cert.id} certification={cert} onEdit={handleEdit} onDelete={(c) => setDeletingCert(c)} />
           ))}

@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { Pencil } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
 
 export default function ProfileHeaderBlock() {
@@ -14,10 +13,11 @@ export default function ProfileHeaderBlock() {
     : '??';
 
   return (
-    <Card className="border-[var(--border-card)] bg-[var(--bg-card)] animate-slide-up">
-      <CardContent className="flex items-center gap-6 p-8 max-md:flex-col max-md:text-center">
+    <div className="flex items-center justify-between rounded-xl border border-[#1A2B42] bg-[#0E1B2E] p-6 max-md:flex-col max-md:gap-4 max-md:text-center animate-slide-up">
+      {/* Left — Avatar + Info */}
+      <div className="flex items-center gap-4 max-md:flex-col">
         {/* Avatar */}
-        <div className="flex h-[88px] w-[88px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] text-2xl font-extrabold text-white">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-tr from-[#1683FF] to-[#7C5CFC] text-xl font-bold text-white">
           {p.profilePhoto ? (
             <img src={URL.createObjectURL(p.profilePhoto)} alt={p.fullName} className="h-full w-full object-cover" />
           ) : (
@@ -25,23 +25,26 @@ export default function ProfileHeaderBlock() {
           )}
         </div>
 
-        {/* Info */}
-        <div className="flex-1">
-          <h2 className="mb-1 text-2xl font-extrabold text-[var(--text-primary)]">
+        {/* Name + Info */}
+        <div>
+          <h2 className="text-xl font-bold text-[#F1F5F9]">
             {p.fullName || 'Unnamed Student'}
           </h2>
-          <p className="mb-1 text-base font-semibold text-[var(--accent-primary)]">{p.branch || 'No branch set'}</p>
-          <p className="text-sm text-[var(--text-muted)]">
-            {profile.academicInfo.degree} · {profile.academicInfo.academicYear}
+          <p className="text-sm font-semibold text-[#1683FF]">{p.branch || 'No branch set'}</p>
+          <p className="text-xs text-[#94A3B8]">
+            {profile.academicInfo.degree} ({profile.academicInfo.academicYear}) · {profile.academicInfo.college}
           </p>
         </div>
+      </div>
 
-        {/* Edit Button */}
-        <Link href="/profile/edit" className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-card)] bg-transparent px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)] hover:bg-[var(--accent-primary-subtle)] hover:text-[var(--text-primary)]">
-            <Pencil className="h-4 w-4" />
-            Edit Profile
-          </Link>
-      </CardContent>
-    </Card>
+      {/* Right — Edit Button */}
+      <Link
+        href="/profile/edit"
+        className="inline-flex items-center gap-2 rounded-lg bg-[#1683FF] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#0D6FE0]"
+      >
+        <Plus className="h-4 w-4" />
+        Edit Profile
+      </Link>
+    </div>
   );
 }

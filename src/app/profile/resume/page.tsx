@@ -21,8 +21,8 @@ export default function ResumeUploadPage() {
   return (
     <div className="animate-fade-in">
       <div className="mb-6">
-        <h2 className="text-2xl font-extrabold text-[var(--text-primary)]">Resume Upload</h2>
-        <p className="text-sm text-[var(--text-muted)]">Upload and manage your placement resume</p>
+        <h2 className="text-2xl font-bold text-[#F1F5F9]">Resume Upload</h2>
+        <p className="text-sm text-[#64748B]">Upload and manage your resume (PDF only, max 5 MB)</p>
       </div>
       <ResumeUploader />
     </div>

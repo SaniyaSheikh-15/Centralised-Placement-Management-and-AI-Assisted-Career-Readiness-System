@@ -10,7 +10,7 @@ export default function ProfileLayout({
     <>
       <Sidebar />
       <TopNavbar />
-      <main className="ml-[260px] mt-[60px] min-h-[calc(100vh-60px)] p-8 max-md:ml-0 max-md:p-4">
+      <main className="ml-[260px] mt-[60px] min-h-[calc(100vh-60px)] bg-[#050B14] p-8 max-md:ml-0 max-md:p-4">
         {children}
       </main>
     </>

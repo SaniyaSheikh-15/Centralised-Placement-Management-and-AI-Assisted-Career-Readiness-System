@@ -1,17 +1,16 @@
-import { Badge } from '@/components/ui/badge';
 import type { TechnicalSkill } from '@/types/student-profile';
 
-const proficiencyConfig: Record<string, { variant: 'default' | 'secondary' | 'outline'; className: string }> = {
-  Beginner: { variant: 'secondary', className: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-  Intermediate: { variant: 'secondary', className: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-  Advanced: { variant: 'secondary', className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+const proficiencyConfig: Record<string, string> = {
+  Beginner: 'bg-indigo-950/60 text-indigo-400 border border-indigo-800/40',
+  Intermediate: 'bg-cyan-950/60 text-cyan-400 border border-cyan-800/40',
+  Advanced: 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40',
 };
 
 export default function SkillProficiencyBadge({ proficiency }: { proficiency: TechnicalSkill['proficiency'] }) {
-  const config = proficiencyConfig[proficiency] || proficiencyConfig.Beginner;
+  const className = proficiencyConfig[proficiency] || proficiencyConfig.Beginner;
   return (
-    <Badge variant={config.variant} className={config.className}>
+    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${className}`}>
       {proficiency}
-    </Badge>
+    </span>
   );
 }

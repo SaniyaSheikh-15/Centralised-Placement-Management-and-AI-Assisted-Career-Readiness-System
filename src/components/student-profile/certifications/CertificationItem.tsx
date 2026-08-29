@@ -1,7 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, ExternalLink, Calendar } from 'lucide-react';
+import { Pencil, Trash2, ExternalLink, Award } from 'lucide-react';
 import type { Certification } from '@/types/student-profile';
 
 interface CertificationItemProps {
@@ -15,33 +14,53 @@ export default function CertificationItem({ certification, onEdit, onDelete }: C
     if (!dateStr) return '';
     const [year, month] = dateStr.split('-');
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${months[parseInt(month, 10) - 1]} ${year}`;
+    return `Issued ${months[parseInt(month, 10) - 1]} ${year}`;
   };
 
   return (
-    <div className="group flex items-start gap-4 rounded-xl border border-[var(--border-card)] bg-[var(--bg-card)] p-4 transition-all hover:border-[rgba(22,131,255,0.25)]">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--color-warning-subtle)] text-xl">🏆</div>
-      <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-semibold text-[var(--text-primary)]">{certification.name}</h4>
-        <p className="text-sm text-[var(--text-secondary)]">{certification.organization}</p>
-        <div className="mt-2 flex items-center gap-4 text-xs">
-          <span className="flex items-center gap-1 text-[var(--text-muted)]">
-            <Calendar className="h-3 w-3" /> {formatDate(certification.date)}
-          </span>
+    <div className="group flex items-center justify-between rounded-xl border border-[#1A2B42] bg-[#0E1B2E] p-5 transition-all hover:border-[rgba(22,131,255,0.5)]">
+      <div className="flex items-center gap-4 min-w-0">
+        {/* Award Icon */}
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[rgba(22,131,255,0.15)] text-[#1683FF]">
+          <Award className="h-5 w-5" />
+        </div>
+
+        {/* Details */}
+        <div className="min-w-0">
+          <h4 className="text-sm font-bold text-[#F1F5F9]">{certification.name}</h4>
+          <p className="text-xs text-[#94A3B8]">
+            {certification.organization} · {formatDate(certification.date)}
+          </p>
           {certification.link && (
-            <a href={certification.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[var(--accent-primary)] transition-colors hover:text-[var(--accent-primary-hover)]">
-              <ExternalLink className="h-3 w-3" /> View Credential
+            <a
+              href={certification.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-flex items-center gap-1 text-xs text-[#1683FF] transition-colors hover:underline"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Verify Credential
             </a>
           )}
         </div>
       </div>
+
+      {/* Actions */}
       <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(certification)} title="Edit">
+        <button
+          onClick={() => onEdit(certification)}
+          className="rounded-md p-1.5 text-[#94A3B8] transition-colors hover:bg-white/10 hover:text-[#F1F5F9]"
+          title="Edit"
+        >
           <Pencil className="h-3.5 w-3.5" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7 text-[var(--color-danger)] hover:text-[var(--color-danger)]" onClick={() => onDelete(certification)} title="Delete">
+        </button>
+        <button
+          onClick={() => onDelete(certification)}
+          className="rounded-md p-1.5 text-[#EF4444] transition-colors hover:bg-red-500/10"
+          title="Delete"
+        >
           <Trash2 className="h-3.5 w-3.5" />
-        </Button>
+        </button>
       </div>
     </div>
   );

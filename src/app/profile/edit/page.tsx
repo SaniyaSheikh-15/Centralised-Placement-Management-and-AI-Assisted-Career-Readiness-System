@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Save, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
 import ProfileSkeletonLoader from '@/components/student-profile/common/ProfileSkeletonLoader';
@@ -84,33 +82,37 @@ export default function EditProfilePage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between max-md:flex-col max-md:items-start max-md:gap-3">
         <div>
-          <h2 className="text-2xl font-extrabold text-[var(--text-primary)]">Edit Profile</h2>
-          <p className="text-sm text-[var(--text-muted)]">Update your career profile information across all sections</p>
+          <h2 className="text-2xl font-bold text-[#F1F5F9]">Edit Profile</h2>
+          <p className="text-sm text-[#64748B]">Update your career profile information across all 9 sections</p>
         </div>
-        <Button variant="secondary" onClick={handleSaveDraft}>
-          <Save className="mr-1.5 h-4 w-4" /> Save Draft
-        </Button>
+        <button
+          onClick={handleSaveDraft}
+          className="inline-flex items-center gap-2 rounded-lg border border-[#1A2B42] bg-[#0E1B2E] px-4 py-2 text-sm font-medium text-[#F1F5F9] transition-colors hover:bg-[#1A2B42]"
+        >
+          <Save className="h-4 w-4" />
+          Save Draft
+        </button>
       </div>
 
       {/* Save Message */}
       {saveMessage && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-green-500/20 bg-[var(--color-success-subtle)] px-4 py-3 text-sm text-[var(--color-success)] animate-slide-in-left">
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-[#10B981] animate-slide-in-left">
           <Check className="h-4 w-4" /> {saveMessage}
         </div>
       )}
 
-      {/* Stepper Navigation */}
-      <div className="mb-6 flex flex-wrap gap-1 rounded-xl border border-[var(--border-card)] bg-[var(--bg-card)] p-2">
+      {/* 9-Step Pill Stepper Navigation */}
+      <div className="mb-6 flex flex-wrap gap-1 rounded-xl border border-[#1A2B42] bg-[#0E1B2E] p-2">
         {TABS.map((tab, index) => (
           <button
             key={tab.key}
             onClick={() => setActiveEditTab(index)}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all ${
               index === activeEditTab
-                ? 'bg-[var(--accent-primary)] text-white shadow-sm'
+                ? 'bg-[#1683FF] text-white shadow-sm'
                 : index < activeEditTab
-                  ? 'text-[var(--color-success)] hover:bg-white/5'
-                  : 'text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-secondary)]'
+                  ? 'text-[#10B981] hover:bg-white/5'
+                  : 'border border-transparent text-[#64748B] hover:bg-white/5 hover:text-[#94A3B8]'
             }`}
           >
             <span>{index < activeEditTab ? '✓' : tab.icon}</span>
@@ -120,36 +122,47 @@ export default function EditProfilePage() {
       </div>
 
       {/* Tab Content */}
-      <Card className="border-[var(--border-card)] bg-[var(--bg-card)]">
-        <CardContent className="p-6 sm:p-8">
-          <div className="mb-6">
-            <h3 className="flex items-center gap-2 text-xl font-bold text-[var(--text-primary)]">
-              <span>{TABS[activeEditTab]?.icon}</span>
-              <span>{TABS[activeEditTab]?.label}</span>
-            </h3>
-            <p className="mt-1 text-sm text-[var(--text-muted)]">Step {activeEditTab + 1} of {TABS.length}</p>
-          </div>
-          {renderTabContent()}
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-[#1A2B42] bg-[#0E1B2E] p-6 sm:p-8">
+        <div className="mb-6">
+          <h3 className="flex items-center gap-2 text-xl font-bold text-[#F1F5F9]">
+            <span>{TABS[activeEditTab]?.icon}</span>
+            <span>{TABS[activeEditTab]?.label}</span>
+          </h3>
+          <p className="mt-1 text-sm text-[#64748B]">Step {activeEditTab + 1} of {TABS.length}</p>
+        </div>
+        {renderTabContent()}
+      </div>
 
       {/* Navigation Controls */}
-      <div className="mt-6 flex items-center justify-between border-t border-[var(--border-card)] pt-4">
-        <Button variant="ghost" onClick={handlePrevious} disabled={activeEditTab === 0}>
-          <ChevronLeft className="mr-1.5 h-4 w-4" /> Previous
-        </Button>
+      <div className="mt-6 flex items-center justify-between border-t border-[#1A2B42] pt-4">
+        <button
+          onClick={handlePrevious}
+          disabled={activeEditTab === 0}
+          className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-[#94A3B8] transition-colors hover:bg-white/5 hover:text-[#F1F5F9] disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="h-4 w-4" /> Previous
+        </button>
         <div className="flex gap-3">
-          <Button variant="ghost" onClick={handleSaveDraft}>
-            <Save className="mr-1.5 h-4 w-4" /> Save Draft
-          </Button>
+          <button
+            onClick={handleSaveDraft}
+            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-[#94A3B8] transition-colors hover:bg-white/5 hover:text-[#F1F5F9]"
+          >
+            <Save className="h-4 w-4" /> Save Draft
+          </button>
           {activeEditTab < TABS.length - 1 ? (
-            <Button onClick={handleNext}>
-              Save & Next <ChevronRight className="ml-1.5 h-4 w-4" />
-            </Button>
+            <button
+              onClick={handleNext}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#1683FF] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#0D6FE0]"
+            >
+              Save & Next <ChevronRight className="h-4 w-4" />
+            </button>
           ) : (
-            <Button onClick={handleSaveDraft}>
-              <Check className="mr-1.5 h-4 w-4" /> Complete Profile
-            </Button>
+            <button
+              onClick={handleSaveDraft}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#1683FF] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#0D6FE0]"
+            >
+              <Check className="h-4 w-4" /> Complete Profile
+            </button>
           )}
         </div>
       </div>

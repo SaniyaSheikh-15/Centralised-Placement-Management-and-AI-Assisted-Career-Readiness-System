@@ -1,95 +1,63 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Code2, Briefcase, Award, FolderKanban, Star } from 'lucide-react';
+import { Briefcase } from 'lucide-react';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
 
 export default function ProfessionalSummaryCard() {
   const { profile } = useStudentProfile();
 
   return (
-    <Card className="border-[var(--border-card)] bg-[var(--bg-card)] animate-slide-up">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base text-[var(--text-primary)]">
-          <Briefcase className="h-4 w-4 text-[var(--accent-primary)]" />
-          Professional Summary
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="rounded-xl border border-[#1A2B42] bg-[#0E1B2E] animate-slide-up">
+      <div className="flex items-center gap-2.5 border-b border-[#1A2B42] px-6 py-4">
+        <Briefcase className="h-4 w-4 text-[#1683FF]" />
+        <h3 className="text-base font-semibold text-[#F1F5F9]">Professional Summary</h3>
+      </div>
+      <div className="space-y-5 px-6 py-5">
         {/* Technical Skills */}
         <div>
-          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--text-muted)]">
-            <Code2 className="h-3.5 w-3.5" /> Technical Skills ({profile.technicalSkills.length})
+          <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#64748B]">
+            Technical Skills
           </div>
           {profile.technicalSkills.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {profile.technicalSkills.map((skill) => (
-                <Badge key={skill.id} variant="secondary" className="bg-[var(--accent-primary-subtle)] text-[var(--accent-primary)]">
+                <span
+                  key={skill.id}
+                  className="rounded-md border border-[#1A2B42] bg-[#0A1524] px-2.5 py-1 text-xs font-medium text-[#94A3B8]"
+                >
                   {skill.name}
-                </Badge>
+                </span>
               ))}
             </div>
           ) : (
-            <p className="text-sm italic text-[var(--text-muted)]">No skills added yet</p>
+            <p className="text-sm italic text-[#64748B]">No skills added yet</p>
           )}
         </div>
 
-        <Separator className="bg-[var(--border-card)]" />
+        {/* Divider */}
+        <div className="border-t border-[#1A2B42]/60" />
 
-        {/* Projects */}
+        {/* Soft Skills */}
         <div>
-          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--text-muted)]">
-            <FolderKanban className="h-3.5 w-3.5" /> Projects ({profile.projects.length})
+          <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#64748B]">
+            Soft Skills
           </div>
-          {profile.projects.length > 0 ? (
-            <div className="space-y-1">
-              {profile.projects.map((proj) => (
-                <p key={proj.id} className="text-sm font-medium text-[var(--text-primary)]">• {proj.name}</p>
+          {profile.softSkills.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {profile.softSkills.map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="rounded-md border border-[#1A2B42] bg-[#0A1524] px-2.5 py-1 text-xs font-medium text-[#94A3B8]"
+                >
+                  {skill}
+                </span>
               ))}
             </div>
           ) : (
-            <p className="text-sm italic text-[var(--text-muted)]">No projects added yet</p>
+            <p className="text-sm italic text-[#64748B]">No soft skills added yet</p>
           )}
         </div>
-
-        <Separator className="bg-[var(--border-card)]" />
-
-        {/* Certifications */}
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--text-muted)]">
-            <Award className="h-3.5 w-3.5" /> Certifications ({profile.certifications.length})
-          </div>
-          {profile.certifications.length > 0 ? (
-            <div className="space-y-1">
-              {profile.certifications.map((cert) => (
-                <p key={cert.id} className="text-sm font-medium text-[var(--text-primary)]">• {cert.name}</p>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm italic text-[var(--text-muted)]">No certifications added yet</p>
-          )}
-        </div>
-
-        <Separator className="bg-[var(--border-card)]" />
-
-        {/* Achievements */}
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--text-muted)]">
-            <Star className="h-3.5 w-3.5" /> Achievements ({profile.achievements.length})
-          </div>
-          {profile.achievements.length > 0 ? (
-            <div className="space-y-1">
-              {profile.achievements.map((ach) => (
-                <p key={ach.id} className="text-sm font-medium text-[var(--text-primary)]">• {ach.title}</p>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm italic text-[var(--text-muted)]">No achievements added yet</p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
