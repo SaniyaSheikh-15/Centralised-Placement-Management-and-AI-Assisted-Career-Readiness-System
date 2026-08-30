@@ -8,7 +8,23 @@ from backend.app.models.auth import (
     UserRole,
 )
 
+from backend.app.models.student import (
+    Branch,
+    Certification,
+    Project,
+    ProjectSkill,
+    Resume,
+    Skill,
+    StudentProfile,
+    StudentSkill,
+    StudentInternship,
+    StudentAchievement,
+    StudentSocialLink,
+)
+
+
 __all__ = [
+    # Auth
     "Role",
     "User",
     "UserRole",
@@ -16,4 +32,17 @@ __all__ = [
     "Recruiter",
     "TPAccessRequest",
     "OTPCode",
-]
+
+    # Student
+    "Branch",
+    "Skill",
+    "StudentProfile",
+    "StudentSkill",
+    "Project",
+    "ProjectSkill",
+    "Certification",
+    "Resume",
+    "StudentInternship",
+    "StudentAchievement",
+    "StudentSocialLink",
+]
