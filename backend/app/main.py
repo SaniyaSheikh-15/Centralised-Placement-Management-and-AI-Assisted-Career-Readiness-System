@@ -27,11 +27,30 @@ async def lifespan(app: FastAPI):
     yield
 
 
+import os
+
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="Centralised Placement Management & AI-Assisted Career Readiness System",
     version="1.0.0",
     description="Backend API for the placement management and career readiness platform.",
     lifespan=lifespan,
+)
+
+# CORS Configuration
+raw_origins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000",
+)
+allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
