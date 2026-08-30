@@ -66,3 +66,4 @@ node_modules/
 *.tmp
 *.temp
 =======
+backend/storage/
