@@ -1,0 +1,1 @@
+sidebarConfig[user.role]
