@@ -12,7 +12,6 @@ class AchievementRepository:
         db: Session,
         achievement: StudentAchievement,
     ) -> StudentAchievement:
-
         db.add(achievement)
         db.commit()
         db.refresh(achievement)
@@ -25,7 +24,6 @@ class AchievementRepository:
         achievement_id: UUID,
         student_id: UUID,
     ) -> StudentAchievement | None:
-
         return (
             db.query(StudentAchievement)
             .filter(
@@ -40,11 +38,13 @@ class AchievementRepository:
         db: Session,
         student_id: UUID,
     ) -> list[StudentAchievement]:
-
         return (
             db.query(StudentAchievement)
             .filter(
                 StudentAchievement.student_id == student_id
+            )
+            .order_by(
+                StudentAchievement.achievement_date.desc()
             )
             .all()
         )
@@ -54,7 +54,6 @@ class AchievementRepository:
         db: Session,
         achievement: StudentAchievement,
     ) -> StudentAchievement:
-
         db.commit()
         db.refresh(achievement)
 
@@ -65,6 +64,5 @@ class AchievementRepository:
         db: Session,
         achievement: StudentAchievement,
     ) -> None:
-
         db.delete(achievement)
         db.commit()

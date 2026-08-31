@@ -14,8 +14,12 @@ class StudentSkillRepository:
     ) -> list[StudentSkill]:
         return (
             db.query(StudentSkill)
-            .filter(StudentSkill.student_id == student_id)
-            .order_by(StudentSkill.created_at.desc())
+            .filter(
+                StudentSkill.student_id == student_id
+            )
+            .order_by(
+                StudentSkill.created_at.desc()
+            )
             .all()
         )
 

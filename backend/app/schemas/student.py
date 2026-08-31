@@ -4,9 +4,10 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-# -------------------------
+
+# =========================================================
 # Student Profile
-# -------------------------
+# =========================================================
 
 class StudentProfileBase(BaseModel):
     branch_id: UUID
@@ -62,6 +63,7 @@ class StudentProfileUpdate(BaseModel):
     mother_name: str | None = None
     father_occupation: str | None = None
     abc_id: str | None = None
+    enrollment_no: str | None = None
     college: str | None = None
     degree: str | None = None
     ssc_percentage: Decimal | None = None
@@ -103,15 +105,19 @@ class StudentProfileResponse(StudentProfileBase):
     @model_validator(mode="before")
     @classmethod
     def populate_user_fields(cls, data):
-        if hasattr(data, "user"):
-            user = data.user
+        if not hasattr(data, "user") or data.user is None:
+            return data
 
-            return {
-                **{
-                    column: getattr(data, column)
-                    for column in cls.model_fields
-                    if hasattr(data, column)
-                },
+        user = data.user
+
+        result = {
+            field_name: getattr(data, field_name)
+            for field_name in cls.model_fields
+            if hasattr(data, field_name)
+        }
+
+        result.update(
+            {
                 "first_name": user.first_name,
                 "last_name": user.last_name,
                 "full_name": (
@@ -121,13 +127,14 @@ class StudentProfileResponse(StudentProfileBase):
                 "phone": user.phone,
                 "profile_photo": user.profile_photo,
             }
+        )
 
-        return data
+        return result
 
 
-# -------------------------
+# =========================================================
 # Student Skills
-# -------------------------
+# =========================================================
 
 class StudentSkillCreate(BaseModel):
     skill_id: UUID
@@ -143,9 +150,9 @@ class StudentSkillResponse(StudentSkillCreate):
     created_at: datetime | None = None
 
 
-# -------------------------
+# =========================================================
 # Projects
-# -------------------------
+# =========================================================
 
 class ProjectCreate(BaseModel):
     title: str | None = None
@@ -155,6 +162,7 @@ class ProjectCreate(BaseModel):
     start_date: date | None = None
     end_date: date | None = None
 
+
 class ProjectUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
@@ -162,6 +170,7 @@ class ProjectUpdate(BaseModel):
     live_demo_url: str | None = None
     start_date: date | None = None
     end_date: date | None = None
+
 
 class ProjectResponse(ProjectCreate):
     model_config = ConfigDict(from_attributes=True)
@@ -171,9 +180,9 @@ class ProjectResponse(ProjectCreate):
     created_at: datetime | None = None
 
 
-# -------------------------
+# =========================================================
 # Project Skills
-# -------------------------
+# =========================================================
 
 class ProjectSkillCreate(BaseModel):
     skill_id: UUID
@@ -187,9 +196,9 @@ class ProjectSkillResponse(ProjectSkillCreate):
     created_at: datetime | None = None
 
 
-# -------------------------
+# =========================================================
 # Certifications
-# -------------------------
+# =========================================================
 
 class CertificationCreate(BaseModel):
     certificate_name: str | None = None
@@ -197,6 +206,7 @@ class CertificationCreate(BaseModel):
     issue_date: date | None = None
     expiry_date: date | None = None
     credential_url: str | None = None
+
 
 class CertificationUpdate(BaseModel):
     certificate_name: str | None = None
@@ -214,9 +224,9 @@ class CertificationResponse(CertificationCreate):
     created_at: datetime | None = None
 
 
-# -------------------------
+# =========================================================
 # Resumes
-# -------------------------
+# =========================================================
 
 class ResumeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -224,16 +234,16 @@ class ResumeResponse(BaseModel):
     resume_id: UUID
     student_id: UUID
     resume_file_name: str
-    resume_storage_path: str
     mime_type: str
     file_size_kb: int | None = None
     version: int
     is_default: bool | None = None
     uploaded_at: datetime
 
-# -------------------------
+
+# =========================================================
 # Student Internships
-# -------------------------
+# =========================================================
 
 class StudentInternshipCreate(BaseModel):
     company_name: str
@@ -264,9 +274,10 @@ class StudentInternshipResponse(StudentInternshipCreate):
     student_id: UUID
     created_at: datetime | None = None
 
-# -------------------------
+
+# =========================================================
 # Student Achievements
-# -------------------------
+# =========================================================
 
 class StudentAchievementCreate(BaseModel):
     title: str
@@ -291,18 +302,15 @@ class StudentAchievementResponse(StudentAchievementCreate):
     student_id: UUID
     created_at: datetime | None = None
 
-# -------------------------
+
+# =========================================================
 # Student Social Links
-# -------------------------
+# =========================================================
 
 class StudentSocialLinkCreate(BaseModel):
     platform: str
     profile_url: str
 
-
-class StudentSocialLinkUpdate(BaseModel):
-    platform: str | None = None
-    profile_url: str | None = None
 
 class StudentSocialLinkUpdate(BaseModel):
     platform: str | None = None

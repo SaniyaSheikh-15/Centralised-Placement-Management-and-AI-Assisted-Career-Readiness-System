@@ -12,6 +12,7 @@ class ProjectSkillRepository:
         db: Session,
         project_id: UUID,
     ) -> list[ProjectSkill]:
+
         return (
             db.query(ProjectSkill)
             .filter(ProjectSkill.project_id == project_id)
@@ -24,6 +25,7 @@ class ProjectSkillRepository:
         project_skill_id: UUID,
         project_id: UUID,
     ) -> ProjectSkill | None:
+
         return (
             db.query(ProjectSkill)
             .filter(
@@ -39,6 +41,7 @@ class ProjectSkillRepository:
         project_id: UUID,
         skill_id: UUID,
     ) -> ProjectSkill | None:
+
         return (
             db.query(ProjectSkill)
             .filter(
@@ -53,6 +56,7 @@ class ProjectSkillRepository:
         db: Session,
         project_skill: ProjectSkill,
     ) -> ProjectSkill:
+
         db.add(project_skill)
         db.commit()
         db.refresh(project_skill)
@@ -64,5 +68,6 @@ class ProjectSkillRepository:
         db: Session,
         project_skill: ProjectSkill,
     ) -> None:
+
         db.delete(project_skill)
         db.commit()

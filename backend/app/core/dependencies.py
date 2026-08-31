@@ -1,6 +1,7 @@
 from uuid import UUID
 from typing import Callable
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
@@ -36,6 +37,9 @@ def get_current_user(
 
         user_uuid = UUID(user_id)
 
+    except HTTPException:
+        raise
+
     except (ValueError, TypeError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -43,7 +47,7 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    except Exception:
+    except jwt.InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired authentication token",
@@ -76,17 +80,24 @@ def require_roles(*allowed_roles: str) -> Callable:
     def role_checker(
         current_user: User = Depends(get_current_user),
     ) -> User:
+
         if not current_user.user_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="User has no assigned roles",
             )
 
-        user_role_names = [ur.role.role_name for ur in current_user.user_roles]
+        user_role_names = [
+            ur.role.role_name
+            for ur in current_user.user_roles
+        ]
 
         mapped_allowed = [
-            RoleRepository.ROLE_NAME_MAP.get(r.lower(), r)
-            for r in allowed_roles
+            RoleRepository.ROLE_NAME_MAP.get(
+                role.lower(),
+                role,
+            )
+            for role in allowed_roles
         ]
 
         has_access = any(

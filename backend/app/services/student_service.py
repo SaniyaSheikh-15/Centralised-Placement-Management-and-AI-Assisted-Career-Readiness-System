@@ -1,6 +1,5 @@
 from uuid import UUID
 from datetime import datetime
-from backend.app.services.resume_service import ResumeService
 
 from sqlalchemy.orm import Session
 
@@ -20,26 +19,18 @@ from backend.app.models.student import (
 from backend.app.schemas.student import (
     StudentProfileCreate,
     StudentProfileUpdate,
-    StudentProfileResponse,
     StudentSkillCreate,
-    StudentSkillResponse,
     ProjectCreate,
     ProjectUpdate,
-    ProjectResponse,
     ProjectSkillCreate,
-    ProjectSkillResponse,
     CertificationCreate,
     CertificationUpdate,
-    CertificationResponse,
     StudentInternshipCreate,
     StudentInternshipUpdate,
-    StudentInternshipResponse,
     StudentAchievementCreate,
     StudentAchievementUpdate,
-    StudentAchievementResponse,
     StudentSocialLinkCreate,
     StudentSocialLinkUpdate,
-    StudentSocialLinkResponse,
 )
 
 from backend.app.repositories.student_skill_repository import (
@@ -57,11 +48,15 @@ from backend.app.repositories.certification_repository import (
 from backend.app.repositories.resume_repository import (
     ResumeRepository,
 )
-from backend.app.repositories.achievement_repository import (
-    AchievementRepository,
-)
+
+from backend.app.services.resume_service import ResumeService
+
 
 class StudentService:
+
+    # ---------------------------------------------------------
+    # STUDENT PROFILE
+    # ---------------------------------------------------------
 
     @staticmethod
     def get_profile(
@@ -92,7 +87,6 @@ class StudentService:
         request: StudentProfileCreate,
     ) -> StudentProfile:
 
-        # Check whether this user already has a profile
         existing_profile = (
             db.query(StudentProfile)
             .filter(StudentProfile.user_id == user_id)
@@ -104,7 +98,6 @@ class StudentService:
                 "Student profile already exists for this user"
             )
 
-        # Check enrollment number
         existing_enrollment = (
             db.query(StudentProfile)
             .filter(
@@ -131,6 +124,27 @@ class StudentService:
             active_backlogs=request.active_backlogs,
             date_of_birth=request.date_of_birth,
             gender=request.gender,
+            alternate_phone=request.alternate_phone,
+            alternate_email=request.alternate_email,
+            father_name=request.father_name,
+            mother_name=request.mother_name,
+            father_occupation=request.father_occupation,
+            abc_id=request.abc_id,
+            college=request.college,
+            degree=request.degree,
+            ssc_percentage=request.ssc_percentage,
+            ssc_passing_year=request.ssc_passing_year,
+            hsc_diploma_percentage=request.hsc_diploma_percentage,
+            hsc_diploma_passing_year=request.hsc_diploma_passing_year,
+            btech_aggregate=request.btech_aggregate,
+            t_and_p_interest=request.t_and_p_interest,
+            placement_interest=request.placement_interest,
+            career_area=request.career_area,
+            aptitude_prepared=request.aptitude_prepared,
+            aptitude_training_details=request.aptitude_training_details,
+            languages_known=request.languages_known,
+            english_rating=request.english_rating,
+            ready_to_relocate=request.ready_to_relocate,
             linkedin_url=request.linkedin_url,
             github_url=request.github_url,
             portfolio_url=request.portfolio_url,
@@ -165,7 +179,6 @@ class StudentService:
             exclude_unset=True
         )
 
-        # Check enrollment number if it is being changed
         if "enrollment_no" in update_data:
             existing = (
                 db.query(StudentProfile)
@@ -210,7 +223,6 @@ class StudentService:
         db.delete(profile)
         db.commit()
 
-
     # ---------------------------------------------------------
     # STUDENT SKILLS
     # ---------------------------------------------------------
@@ -233,7 +245,6 @@ class StudentService:
         request: StudentSkillCreate,
     ) -> StudentSkill:
 
-        # Verify that the skill exists
         skill = (
             db.query(Skill)
             .filter(Skill.skill_id == request.skill_id)
@@ -243,7 +254,6 @@ class StudentService:
         if not skill:
             raise ValueError("Skill not found")
 
-        # Prevent duplicate skill for the same student
         existing = StudentSkillRepository.get_by_skill(
             db,
             student_id,
@@ -284,7 +294,6 @@ class StudentService:
         if not student_skill:
             raise ValueError("Student skill not found")
 
-        # Verify skill exists
         skill = (
             db.query(Skill)
             .filter(Skill.skill_id == request.skill_id)
@@ -294,14 +303,16 @@ class StudentService:
         if not skill:
             raise ValueError("Skill not found")
 
-        # Prevent duplicate when changing skill
         existing = StudentSkillRepository.get_by_skill(
             db,
             student_id,
             request.skill_id,
         )
 
-        if existing and existing.student_skill_id != student_skill_id:
+        if (
+            existing
+            and existing.student_skill_id != student_skill_id
+        ):
             raise ValueError(
                 "Student already has this skill"
             )
@@ -340,7 +351,7 @@ class StudentService:
             student_skill,
         )
 
-        # ---------------------------------------------------------
+    # ---------------------------------------------------------
     # STUDENT PROJECTS
     # ---------------------------------------------------------
 
@@ -427,7 +438,7 @@ class StudentService:
             project,
         )
 
-        # ---------------------------------------------------------
+    # ---------------------------------------------------------
     # PROJECT SKILLS
     # ---------------------------------------------------------
 
@@ -474,6 +485,15 @@ class StudentService:
 
         if not project:
             raise ValueError("Project not found")
+
+        skill = (
+            db.query(Skill)
+            .filter(Skill.skill_id == request.skill_id)
+            .first()
+        )
+
+        if not skill:
+            raise ValueError("Skill not found")
 
         existing = ProjectSkillRepository.get_existing(
             db,
@@ -549,7 +569,7 @@ class StudentService:
     def create_certification(
         db: Session,
         student_id: UUID,
-        request: CertificationUpdate,
+        request: CertificationCreate,
     ) -> Certification:
 
         certification = Certification(
@@ -559,6 +579,7 @@ class StudentService:
             issue_date=request.issue_date,
             expiry_date=request.expiry_date,
             credential_url=request.credential_url,
+            created_at=datetime.utcnow(),
         )
 
         return CertificationRepository.create(
@@ -594,26 +615,27 @@ class StudentService:
         db.refresh(certification)
 
         return certification
-        @staticmethod
-        def delete_certification(
-            db: Session,
-            student_id: UUID,
-            certificate_id: UUID,
-        ) -> None:
 
-            certification = CertificationRepository.get_by_id(
-                db,
-                certificate_id,
-                student_id,
-            )
+    @staticmethod
+    def delete_certification(
+        db: Session,
+        student_id: UUID,
+        certificate_id: UUID,
+    ) -> None:
 
-            if not certification:
-                raise ValueError("Certification not found")
+        certification = CertificationRepository.get_by_id(
+            db,
+            certificate_id,
+            student_id,
+        )
 
-            CertificationRepository.delete(
-                db,
-                certification,
-            )
+        if not certification:
+            raise ValueError("Certification not found")
+
+        CertificationRepository.delete(
+            db,
+            certification,
+        )
 
     # ---------------------------------------------------------
     # STUDENT INTERNSHIPS
@@ -627,8 +649,12 @@ class StudentService:
 
         return (
             db.query(StudentInternship)
-            .filter(StudentInternship.student_id == student_id)
-            .order_by(StudentInternship.start_date.desc())
+            .filter(
+                StudentInternship.student_id == student_id
+            )
+            .order_by(
+                StudentInternship.start_date.desc()
+            )
             .all()
         )
 
@@ -656,7 +682,7 @@ class StudentService:
         db.refresh(internship)
 
         return internship
-    
+
     @staticmethod
     def update_internship(
         db: Session,
@@ -710,7 +736,6 @@ class StudentService:
 
         db.delete(internship)
         db.commit()
-
 
     # ---------------------------------------------------------
     # STUDENT ACHIEVEMENTS
@@ -809,7 +834,6 @@ class StudentService:
         db.delete(achievement)
         db.commit()
 
-
     # ---------------------------------------------------------
     # STUDENT SOCIAL LINKS
     # ---------------------------------------------------------
@@ -825,7 +849,9 @@ class StudentService:
             .filter(
                 StudentSocialLink.student_id == student_id
             )
-            .order_by(StudentSocialLink.created_at.desc())
+            .order_by(
+                StudentSocialLink.created_at.desc()
+            )
             .all()
         )
 
@@ -903,93 +929,6 @@ class StudentService:
         db.commit()
 
     # ---------------------------------------------------------
-    # CERTIFICATIONS
-    # ---------------------------------------------------------
-
-    @staticmethod
-    def get_certifications(
-        db: Session,
-        student_id: UUID,
-    ) -> list[Certification]:
-
-        return CertificationRepository.get_by_student(
-            db,
-            student_id,
-        )
-
-    @staticmethod
-    def create_certification(
-        db: Session,
-        student_id: UUID,
-        request: CertificationCreate,
-    ) -> Certification:
-
-        certification = Certification(
-            student_id=student_id,
-            certificate_name=request.certificate_name,
-            issuing_organization=request.issuing_organization,
-            issue_date=request.issue_date,
-            expiry_date=request.expiry_date,
-            credential_url=request.credential_url,
-            created_at=datetime.utcnow(),
-        )
-
-        return CertificationRepository.create(
-            db,
-            certification,
-        )
-
-    @staticmethod
-    def update_certification(
-        db: Session,
-        student_id: UUID,
-        certificate_id: UUID,
-        request: CertificationUpdate,
-    ) -> Certification:
-
-        certification = CertificationRepository.get_by_id(
-            db,
-            certificate_id,
-            student_id,
-        )
-
-        if not certification:
-            raise ValueError("Certification not found")
-
-        update_data = request.model_dump(
-            exclude_unset=True
-        )
-
-        for field, value in update_data.items():
-            setattr(certification, field, value)
-
-        db.commit()
-        db.refresh(certification)
-
-        return certification
-
-    @staticmethod
-    def delete_certification(
-        db: Session,
-        student_id: UUID,
-        certificate_id: UUID,
-    ) -> None:
-
-        certification = CertificationRepository.get_by_id(
-            db,
-            certificate_id,
-            student_id,
-        )
-
-        if not certification:
-            raise ValueError("Certification not found")
-
-        CertificationRepository.delete(
-            db,
-            certification,
-        )
-
-    # ---------------------------------------------------------
     # STUDENT RESUMES
     # ---------------------------------------------------------
 
@@ -1065,6 +1004,8 @@ class StudentService:
             resume,
         )
 
+        # Extract immediately so the upload workflow validates
+        # that the PDF can actually be processed.
         extracted_text = ResumeService.extract_text(
             storage_path,
         )

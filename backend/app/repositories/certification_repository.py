@@ -14,8 +14,12 @@ class CertificationRepository:
     ) -> list[Certification]:
         return (
             db.query(Certification)
-            .filter(Certification.student_id == student_id)
-            .order_by(Certification.issue_date.desc())
+            .filter(
+                Certification.student_id == student_id
+            )
+            .order_by(
+                Certification.issue_date.desc()
+            )
             .all()
         )
 

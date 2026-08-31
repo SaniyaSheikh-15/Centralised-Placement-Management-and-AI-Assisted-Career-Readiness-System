@@ -314,10 +314,11 @@ class AuthService:
 
             # Assign Placement Officer role if not already assigned
             existing_user_roles = [
-                ur.role.role_name for ur in user.user_roles
+                ur.role.role_name.lower()
+                for ur in user.user_roles
             ] if user.user_roles else []
 
-            if "Placement Officer" not in existing_user_roles and role:
+            if "placement_officer" not in existing_user_roles and role:
                 user_role = UserRole(
                     user_id=user.user_id,
                     role_id=role.role_id,

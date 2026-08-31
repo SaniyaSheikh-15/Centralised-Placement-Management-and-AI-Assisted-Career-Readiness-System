@@ -14,8 +14,12 @@ class ProjectRepository:
     ) -> list[Project]:
         return (
             db.query(Project)
-            .filter(Project.student_id == student_id)
-            .order_by(Project.created_at.desc())
+            .filter(
+                Project.student_id == student_id
+            )
+            .order_by(
+                Project.created_at.desc()
+            )
             .all()
         )
 

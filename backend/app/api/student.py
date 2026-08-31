@@ -1,52 +1,58 @@
 from uuid import UUID
-from backend.app.core.dependencies import get_current_user
-from backend.app.models.auth import User
-from backend.app.services.profile_photo_service import ProfilePhotoService
 
 from fastapi import (
     APIRouter,
     Depends,
+    File,
     HTTPException,
     UploadFile,
-    File,
     status,
 )
 from sqlalchemy.orm import Session
 
+from backend.app.core.dependencies import get_current_user
 from backend.app.db.session import get_db
+from backend.app.models.auth import User
 from backend.app.schemas.student import (
+    CertificationCreate,
+    CertificationResponse,
+    CertificationUpdate,
+    ProjectCreate,
+    ProjectResponse,
+    ProjectSkillCreate,
+    ProjectSkillResponse,
+    ProjectUpdate,
+    ResumeResponse,
+    StudentAchievementCreate,
+    StudentAchievementResponse,
+    StudentAchievementUpdate,
+    StudentInternshipCreate,
+    StudentInternshipResponse,
+    StudentInternshipUpdate,
     StudentProfileCreate,
     StudentProfileResponse,
     StudentProfileUpdate,
     StudentSkillCreate,
     StudentSkillResponse,
-    ProjectCreate,
-    ProjectUpdate,
-    ProjectResponse,
-    ProjectSkillCreate,
-    ProjectSkillResponse,
-    CertificationCreate,
-    CertificationUpdate,
-    CertificationResponse,
-    ResumeResponse,
-    StudentInternshipCreate,
-    StudentInternshipResponse,
-    StudentInternshipUpdate,
-    StudentAchievementCreate,
-    StudentAchievementUpdate,
-    StudentAchievementResponse,
     StudentSocialLinkCreate,
-    StudentSocialLinkUpdate,
     StudentSocialLinkResponse,
+    StudentSocialLinkUpdate,
 )
-from backend.app.services.student_service import StudentService
+from backend.app.services.profile_photo_service import ProfilePhotoService
 from backend.app.services.resume_service import ResumeService
+from backend.app.services.student_service import StudentService
 
 
 router = APIRouter(
     prefix="/students",
     tags=["Students"],
 )
+
+
+# ---------------------------------------------------------
+# OWNERSHIP VERIFICATION
+# ---------------------------------------------------------
+
 def verify_student_ownership(
     db: Session,
     student_id: UUID,
@@ -57,7 +63,7 @@ def verify_student_ownership(
         student_id,
     )
 
-    if not profile:
+    if profile is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Student profile not found",
@@ -70,6 +76,7 @@ def verify_student_ownership(
         )
 
     return profile
+
 
 # ---------------------------------------------------------
 # CREATE STUDENT PROFILE
@@ -86,24 +93,19 @@ def create_student_profile(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    # Ensure the authenticated user is creating their own profile
-    if request.user_id != current_user.user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only create your own student profile",
-        )
-
     try:
         return StudentService.create_profile(
             db,
+            current_user.user_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
+
+
 # ---------------------------------------------------------
 # GET STUDENT PROFILE
 # ---------------------------------------------------------
@@ -150,13 +152,15 @@ def get_student_profile_by_user_id(
         user_id,
     )
 
-    if not profile:
+    if profile is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Student profile not found",
         )
 
     return profile
+
+
 # ---------------------------------------------------------
 # UPDATE STUDENT PROFILE
 # ---------------------------------------------------------
@@ -184,12 +188,13 @@ def update_student_profile(
             student_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
+
+
 # ---------------------------------------------------------
 # STUDENT PROFILE PHOTO
 # ---------------------------------------------------------
@@ -204,23 +209,11 @@ async def upload_student_profile_photo(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    profile = StudentService.get_profile(
+    profile = verify_student_ownership(
         db,
         student_id,
+        current_user,
     )
-
-    if not profile:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Student profile not found",
-        )
-
-    # Make sure the authenticated user owns this profile
-    if profile.user_id != current_user.user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only update your own profile photo",
-        )
 
     try:
         file_bytes = await file.read()
@@ -251,7 +244,9 @@ async def upload_student_profile_photo(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
+
+
 # ---------------------------------------------------------
 # DELETE STUDENT PROFILE
 # ---------------------------------------------------------
@@ -277,14 +272,15 @@ def delete_student_profile(
             db,
             student_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
+
+
 # ---------------------------------------------------------
 # STUDENT SKILLS
 # ---------------------------------------------------------
@@ -313,12 +309,12 @@ def create_student_skill(
             student_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
+
 
 @router.get(
     "/{student_id}/skills",
@@ -367,12 +363,12 @@ def update_student_skill(
             student_skill_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
+
 
 @router.delete(
     "/{student_id}/skills/{student_skill_id}",
@@ -397,14 +393,14 @@ def delete_student_skill(
             student_id,
             student_skill_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
+
 
 # ---------------------------------------------------------
 # STUDENT PROJECTS
@@ -434,12 +430,12 @@ def create_student_project(
             student_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
+
 
 @router.get(
     "/{student_id}/projects",
@@ -461,6 +457,7 @@ def get_student_projects(
         db,
         student_id,
     )
+
 
 @router.put(
     "/{student_id}/projects/{project_id}",
@@ -487,12 +484,11 @@ def update_student_project(
             project_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
 
 @router.delete(
@@ -518,14 +514,14 @@ def delete_student_project(
             student_id,
             project_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
+
 
 # ---------------------------------------------------------
 # PROJECT SKILLS
@@ -557,12 +553,12 @@ def create_project_skill(
             project_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
+
 
 @router.get(
     "/{student_id}/projects/{project_id}/skills",
@@ -587,12 +583,11 @@ def get_project_skills(
             student_id,
             project_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
 
 @router.delete(
@@ -620,12 +615,11 @@ def delete_project_skill(
             project_id,
             project_skill_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
 
@@ -658,12 +652,12 @@ def create_student_internship(
             student_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
+
 
 @router.get(
     "/{student_id}/internships",
@@ -686,9 +680,6 @@ def get_student_internships(
         student_id,
     )
 
-# ---------------------------------------------------------
-# UPDATE STUDENT INTERNSHIP
-# ---------------------------------------------------------
 
 @router.put(
     "/{student_id}/internships/{internship_id}",
@@ -715,13 +706,13 @@ def update_student_internship(
             internship_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
-    
+        ) from exc
+
+
 @router.delete(
     "/{student_id}/internships/{internship_id}",
     status_code=status.HTTP_204_NO_CONTENT,
@@ -745,14 +736,14 @@ def delete_student_internship(
             student_id,
             internship_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
+
 
 # ---------------------------------------------------------
 # STUDENT ACHIEVEMENTS
@@ -782,12 +773,11 @@ def create_student_achievement(
             student_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
 
 
 @router.get(
@@ -811,9 +801,6 @@ def get_student_achievements(
         student_id,
     )
 
-# ---------------------------------------------------------
-# UPDATE STUDENT ACHIEVEMENT
-# ---------------------------------------------------------
 
 @router.put(
     "/{student_id}/achievements/{achievement_id}",
@@ -840,12 +827,12 @@ def update_student_achievement(
             achievement_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
+
 
 @router.delete(
     "/{student_id}/achievements/{achievement_id}",
@@ -870,12 +857,11 @@ def delete_student_achievement(
             student_id,
             achievement_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
 
@@ -908,12 +894,11 @@ def create_student_social_link(
             student_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
 
 
 @router.get(
@@ -937,10 +922,6 @@ def get_student_social_links(
         student_id,
     )
 
-
-# ---------------------------------------------------------
-# UPDATE STUDENT SOCIAL LINK
-# ---------------------------------------------------------
 
 @router.put(
     "/{student_id}/social-links/{social_link_id}",
@@ -967,12 +948,11 @@ def update_student_social_link(
             social_link_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
 
 @router.delete(
@@ -998,14 +978,15 @@ def delete_student_social_link(
             student_id,
             social_link_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
+
+
 # ---------------------------------------------------------
 # STUDENT CERTIFICATIONS
 # ---------------------------------------------------------
@@ -1034,12 +1015,12 @@ def create_student_certification(
             student_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
+
 
 @router.get(
     "/{student_id}/certifications",
@@ -1088,12 +1069,11 @@ def update_student_certification(
             certificate_id,
             request,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
 
 @router.delete(
@@ -1119,14 +1099,14 @@ def delete_student_certification(
             student_id,
             certificate_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
+
 
 # ---------------------------------------------------------
 # STUDENT RESUMES
@@ -1153,7 +1133,7 @@ async def upload_student_resume(
     try:
         file_bytes = await file.read()
 
-        resume, extracted_text = StudentService.create_resume(
+        resume, _ = StudentService.create_resume(
             db,
             student_id,
             file.filename or "resume.pdf",
@@ -1167,7 +1147,7 @@ async def upload_student_resume(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc
 
 
 @router.get(
@@ -1215,7 +1195,7 @@ def get_student_resume(
         resume_id,
     )
 
-    if not resume:
+    if resume is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resume not found",
@@ -1247,12 +1227,11 @@ def delete_student_resume(
             student_id,
             resume_id,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
-        )
+        ) from exc
 
     return None
 
@@ -1279,7 +1258,7 @@ def extract_student_resume(
         resume_id,
     )
 
-    if not resume:
+    if resume is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Resume not found",
@@ -1287,7 +1266,7 @@ def extract_student_resume(
 
     try:
         extracted_text = ResumeService.extract_text(
-            resume.resume_storage_path
+            resume.resume_storage_path,
         )
 
         return {
@@ -1300,4 +1279,4 @@ def extract_student_resume(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
+        ) from exc

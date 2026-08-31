@@ -13,12 +13,12 @@ class ResumeRepository:
         resume_id: UUID,
         student_id: UUID | None = None,
     ) -> Resume | None:
-
         query = (
             db.query(Resume)
             .filter(Resume.resume_id == resume_id)
         )
 
+        # When student_id is supplied, enforce ownership.
         if student_id is not None:
             query = query.filter(
                 Resume.student_id == student_id
@@ -33,8 +33,12 @@ class ResumeRepository:
     ) -> list[Resume]:
         return (
             db.query(Resume)
-            .filter(Resume.student_id == student_id)
-            .order_by(Resume.version.desc())
+            .filter(
+                Resume.student_id == student_id
+            )
+            .order_by(
+                Resume.version.desc()
+            )
             .all()
         )
 
@@ -45,12 +49,19 @@ class ResumeRepository:
     ) -> int:
         latest = (
             db.query(Resume.version)
-            .filter(Resume.student_id == student_id)
-            .order_by(Resume.version.desc())
+            .filter(
+                Resume.student_id == student_id
+            )
+            .order_by(
+                Resume.version.desc()
+            )
             .first()
         )
 
-        return latest[0] if latest else 0
+        if latest is None:
+            return 0
+
+        return int(latest[0])
 
     @staticmethod
     def create(
@@ -58,8 +69,13 @@ class ResumeRepository:
         resume: Resume,
     ) -> Resume:
         db.add(resume)
-        db.commit()
-        db.refresh(resume)
+
+        try:
+            db.commit()
+            db.refresh(resume)
+        except Exception:
+            db.rollback()
+            raise
 
         return resume
 
@@ -69,4 +85,9 @@ class ResumeRepository:
         resume: Resume,
     ) -> None:
         db.delete(resume)
-        db.commit()
+
+        try:
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise

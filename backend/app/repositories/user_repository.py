@@ -15,11 +15,20 @@ class UserRepository:
     ) -> User | None:
         statement = (
             select(User)
-            .options(joinedload(User.user_roles))
-            .where(User.user_id == user_id)
+            .options(
+                joinedload(User.user_roles)
+            )
+            .where(
+                User.user_id == user_id
+            )
         )
 
-        return db.execute(statement).scalars().first()
+        return (
+            db.execute(statement)
+            .unique()
+            .scalars()
+            .first()
+        )
 
     @staticmethod
     def get_by_email(
@@ -28,11 +37,20 @@ class UserRepository:
     ) -> User | None:
         statement = (
             select(User)
-            .options(joinedload(User.user_roles))
-            .where(User.email == email)
+            .options(
+                joinedload(User.user_roles)
+            )
+            .where(
+                User.email == email
+            )
         )
 
-        return db.execute(statement).scalars().first()
+        return (
+            db.execute(statement)
+            .unique()
+            .scalars()
+            .first()
+        )
 
     @staticmethod
     def create(
