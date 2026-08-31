@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-main: #050b16;
+  --bg-card: #0d1929;
+  --bg-card-hover: #12223a;
+  --bg-input: #091525;
+
+  --border: #1b304b;
+
+  --text-main: #f4f7fb;
+  --text-secondary: #8fa2bb;
+
+  --blue: #237cff;
+  --blue-light: #4b94ff;
+
+  --purple: #7657ff;
+  --purple-light: #8b6cff;
+
+  --error: #ff6b7a;
+  --success: #35d39a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-main);
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(35, 124, 255, 0.10),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      rgba(118, 87, 255, 0.12),
+      transparent 30%
+    ),
+    var(--bg-main);
+  overflow-x: hidden;
+}
+
+/* Background Glowing spheres */
+.background-glow {
+  position: fixed;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  opacity: 0.18;
+  z-index: 0;
+}
+
+.glow-one {
+  background: #237cff;
+  top: -150px;
+  left: -100px;
+}
+
+.glow-two {
+  background: #7657ff;
+  bottom: -150px;
+  right: -100px;
+}
+
+/* Spinner loader */
+.loader-spinner {
+  width: 17px;
+  height: 17px;
+  margin: auto;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

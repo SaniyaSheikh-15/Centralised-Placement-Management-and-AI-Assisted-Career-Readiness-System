@@ -26,3 +26,10 @@ if not JWT_SECRET_KEY:
     raise RuntimeError(
         f"JWT_SECRET_KEY is not configured. Expected .env at: {ENV_FILE}"
     )
+
+# SMTP Email Configuration
+SMTP_HOST = os.getenv("SMTP_HOST")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587")) if os.getenv("SMTP_PORT") else 587
+SMTP_USERNAME = os.getenv("SMTP_USERNAME")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+EMAIL_FROM = os.getenv("EMAIL_FROM") or SMTP_USERNAME or "noreply@campusconnect.edu"
