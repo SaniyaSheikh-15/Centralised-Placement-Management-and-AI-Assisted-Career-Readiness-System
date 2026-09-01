@@ -25,6 +25,7 @@ node_modules/
 !.yarn/versions
 
 /.next/
+**/.next/
 /out/
 /build
 /vercel
