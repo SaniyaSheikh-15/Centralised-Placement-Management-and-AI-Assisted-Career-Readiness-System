@@ -1,10 +1,11 @@
 # CAMPUSCONNECT — CODEBASE STATE & PROGRESS SNAPSHOT
 
-> **Context Snapshot Date**: August 2026  
+> **Context Snapshot Date**: August 29, 2026  
 > **Repository**: `SaniyaSheikh-15/Centralised-Placement-Management-and-AI-Assisted-Career-Readiness-System`  
 > **Collaborator**: `mohduzaifahkhan` (`uzaifkhan015@gmail.com`)  
 > **Module**: **Student Profile Builder** (`feature/student-profile`)  
-> **Purpose**: Master context file recording all completed work, architecture, design system, type definitions, component status, and pending tasks for seamless model handover.
+> **Pull Request**: [PR #5](https://github.com/SaniyaSheikh-15/Centralised-Placement-Management-and-AI-Assisted-Career-Readiness-System/pull/5) — Pushed & under review  
+> **Purpose**: Master context file recording all completed work, architecture, design system, type definitions, component status, and git state for seamless model handover.
 
 ---
 
@@ -19,12 +20,17 @@ A centralised placement management and AI-assisted career readiness portal built
 - **Language**: TypeScript 5 (Strict mode)
 - **Styling**: Tailwind CSS v4 (`@tailwindcss/postcss`) + `tw-animate-css`
 - **UI Primitives**: Base UI (`@base-ui/react` ^1.7.0) + shadcn/ui patterns + `class-variance-authority` + `clsx` + `tailwind-merge`
-- **Icons**: `lucide-react` (^1.35.0)
+- **Icons**: `lucide-react` (^1.35.0) — Note: `Github` and `Linkedin` icons do NOT exist in this version; use `Code2`, `ExternalLink`, `Globe` instead.
 - **Database**: PostgreSQL with 29 frozen relational tables across 6 modules (schema located at `database/sql/placement_management_v1.sql`).
+
+### Git & Branching Rules
+- **Branch**: `feature/student-profile` (module branch)
+- **Rule**: Nobody pushes directly to `main` or `develop`. All work goes to feature branches, then PR → review → merge into `develop`.
+- **Current State**: All work committed and pushed. PR #5 is open targeting `develop`.
 
 ---
 
-## 2. Completed Work & File Inventory
+## 2. ALL WORK COMPLETED ✅
 
 ### A. Configuration & Setup
 - [x] `package.json` — Next.js 16.3.3, React 19, Tailwind v4, Base UI, Lucide React, TypeScript
@@ -54,82 +60,119 @@ A centralised placement management and AI-assisted career readiness portal built
   - CRUD operations for: Skills, Projects, Certifications, Internships, Achievements, Resume, Soft Skills
   - Form section updates for Personal, Academic, Placement Readiness, Online Presence
   - Multi-step draft management (`saveDraft()`, `resetDraft()`)
+  - Tab navigation state (`activeEditTab`, `setActiveEditTab`)
   - UI simulators (`simulateLoading()`, `simulateError()`, `clearError()`)
 - [x] `mock/studentProfileMockData.ts`:
   - Rich, realistic default student profile mock data (`defaultMockProfile`)
+  - Empty profile (`emptyMockProfile`) for testing empty states
 - [x] `utils/profileValidation.ts`:
-  - Validation routines for CGPA (0.00-10.00), percentages, URLs (GitHub, LinkedIn, live demo), email, phone, dates, and resume files (PDF <= 5MB)
+  - Validation routines for CGPA (0.00-10.00), percentages, URLs, email, phone, dates, Aadhaar (12-digit), PAN (ABCDE1234F), resume files (PDF <= 5MB)
+  - Input masks: `maskPhone`, `maskAadhaar`, `maskPAN`, `maskNumericOnly`
 
 ### E. UI Primitives (`src/components/ui/`)
-- [x] 17 Base-UI / shadcn components created:
+- [x] 17 Base-UI / shadcn components:
   - `alert-dialog.tsx`, `alert.tsx`, `avatar.tsx`, `badge.tsx`, `button.tsx`, `card.tsx`, `dialog.tsx`, `input.tsx`, `label.tsx`, `progress.tsx`, `radio-group.tsx`, `select.tsx`, `separator.tsx`, `skeleton.tsx`, `tabs.tsx`, `textarea.tsx`, `tooltip.tsx`
+- **Known Base UI quirks**:
+  - `<Button asChild>` is NOT supported — use styled `<Link>` elements instead
+  - `<AlertDialogDescription asChild>` is NOT supported — put children directly inside
+  - `<Select>` value prop type is `string | undefined` (not `string | null`)
+  - `<Select>` `onValueChange` callback type is `(v: string | null) => void` — use `v ?? ''` to coerce
 
 ### F. Shell & Shared Layout (`src/components/shared/` & `src/app/`)
 - [x] `src/components/shared/Sidebar.tsx` — Left fixed navigation with active state styling
 - [x] `src/components/shared/TopNavbar.tsx` — Top header with dynamic route title, search, notification counter, student avatar
 - [x] `src/app/layout.tsx` — Root layout with `Inter` font, `dark` theme class, `StudentProfileProvider`, `TooltipProvider`
 - [x] `src/app/page.tsx` — Root redirect to `/profile`
-- [x] `src/app/profile/layout.tsx` — Profile layout wrapping Sidebar + TopNavbar + main content area
+- [x] `src/app/profile/layout.tsx` — Profile layout wrapping Sidebar + TopNavbar + main content area (padding: `p-10`)
 
-### G. Converted Profile Feature Components (`src/components/student-profile/`)
-- [x] `overview/`:
-  - `AcademicInfoCard.tsx`
-  - `PersonalInfoCard.tsx`
-  - `PlacementReadinessCard.tsx`
-  - `ProfessionalSummaryCard.tsx`
-  - `OnlinePresenceCard.tsx`
-  - `ProfileHeaderBlock.tsx`
-  - `ResumeSummaryCard.tsx`
-- [x] `skills/`:
-  - `AddSkillModal.tsx` (Autocomplete suggestions + proficiency selector)
-  - `SkillChip.tsx`
-  - `SkillProficiencyBadge.tsx`
-- [x] `projects/`:
-  - `ProjectCard.tsx`
-  - `ProjectModal.tsx` (Add/Edit project with tech stack tags)
-- [x] `certifications/`:
-  - `CertificationItem.tsx`
-  - `CertificationModal.tsx`
-- [x] `resume/`:
-  - `ResumeUploader.tsx` (Drag-and-drop, simulated upload progress bar, PDF preview iframe, download/replace actions)
-- [x] `common/`:
-  - `DeleteConfirmModal.tsx`
-  - `ProfileEmptyState.tsx`
-  - `ProfileErrorState.tsx`
-  - `ProfileSkeletonLoader.tsx`
+### G. Profile Feature Components (`src/components/student-profile/`)
 
----
+#### `overview/` — 7 Overview Cards
+- [x] `ProfileHeaderBlock.tsx` — Avatar with gradient initials, name, branch, degree, "Edit Profile" link
+- [x] `PersonalInfoCard.tsx` — DOB, Gender, Phone, Email, Category, Father's Name, Income
+- [x] `AcademicInfoCard.tsx` — Enrollment, College, Degree, SSC, HSC, CGPA, Backlogs
+- [x] `PlacementReadinessCard.tsx` — TP Activities, Placement, Aptitude, English Rating (stars), Relocation
+- [x] `ProfessionalSummaryCard.tsx` — Technical Skills (badges), Projects (list), Certifications (list), Achievements (list)
+- [x] `OnlinePresenceCard.tsx` — GitHub, LinkedIn, Portfolio, Coding profile (badge links)
+- [x] `ResumeSummaryCard.tsx` — Resume file info or "Upload Resume" link
 
-## 3. Pending Work (What Remains To Execute Next)
+#### `edit/` — 9 Edit Wizard Tabs ✅
+- [x] `TabPersonal.tsx` — Core identity, family details, gov IDs (PAN/Aadhaar/ABC ID), branch, phone, email, addresses
+- [x] `TabAcademic.tsx` — Enrollment, college, degree, SSC/HSC percentages, CGPA, conditional backlog details
+- [x] `TabSkills.tsx` — Technical skills (SkillChip + AddSkillModal) + soft skills (tag input with removable badges)
+- [x] `TabProjects.tsx` — Project CRUD (reuses ProjectCard + ProjectModal + DeleteConfirmModal)
+- [x] `TabInternships.tsx` — Inline add/edit form + card list with role/org/duration + delete
+- [x] `TabCertifications.tsx` — Reuses CertificationItem + CertificationModal + DeleteConfirmModal
+- [x] `TabAchievements.tsx` — Inline add/edit form + card list with title/date/description + delete
+- [x] `TabSocialLinks.tsx` — GitHub, LinkedIn, Portfolio, Coding Profile URL inputs + recruiter tip
+- [x] `TabResume.tsx` — Wraps ResumeUploader + ATS tip banner
 
-### Step 1: Create 9 Edit Wizard Tab Components (`src/components/student-profile/edit/`)
-Need to create TypeScript versions for the 9-step profile editor:
-1. `TabPersonal.tsx` — Full personal information form (full name, phone, email, addresses, family details, Aadhaar, PAN, ABC ID, branch).
-2. `TabAcademic.tsx` — Academic information (enrollment, college, degree, SSC %, HSC %, CGPA, backlogs toggle & details).
-3. `TabSkills.tsx` — Technical skills list with proficiency selector + soft skills tag input.
-4. `TabProjects.tsx` — Project manager within the edit wizard (title, tech stack tags, description, repo link, live link).
-5. `TabInternships.tsx` — Work experience / internship manager (organization, role, duration, description).
-6. `TabCertifications.tsx` — Certification credentials manager (name, organization, issue date, credential URL).
-7. `TabAchievements.tsx` — Extracurricular & academic achievements manager (title, date, description).
-8. `TabSocialLinks.tsx` — Online profiles form (GitHub, LinkedIn, Portfolio, LeetCode / Coding Profile URLs with validation).
-9. `TabResume.tsx` — Resume upload step within the edit wizard using `ResumeUploader`.
+#### `skills/` — Skill Management
+- [x] `AddSkillModal.tsx` — Dialog with autocomplete suggestions + proficiency selector
+- [x] `SkillChip.tsx` — Inline skill display with edit/remove buttons on hover
+- [x] `SkillProficiencyBadge.tsx` — Color-coded badge (Beginner/Intermediate/Advanced)
 
-### Step 2: Create Next.js App Router Pages (`src/app/profile/`)
-1. `src/app/profile/page.tsx` — Overview dashboard (renders `ProfileHeaderBlock` + 2-column grid of 6 overview cards + skeleton/error states).
-2. `src/app/profile/edit/page.tsx` — 9-step tabbed wizard with stepper navigation, draft preservation, "Save Draft" & "Save & Next" buttons.
-3. `src/app/profile/skills/page.tsx` — Dedicated skills management page with `AddSkillModal` and `DeleteConfirmModal`.
-4. `src/app/profile/projects/page.tsx` — Dedicated projects showcase page with `ProjectCard` grid and `ProjectModal`.
-5. `src/app/profile/certifications/page.tsx` — Dedicated certifications page with `CertificationItem` list and `CertificationModal`.
-6. `src/app/profile/resume/page.tsx` — Dedicated resume page with `ResumeUploader`.
+#### `projects/` — Project Showcase
+- [x] `ProjectCard.tsx` — Card with tech stack badges, GitHub/Live URL links, edit/delete buttons
+- [x] `ProjectModal.tsx` — Dialog form with tech stack tag input, URL fields, validation
 
-### Step 3: Minor Type & Icon Fixes
-- Fix `lucide-react` icon names (e.g. replacing `Github`/`Linkedin` with SVG or valid lucide icon identifiers).
-- Replace any `<Button asChild>` usage with standard `<Link>` buttons or proper `asChild` support.
-- Run `npx tsc --noEmit` and `npm run build` to verify clean build with zero errors.
+#### `certifications/` — Credential Cards
+- [x] `CertificationItem.tsx` — Card with organization, date, credential link, edit/delete on hover
+- [x] `CertificationModal.tsx` — Dialog form with name, org, date, URL fields, validation
+
+#### `resume/` — Resume Upload
+- [x] `ResumeUploader.tsx` — Drag-and-drop, PDF validation, simulated upload progress, iframe preview, download/replace
+
+#### `common/` — Shared Utilities
+- [x] `DeleteConfirmModal.tsx` — AlertDialog with danger styling and confirm/cancel actions
+- [x] `ProfileEmptyState.tsx` — Centered empty state with icon, title, description, and CTA button
+- [x] `ProfileErrorState.tsx` — Error state with retry button
+- [x] `ProfileSkeletonLoader.tsx` — 4 variants: `overview`, `cards`, `list`, `form`
+
+### H. App Router Pages (`src/app/profile/`) ✅
+- [x] `page.tsx` — Overview dashboard with ProfileHeaderBlock + 3 separated card rows (2-col grid) with dividers
+- [x] `edit/page.tsx` — 9-step tabbed wizard with stepper nav, tab content renderer, save draft, previous/next/complete buttons
+- [x] `skills/page.tsx` — Skills management with add/edit/delete modal flows and empty state
+- [x] `projects/page.tsx` — Projects showcase with card grid, add/edit modal, delete confirmation, empty state
+- [x] `certifications/page.tsx` — Certifications with list, add/edit modal, delete confirmation, empty state
+- [x] `resume/page.tsx` — Resume upload with ResumeUploader and loading/error states
 
 ---
 
-## 4. Quick Architecture Reference
+## 3. TypeScript & Build Verification ✅
+
+- [x] `npx tsc --noEmit` — **ZERO errors**
+- [x] `npm run build` — Compiled successfully, all 8 routes statically generated:
+  ```
+  Route (app)
+  ┌ ○ /
+  ├ ○ /_not-found
+  ├ ○ /profile
+  ├ ○ /profile/certifications
+  ├ ○ /profile/edit
+  ├ ○ /profile/projects
+  ├ ○ /profile/resume
+  └ ○ /profile/skills
+  ```
+- [x] Git committed & pushed to `origin feature/student-profile`
+- [x] Pull Request #5 open, no conflicts with base branch, 1 pending review
+
+---
+
+## 4. Bug Fixes Applied
+
+| File | Issue | Fix |
+|---|---|---|
+| `OnlinePresenceCard.tsx` | `Github`/`Linkedin` icons don't exist in lucide-react 1.35 | Replaced with `Code2`/`ExternalLink` |
+| `ProjectCard.tsx` | `Github` icon doesn't exist | Replaced with `Code2` |
+| `ProfileHeaderBlock.tsx` | `<Button asChild>` not supported by Base UI | Replaced with styled `<Link>` |
+| `ResumeSummaryCard.tsx` | `<Button asChild>` not supported by Base UI | Replaced with styled `<Link>` |
+| `DeleteConfirmModal.tsx` | `<AlertDialogDescription asChild>` not supported | Removed `asChild`, used `<span>` children |
+| `TabPersonal.tsx` / `TabAcademic.tsx` | Select `onValueChange` type `string|null` vs `string` | Added `(v: string | null) => ... v ?? ''` |
+
+---
+
+## 5. Architecture Reference (Final)
 
 ```
 src/
@@ -138,33 +181,46 @@ src/
 │   ├── layout.tsx                 # Root layout with Provider
 │   ├── page.tsx                   # Redirect -> /profile
 │   └── profile/
-│       ├── layout.tsx             # Sidebar + Navbar shell
-│       ├── page.tsx               # [PENDING] Overview page
-│       ├── edit/page.tsx          # [PENDING] 9-step Edit wizard
-│       ├── skills/page.tsx        # [PENDING] Skills page
-│       ├── projects/page.tsx      # [PENDING] Projects page
-│       ├── certifications/page.tsx# [PENDING] Certifications page
-│       └── resume/page.tsx        # [PENDING] Resume page
+│       ├── layout.tsx             # Sidebar + Navbar shell (p-10)
+│       ├── page.tsx               # ✅ Overview (3 card rows with dividers)
+│       ├── edit/page.tsx          # ✅ 9-step Edit wizard
+│       ├── skills/page.tsx        # ✅ Skills management
+│       ├── projects/page.tsx      # ✅ Projects showcase
+│       ├── certifications/page.tsx# ✅ Certifications
+│       └── resume/page.tsx        # ✅ Resume upload
 ├── components/
 │   ├── shared/
-│   │   ├── Sidebar.tsx
-│   │   └── TopNavbar.tsx
+│   │   ├── Sidebar.tsx            # Left nav, 260px fixed
+│   │   └── TopNavbar.tsx          # Top bar, 60px fixed
 │   ├── student-profile/
-│   │   ├── common/                # Loader, Empty, Error, DeleteModal
-│   │   ├── overview/              # 7 Overview cards + header
-│   │   ├── skills/                # AddSkillModal, SkillChip, Badge
+│   │   ├── common/                # DeleteModal, Empty, Error, Skeleton (4 variants)
+│   │   ├── overview/              # 7 Overview cards + ProfileHeaderBlock
+│   │   ├── edit/                  # ✅ 9 Tab components (Personal→Resume)
+│   │   ├── skills/                # AddSkillModal, SkillChip, ProficiencyBadge
 │   │   ├── projects/              # ProjectCard, ProjectModal
-│   │   ├── certifications/        # CertificationItem, Modal
-│   │   ├── resume/                # ResumeUploader
-│   │   └── edit/                  # [PENDING] 9 Tab components
+│   │   ├── certifications/        # CertificationItem, CertificationModal
+│   │   └── resume/                # ResumeUploader (drag-drop, progress, preview)
 │   └── ui/                        # 17 Base-UI/shadcn primitives
 ├── features/
 │   └── student-profile/
-│       ├── context/               # StudentProfileContext.tsx
-│       ├── mock/                  # studentProfileMockData.ts
-│       └── utils/                 # profileValidation.ts
+│       ├── context/               # StudentProfileContext.tsx (CRUD + draft + tabs)
+│       ├── mock/                  # studentProfileMockData.ts (default + empty)
+│       └── utils/                 # profileValidation.ts (validators + masks)
 ├── lib/
 │   └── utils.ts                   # cn() helper
 └── types/
     └── student-profile.ts         # Complete domain TypeScript types
 ```
+
+---
+
+## 6. UI Spacing Notes (Latest)
+
+Cards use consistent padding pattern:
+- **CardHeader**: `pb-4 pt-6 px-6`
+- **CardContent**: `px-6 pb-6`
+- **InfoRow**: `py-3` for comfortable row height
+- **Grid gaps**: `gap-8` between cards
+- **Horizontal dividers**: `border-t border-[var(--border-card)]` between card row groups
+- **Main content padding**: `p-10` (mobile: `p-4`)
+- **ProfileHeaderBlock**: `p-10` with `gap-8`
