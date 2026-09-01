@@ -1,30 +1,52 @@
+import { getStoredToken } from "./auth";
+
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 async function apiRequest(
   endpoint: string,
   options: RequestInit = {}
 ) {
-  const token = localStorage.getItem('access_token');
+  /*
+   * IMPORTANT:
+   * Use the same authentication storage helper
+   * used by AuthContext.
+   *
+   * This correctly supports both:
+   * - localStorage  → Remember Me = true
+   * - sessionStorage → Remember Me = false
+   */
+  const token =
+  localStorage.getItem("accessToken") ||
+  sessionStorage.getItem("accessToken");
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
       ...(options.body instanceof FormData
         ? {}
-        : { 'Content-Type': 'application/json' }),
+        : {
+            "Content-Type": "application/json",
+          }),
+
       ...(token
-        ? { Authorization: `Bearer ${token}` }
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
         : {}),
+
       ...(options.headers || {}),
     },
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
+    const error = await response
+      .json()
+      .catch(() => ({}));
 
     throw new Error(
-      error.detail || `Request failed: ${response.status}`
+      error.detail ||
+        `Request failed: ${response.status}`
     );
   }
 
@@ -35,38 +57,62 @@ async function apiRequest(
   return response.json();
 }
 
-// Profile
-export function getStudentProfile(studentId: string) {
-  return apiRequest(`/students/profile/${studentId}`);
+/* ============================================================
+   PROFILE
+============================================================ */
+
+export function getStudentProfile(
+  studentId: string
+) {
+  return apiRequest(
+    `/students/profile/${studentId}`
+  );
 }
 
-export function getStudentProfileByUserId(userId: string) {
-  return apiRequest(`/students/profile/user/${userId}`);
+export function getStudentProfileByUserId(
+  userId: string
+) {
+  return apiRequest(
+    `/students/profile/user/${userId}`
+  );
 }
 
 export function updateStudentProfile(
   studentId: string,
   data: unknown
 ) {
-  return apiRequest(`/students/profile/${studentId}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
+  return apiRequest(
+    `/students/profile/${studentId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }
+  );
 }
 
-// Skills
-export function getStudentSkills(studentId: string) {
-  return apiRequest(`/students/${studentId}/skills`);
+/* ============================================================
+   SKILLS
+============================================================ */
+
+export function getStudentSkills(
+  studentId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/skills`
+  );
 }
 
 export function addStudentSkill(
   studentId: string,
   data: unknown
 ) {
-  return apiRequest(`/students/${studentId}/skills`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  return apiRequest(
+    `/students/${studentId}/skills`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
 }
 
 export function updateStudentSkill(
@@ -77,7 +123,7 @@ export function updateStudentSkill(
   return apiRequest(
     `/students/${studentId}/skills/${skillId}`,
     {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     }
   );
@@ -90,24 +136,34 @@ export function deleteStudentSkill(
   return apiRequest(
     `/students/${studentId}/skills/${skillId}`,
     {
-      method: 'DELETE',
+      method: "DELETE",
     }
   );
 }
 
-// Projects
-export function getStudentProjects(studentId: string) {
-  return apiRequest(`/students/${studentId}/projects`);
+/* ============================================================
+   PROJECTS
+============================================================ */
+
+export function getStudentProjects(
+  studentId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/projects`
+  );
 }
 
 export function addStudentProject(
   studentId: string,
   data: unknown
 ) {
-  return apiRequest(`/students/${studentId}/projects`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  return apiRequest(
+    `/students/${studentId}/projects`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
 }
 
 export function updateStudentProject(
@@ -118,7 +174,7 @@ export function updateStudentProject(
   return apiRequest(
     `/students/${studentId}/projects/${projectId}`,
     {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     }
   );
@@ -131,13 +187,18 @@ export function deleteStudentProject(
   return apiRequest(
     `/students/${studentId}/projects/${projectId}`,
     {
-      method: 'DELETE',
+      method: "DELETE",
     }
   );
 }
 
-// Certifications
-export function getStudentCertifications(studentId: string) {
+/* ============================================================
+   CERTIFICATIONS
+============================================================ */
+
+export function getStudentCertifications(
+  studentId: string
+) {
   return apiRequest(
     `/students/${studentId}/certifications`
   );
@@ -150,7 +211,7 @@ export function addStudentCertification(
   return apiRequest(
     `/students/${studentId}/certifications`,
     {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     }
   );
@@ -164,7 +225,7 @@ export function updateStudentCertification(
   return apiRequest(
     `/students/${studentId}/certifications/${certificateId}`,
     {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     }
   );
@@ -177,27 +238,55 @@ export function deleteStudentCertification(
   return apiRequest(
     `/students/${studentId}/certifications/${certificateId}`,
     {
-      method: 'DELETE',
+      method: "DELETE",
     }
   );
 }
 
-// Internships
-export function getStudentInternships(studentId: string) {
-  return apiRequest(`/students/${studentId}/internships`);
+/* ============================================================
+   INTERNSHIPS
+============================================================ */
+
+export function getStudentInternships(
+  studentId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/internships`
+  );
 }
 
-// Achievements
-export function getStudentAchievements(studentId: string) {
-  return apiRequest(`/students/${studentId}/achievements`);
+/* ============================================================
+   ACHIEVEMENTS
+============================================================ */
+
+export function getStudentAchievements(
+  studentId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/achievements`
+  );
 }
 
-// Social Links
-export function getStudentSocialLinks(studentId: string) {
-  return apiRequest(`/students/${studentId}/social-links`);
+/* ============================================================
+   SOCIAL LINKS
+============================================================ */
+
+export function getStudentSocialLinks(
+  studentId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/social-links`
+  );
 }
 
-// Resumes
-export function getStudentResumes(studentId: string) {
-  return apiRequest(`/students/${studentId}/resumes`);
+/* ============================================================
+   RESUMES
+============================================================ */
+
+export function getStudentResumes(
+  studentId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/resumes`
+  );
 }
