@@ -137,16 +137,17 @@ class StudentProfileResponse(StudentProfileBase):
 # =========================================================
 
 class StudentSkillCreate(BaseModel):
-    skill_id: UUID
+    skill_name: str
     proficiency_level: str | None = None
     years_of_experience: Decimal | None = None
 
-
-class StudentSkillResponse(StudentSkillCreate):
-    model_config = ConfigDict(from_attributes=True)
-
+class StudentSkillResponse(BaseModel):
     student_skill_id: UUID
     student_id: UUID
+    skill_id: UUID
+    skill_name: str
+    proficiency_level: str | None = None
+    years_of_experience: Decimal | None = None
     created_at: datetime | None = None
 
 

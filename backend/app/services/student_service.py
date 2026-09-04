@@ -20,6 +20,7 @@ from backend.app.schemas.student import (
     StudentProfileCreate,
     StudentProfileUpdate,
     StudentSkillCreate,
+    StudentSkillResponse,
     ProjectCreate,
     ProjectUpdate,
     ProjectSkillCreate,
@@ -228,16 +229,28 @@ class StudentService:
     # ---------------------------------------------------------
 
     @staticmethod
-    def get_skills(
-        db: Session,
-        student_id: UUID,
-    ) -> list[StudentSkill]:
-
-        return StudentSkillRepository.get_by_student(
-            db,
-            student_id,
+    def get_skills(db: Session, student_id: UUID):
+        rows = (
+            db.query(StudentSkill, Skill)
+            .join(Skill, StudentSkill.skill_id == Skill.skill_id)
+            .filter(StudentSkill.student_id == student_id)
+            .order_by(StudentSkill.created_at.desc())
+            .all()
         )
 
+        return [
+            {
+                "student_skill_id": student_skill.student_skill_id,
+                "student_id": student_skill.student_id,
+                "skill_id": student_skill.skill_id,
+                "skill_name": skill.skill_name,
+                "proficiency_level": student_skill.proficiency_level,
+                "years_of_experience": student_skill.years_of_experience,
+                "created_at": student_skill.created_at,
+            }
+            for student_skill, skill in rows
+        ]
+    
     @staticmethod
     def create_skill(
         db: Session,
@@ -245,19 +258,21 @@ class StudentService:
         request: StudentSkillCreate,
     ) -> StudentSkill:
 
+        # Find the master skill using the name provided by frontend
         skill = (
             db.query(Skill)
-            .filter(Skill.skill_id == request.skill_id)
+            .filter(Skill.skill_name == request.skill_name)
             .first()
         )
 
         if not skill:
             raise ValueError("Skill not found")
 
+        # Check if student already has this skill
         existing = StudentSkillRepository.get_by_skill(
             db,
             student_id,
-            request.skill_id,
+            skill.skill_id,
         )
 
         if existing:
@@ -265,25 +280,36 @@ class StudentService:
                 "Student already has this skill"
             )
 
+        # Create student skill using the backend-resolved skill_id
         student_skill = StudentSkill(
             student_id=student_id,
-            skill_id=request.skill_id,
+            skill_id=skill.skill_id,
             proficiency_level=request.proficiency_level,
             years_of_experience=request.years_of_experience,
         )
 
-        return StudentSkillRepository.create(
+        StudentSkillRepository.create(
             db,
             student_skill,
         )
 
+        # Return response with skill_name instead of exposing skill_id
+        return {
+        "student_skill_id": student_skill.student_skill_id,
+        "student_id": student_skill.student_id,
+        "skill_id": skill.skill_id,
+        "skill_name": skill.skill_name,
+        "proficiency_level": student_skill.proficiency_level,
+        "years_of_experience": student_skill.years_of_experience,
+        "created_at": student_skill.created_at,
+    }
     @staticmethod
     def update_skill(
         db: Session,
         student_id: UUID,
         student_skill_id: UUID,
         request: StudentSkillCreate,
-    ) -> StudentSkill:
+    ) -> StudentSkillResponse:
 
         student_skill = StudentSkillRepository.get_by_id(
             db,
@@ -296,7 +322,7 @@ class StudentService:
 
         skill = (
             db.query(Skill)
-            .filter(Skill.skill_id == request.skill_id)
+            .filter(Skill.skill_name == request.skill_name.strip())
             .first()
         )
 
@@ -306,29 +332,31 @@ class StudentService:
         existing = StudentSkillRepository.get_by_skill(
             db,
             student_id,
-            request.skill_id,
+            skill.skill_id,
         )
 
         if (
             existing
             and existing.student_skill_id != student_skill_id
         ):
-            raise ValueError(
-                "Student already has this skill"
-            )
+            raise ValueError("Student already has this skill")
 
-        student_skill.skill_id = request.skill_id
-        student_skill.proficiency_level = (
-            request.proficiency_level
-        )
-        student_skill.years_of_experience = (
-            request.years_of_experience
-        )
+        student_skill.skill_id = skill.skill_id
+        student_skill.proficiency_level = request.proficiency_level
+        student_skill.years_of_experience = request.years_of_experience
 
         db.commit()
         db.refresh(student_skill)
 
-        return student_skill
+        return StudentSkillResponse(
+            student_skill_id=student_skill.student_skill_id,
+            student_id=student_skill.student_id,
+            skill_id=student_skill.skill_id,
+            skill_name=skill.skill_name,
+            proficiency_level=student_skill.proficiency_level,
+            years_of_experience=student_skill.years_of_experience,
+            created_at=student_skill.created_at,
+        )
 
     @staticmethod
     def delete_skill(

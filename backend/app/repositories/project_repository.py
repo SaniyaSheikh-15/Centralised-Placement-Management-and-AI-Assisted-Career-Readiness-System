@@ -8,20 +8,19 @@ from backend.app.models.student import Project
 class ProjectRepository:
 
     @staticmethod
-    def get_by_student(
-        db: Session,
-        student_id: UUID,
-    ) -> list[Project]:
-        return (
+    def get_by_student(db: Session, student_id: UUID) -> list[Project]:
+        print("GET PROJECTS STUDENT ID:", student_id)
+
+        projects = (
             db.query(Project)
-            .filter(
-                Project.student_id == student_id
-            )
-            .order_by(
-                Project.created_at.desc()
-            )
+            .filter(Project.student_id == student_id)
+            .order_by(Project.created_at.desc())
             .all()
         )
+
+        print("PROJECTS FOUND:", projects)
+
+        return projects
 
     @staticmethod
     def get_by_id(

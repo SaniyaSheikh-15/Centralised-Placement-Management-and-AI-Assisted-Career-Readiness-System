@@ -26,23 +26,33 @@ export default function SkillsManagementPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleAddSubmit = (skill: { name: string; proficiency: TechnicalSkill['proficiency'] }) => {
-    addSkill(skill);
-  };
+  const handleAddSubmit = async (skill: {
+      name: string;
+      proficiency: TechnicalSkill['proficiency'];
+    }) => {
+      await addSkill(skill);
+    };
 
-  const handleEditSubmit = (skill: { name: string; proficiency: TechnicalSkill['proficiency'] }) => {
-    if (editingSkill) {
-      updateSkillProficiency(editingSkill.id, skill.proficiency);
-    }
-    setEditingSkill(null);
-  };
+    const handleEditSubmit = async (skill: {
+      name: string;
+      proficiency: TechnicalSkill["proficiency"];
+    }) => {
+      if (editingSkill) {
+        await updateSkillProficiency(
+          editingSkill.id,
+          skill.proficiency
+        );
+      }
 
-  const handleDeleteConfirm = () => {
-    if (deletingSkill) {
-      removeSkill(deletingSkill.id);
-      setDeletingSkill(null);
-    }
-  };
+  setEditingSkill(null);
+};
+
+  const handleDeleteConfirm = async () => {
+  if (deletingSkill) {
+    await removeSkill(deletingSkill.id);
+    setDeletingSkill(null);
+  }
+};
 
   if (isLoading && !loaded) return <ProfileSkeletonLoader variant="list" />;
   if (error) return <ProfileErrorState message={error} onRetry={clearError} />;

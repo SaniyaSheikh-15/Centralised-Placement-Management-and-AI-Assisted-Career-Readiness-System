@@ -7,7 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 import backend.app.models  # noqa: F401
-from backend.app.api import auth, student
+from backend.app.api import auth, master_data, student
 from backend.app.db.session import SessionLocal, get_db
 from backend.app.repositories.role_repository import RoleRepository
 
@@ -65,6 +65,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(student.router)
+app.include_router(master_data.router)
 
 
 # ============================================================

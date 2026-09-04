@@ -20,35 +20,41 @@ async function apiRequest(
   localStorage.getItem("accessToken") ||
   sessionStorage.getItem("accessToken");
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      ...(options.body instanceof FormData
-        ? {}
-        : {
-            "Content-Type": "application/json",
-          }),
+  console.log("API URL:", `${API_URL}${endpoint}`);
+console.log("Request options:", options);
 
-      ...(token
-        ? {
-            Authorization: `Bearer ${token}`,
-          }
-        : {}),
+const response = await fetch(`${API_URL}${endpoint}`, {
+  ...options,
+  headers: {
+    ...(options.body instanceof FormData
+      ? {}
+      : { "Content-Type": "application/json" }),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers || {}),
+  },
+});
 
-      ...(options.headers || {}),
-    },
-  });
+console.log("Response status:", response.status);
 
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({}));
+  const error = await response.json().catch(() => ({}));
 
-    throw new Error(
-      error.detail ||
-        `Request failed: ${response.status}`
-    );
+  const detail = error?.detail;
+
+  let message = `Request failed: ${response.status}`;
+
+  if (typeof detail === "string") {
+    message = detail;
+  } else if (Array.isArray(detail)) {
+    message = detail
+      .map((item) => item?.msg || JSON.stringify(item))
+      .join(", ");
+  } else if (detail && typeof detail === "object") {
+    message = JSON.stringify(detail);
   }
+
+  throw new Error(message);
+}
 
   if (response.status === 204) {
     return null;

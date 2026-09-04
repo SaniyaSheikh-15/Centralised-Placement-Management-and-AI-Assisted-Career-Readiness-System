@@ -15,7 +15,16 @@ import {
 import {
   getStudentProfileByUserId,
   updateStudentProfile,
+  addStudentSkill,
+  getStudentSkills,
+  updateStudentSkill,
+  deleteStudentSkill,
+  getStudentProjects,
+  addStudentProject,
+  updateStudentProject,
+  deleteStudentProject,
 } from "@/lib/student-profile-api";
+
 
 import type {
   StudentProfile,
@@ -133,23 +142,25 @@ interface StudentProfileContextType {
     updates: Partial<StudentProfile["onlinePresence"]>
   ) => void;
 
-  addSkill: (skill: Omit<TechnicalSkill, "id">) => void;
+  addSkill: (
+  skill: Omit<TechnicalSkill, "id">
+) => Promise<void>;
 
   updateSkillProficiency: (
-    skillId: string,
-    proficiency: TechnicalSkill["proficiency"]
-  ) => void;
+  skillId: string,
+  proficiency: TechnicalSkill["proficiency"]
+) => Promise<void>;
 
-  removeSkill: (skillId: string) => void;
+  removeSkill: (skillId: string) => Promise<void>;
 
-  addProject: (project: Omit<Project, "id">) => void;
+  addProject: (project: Omit<Project, "id">) => Promise<void>;
 
   updateProject: (
     projectId: string,
     updates: Partial<Project>
-  ) => void;
+  ) => Promise<void>;
 
-  deleteProject: (projectId: string) => void;
+  deleteProject: (projectId: string) => Promise<void>;
 
   addCertification: (
     cert: Omit<Certification, "id">
@@ -399,6 +410,13 @@ function mapBackendProfileToStudentProfile(
   };
 }
 
+const mapProjectToBackend = (project: Omit<Project, "id">) => ({
+  title: project.name,
+  description: project.description,
+  github_url: project.githubUrl || null,
+  live_demo_url: project.liveUrl || null,
+});
+
 /* ============================================================
    LOCAL ID GENERATOR
 ============================================================ */
@@ -559,6 +577,42 @@ const backendProfile =
           backendProfile.student_id
         );
 
+        const backendSkills = await getStudentSkills(backendProfile.student_id);
+
+
+        const backendProjects = await getStudentProjects(
+  backendProfile.student_id
+);
+
+        const projects: Project[] = backendProjects.map(
+      (project: {
+        project_id: string;
+        title: string | null;
+        description: string | null;
+        github_url: string | null;
+        live_demo_url: string | null;
+      }) => ({
+        id: project.project_id,
+        name: project.title || "",
+        description: project.description || "",
+        techStack: [],
+        githubUrl: project.github_url || "",
+        liveUrl: project.live_demo_url || "",
+      })
+    );
+
+    const technicalSkills: TechnicalSkill[] = backendSkills.map(
+      (skill: {
+        student_skill_id: string;
+        skill_name: string;
+        proficiency_level: TechnicalSkill["proficiency"];
+      }) => ({
+        id: skill.student_skill_id,
+        name: skill.skill_name,
+        proficiency: skill.proficiency_level,
+      })
+    );
+
         console.log(
           "BACKEND STUDENT PROFILE:",
           backendProfile
@@ -570,6 +624,8 @@ const backendProfile =
             authenticatedUser,
             EMPTY_PROFILE
           );
+          mappedProfile.technicalSkills = technicalSkills;
+          mappedProfile.projects = projects;
 
         setProfile(mappedProfile);
 
@@ -703,148 +759,208 @@ const backendProfile =
   ============================================================ */
 
   const addSkill = useCallback(
-    (skill: Omit<TechnicalSkill, "id">) => {
-      const newSkill: TechnicalSkill = {
-        ...skill,
-        id: genId("sk"),
-      };
+  async (skill: Omit<TechnicalSkill, "id">) => {
+    if (!studentId) {
+      throw new Error("Student ID is not available");
+    }
 
-      setProfile((prev) => ({
-        ...prev,
-        technicalSkills: [
-          ...prev.technicalSkills,
-          newSkill,
-        ],
-      }));
+    const backendSkill = await addStudentSkill(
+      studentId,
+      {
+        skill_name: skill.name,
+        proficiency_level: skill.proficiency,
+        years_of_experience: 0,
+      }
+    );
 
-      setEditDraft((prev) => ({
-        ...prev,
-        technicalSkills: [
-          ...prev.technicalSkills,
-          newSkill,
-        ],
-      }));
-    },
-    []
-  );
+    const newSkill: TechnicalSkill = {
+      id: backendSkill.student_skill_id,
+      name: backendSkill.skill_name,
+      proficiency: backendSkill.proficiency_level,
+    };
+
+    setProfile((prev) => ({
+      ...prev,
+      technicalSkills: [
+        ...prev.technicalSkills,
+        newSkill,
+      ],
+    }));
+
+    setEditDraft((prev) => ({
+      ...prev,
+      technicalSkills: [
+        ...prev.technicalSkills,
+        newSkill,
+      ],
+    }));
+  },
+  [studentId]
+);
 
   const updateSkillProficiency = useCallback(
-    (
-      skillId: string,
-      proficiency: TechnicalSkill["proficiency"]
-    ) => {
-      const updater = (
-        prev: StudentProfile
-      ): StudentProfile => ({
-        ...prev,
-        technicalSkills:
-          prev.technicalSkills.map((skill) =>
-            skill.id === skillId
-              ? {
-                  ...skill,
-                  proficiency,
-                }
-              : skill
-          ),
-      });
+  async (
+    skillId: string,
+    proficiency: TechnicalSkill["proficiency"]
+  ) => {
+    if (!studentId) {
+      throw new Error("Student ID is not available");
+    }
 
-      setProfile(updater);
-      setEditDraft(updater);
-    },
-    []
-  );
+    const existingSkill = profile.technicalSkills.find(
+      (skill) => skill.id === skillId
+    );
+
+    if (!existingSkill) {
+      throw new Error("Skill not found");
+    }
+
+    await updateStudentSkill(studentId, skillId, {
+      skill_name: existingSkill.name,
+      proficiency_level: proficiency,
+    });
+
+    const updater = (prev: StudentProfile): StudentProfile => ({
+      ...prev,
+      technicalSkills: prev.technicalSkills.map((skill) =>
+        skill.id === skillId ? { ...skill, proficiency } : skill
+      ),
+    });
+
+    setProfile(updater);
+    setEditDraft(updater);
+  },
+  [studentId, profile.technicalSkills]
+);
+
 
   const removeSkill = useCallback(
-    (skillId: string) => {
-      const updater = (
-        prev: StudentProfile
-      ): StudentProfile => ({
-        ...prev,
-        technicalSkills:
-          prev.technicalSkills.filter(
-            (skill) => skill.id !== skillId
-          ),
-      });
+  async (skillId: string) => {
+    if (!studentId) {
+      throw new Error("Student ID is not available");
+    }
 
-      setProfile(updater);
-      setEditDraft(updater);
-    },
-    []
-  );
+    // First delete from the backend database
+    await deleteStudentSkill(studentId, skillId);
 
+    // Then update the local UI
+    const updater = (prev: StudentProfile): StudentProfile => ({
+      ...prev,
+      technicalSkills: prev.technicalSkills.filter(
+        (skill) => skill.id !== skillId
+      ),
+    });
+
+    setProfile(updater);
+    setEditDraft(updater);
+  },
+  [studentId]
+);
   /* ============================================================
      PROJECTS
   ============================================================ */
 
   const addProject = useCallback(
-    (project: Omit<Project, "id">) => {
-      const newProject: Project = {
-        ...project,
-        id: genId("proj"),
-      };
+  async (project: Omit<Project, "id">) => {
+    if (!studentId) return;
 
-      setProfile((prev) => ({
-        ...prev,
-        projects: [
-          ...prev.projects,
-          newProject,
-        ],
-      }));
+    const backendProject = await addStudentProject(
+      studentId,
+      mapProjectToBackend(project)
+    );
 
-      setEditDraft((prev) => ({
-        ...prev,
-        projects: [
-          ...prev.projects,
-          newProject,
-        ],
-      }));
-    },
-    []
-  );
+    const newProject: Project = {
+      id: backendProject.project_id,
+      name: backendProject.title ?? "",
+      description: backendProject.description ?? "",
+      techStack: project.techStack,
+      githubUrl: backendProject.github_url ?? "",
+      liveUrl: backendProject.live_demo_url ?? "",
+    };
 
-  const updateProject = useCallback(
-    (
-      projectId: string,
-      updates: Partial<Project>
-    ) => {
-      const updater = (
-        prev: StudentProfile
-      ): StudentProfile => ({
-        ...prev,
-        projects: prev.projects.map(
-          (project) =>
-            project.id === projectId
-              ? {
-                  ...project,
-                  ...updates,
-                }
-              : project
-        ),
-      });
+    setProfile((prev) => ({
+      ...prev,
+      projects: [...prev.projects, newProject],
+    }));
 
-      setProfile(updater);
-      setEditDraft(updater);
-    },
-    []
-  );
+    setEditDraft((prev) => ({
+      ...prev,
+      projects: [...prev.projects, newProject],
+    }));
+  },
+  [studentId]
+);
 
-  const deleteProject = useCallback(
-    (projectId: string) => {
-      const updater = (
-        prev: StudentProfile
-      ): StudentProfile => ({
-        ...prev,
-        projects: prev.projects.filter(
-          (project) =>
-            project.id !== projectId
-        ),
-      });
+const updateProject = useCallback(
+  async (projectId: string, updates: Partial<Project>) => {
+    if (!studentId) return;
 
-      setProfile(updater);
-      setEditDraft(updater);
-    },
-    []
-  );
+    const backendUpdates: Record<string, unknown> = {};
+
+    if (updates.name !== undefined) {
+      backendUpdates.title = updates.name;
+    }
+
+    if (updates.description !== undefined) {
+      backendUpdates.description = updates.description;
+    }
+
+    if (updates.githubUrl !== undefined) {
+      backendUpdates.github_url = updates.githubUrl || null;
+    }
+
+    if (updates.liveUrl !== undefined) {
+      backendUpdates.live_demo_url = updates.liveUrl || null;
+    }
+
+    const backendProject = await updateStudentProject(
+      studentId,
+      projectId,
+      backendUpdates
+    );
+
+    const updater = (prev: StudentProfile): StudentProfile => ({
+      ...prev,
+      projects: prev.projects.map((project) =>
+        project.id === projectId
+          ? {
+              ...project,
+              name: backendProject.title ?? project.name,
+              description:
+                backendProject.description ?? project.description,
+              githubUrl:
+                backendProject.github_url ?? project.githubUrl,
+              liveUrl:
+                backendProject.live_demo_url ?? project.liveUrl,
+            }
+          : project
+      ),
+    });
+
+    setProfile(updater);
+    setEditDraft(updater);
+  },
+  [studentId]
+);
+
+const deleteProject = useCallback(
+  async (projectId: string) => {
+    if (!studentId) return;
+
+    await deleteStudentProject(studentId, projectId);
+
+    const updater = (prev: StudentProfile): StudentProfile => ({
+      ...prev,
+      projects: prev.projects.filter(
+        (project) => project.id !== projectId
+      ),
+    });
+
+    setProfile(updater);
+    setEditDraft(updater);
+  },
+  [studentId]
+);
 
   /* ============================================================
      CERTIFICATIONS
