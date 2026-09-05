@@ -22,6 +22,14 @@ from backend.app.models.student import (
     StudentSocialLink,
 )
 
+from backend.app.models.placement_drive import (
+    PlacementDrive,
+    EligibilityRule,
+    DriveBranch,
+    DriveSkill,
+    DriveDocument,
+)
+
 
 __all__ = [
     # Auth
@@ -45,4 +53,11 @@ __all__ = [
     "StudentInternship",
     "StudentAchievement",
     "StudentSocialLink",
+
+    # Placement Drives
+    "PlacementDrive",
+    "EligibilityRule",
+    "DriveBranch",
+    "DriveSkill",
+    "DriveDocument",
 ]

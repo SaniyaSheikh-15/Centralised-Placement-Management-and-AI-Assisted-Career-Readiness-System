@@ -5,7 +5,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 import backend.app.models  # noqa: F401
-from backend.app.api import auth, student
+from backend.app.api import auth, placement_drive, student
 from backend.app.db.base import Base
 from backend.app.db.session import SessionLocal, engine, get_db
 from backend.app.repositories.role_repository import RoleRepository
@@ -36,6 +36,7 @@ app = FastAPI(
 
 app.include_router(auth.router)
 app.include_router(student.router)
+app.include_router(placement_drive.router)
 
 
 @app.get("/")
