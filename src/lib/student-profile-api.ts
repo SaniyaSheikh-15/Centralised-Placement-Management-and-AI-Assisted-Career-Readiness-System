@@ -260,6 +260,44 @@ export function getStudentInternships(
     `/students/${studentId}/internships`
   );
 }
+export function addStudentInternship(
+  studentId: string,
+  data: unknown
+) {
+  return apiRequest(
+    `/students/${studentId}/internships`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
+}
+
+export function updateStudentInternship(
+  studentId: string,
+  internshipId: string,
+  data: unknown
+) {
+  return apiRequest(
+    `/students/${studentId}/internships/${internshipId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }
+  );
+}
+
+export function deleteStudentInternship(
+  studentId: string,
+  internshipId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/internships/${internshipId}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
 
 /* ============================================================
    ACHIEVEMENTS
@@ -273,15 +311,94 @@ export function getStudentAchievements(
   );
 }
 
+export function addStudentAchievement(
+  studentId: string,
+  data: unknown
+) {
+  return apiRequest(
+    `/students/${studentId}/achievements`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
+}
+
+export function updateStudentAchievement(
+  studentId: string,
+  achievementId: string,
+  data: unknown
+) {
+  return apiRequest(
+    `/students/${studentId}/achievements/${achievementId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }
+  );
+}
+
+export function deleteStudentAchievement(
+  studentId: string,
+  achievementId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/achievements/${achievementId}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
 /* ============================================================
    SOCIAL LINKS
 ============================================================ */
 
-export function getStudentSocialLinks(
-  studentId: string
+/* SOCIAL LINKS */
+
+export function getStudentSocialLinks(studentId: string) {
+  return apiRequest(`/students/${studentId}/social-links`);
+}
+
+export function addStudentSocialLink(
+  studentId: string,
+  data: {
+    platform: string;
+    profile_url: string;
+  }
+) {
+  return apiRequest(`/students/${studentId}/social-links`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateStudentSocialLink(
+  studentId: string,
+  socialLinkId: string,
+  data: {
+    platform?: string;
+    profile_url?: string;
+  }
 ) {
   return apiRequest(
-    `/students/${studentId}/social-links`
+    `/students/${studentId}/social-links/${socialLinkId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }
+  );
+}
+
+export function deleteStudentSocialLink(
+  studentId: string,
+  socialLinkId: string
+) {
+  return apiRequest(
+    `/students/${studentId}/social-links/${socialLinkId}`,
+    {
+      method: "DELETE",
+    }
   );
 }
 

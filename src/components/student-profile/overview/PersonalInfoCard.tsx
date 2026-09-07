@@ -40,11 +40,6 @@ export default function PersonalInfoCard() {
         <InfoRow label="Father's Name" value={p.fatherName} />
         <InfoRow label="Mother's Name" value={p.motherName} />
         <InfoRow label="Father's Occupation" value={p.fatherOccupation} />
-        <InfoRow label="Annual Family Income" value={p.annualFamilyIncome} />
-        <InfoRow label="Religion" value={p.religion} />
-        <InfoRow label="Category" value={p.category} />
-        <InfoRow label="Aadhaar Card" value={maskAadhaar(p.aadhaarNumber)} />
-        <InfoRow label="PAN Card" value={p.panNumber} />
         <InfoRow label="Branch" value={p.branch} />
       </div>
     </div>

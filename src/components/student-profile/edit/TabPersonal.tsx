@@ -113,46 +113,7 @@ export default function TabPersonal() {
             <Label htmlFor="fatherOccupation">Father&apos;s Occupation</Label>
             <Input id="fatherOccupation" value={p.fatherOccupation} onChange={(e) => updatePersonalInfo({ fatherOccupation: e.target.value })} />
           </div>
-          <div className="space-y-2">
-            <Label>Annual Family Income</Label>
-            <Select value={p.annualFamilyIncome ?? undefined} onValueChange={(v: string | null) => updatePersonalInfo({ annualFamilyIncome: v ?? '' })}>
-              <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
-              <SelectContent>
-                {INCOME_RANGES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="religion">Religion</Label>
-            <Input id="religion" value={p.religion} onChange={(e) => updatePersonalInfo({ religion: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label>Category</Label>
-            <Select value={p.category ?? undefined} onValueChange={(v: string | null) => updatePersonalInfo({ category: v ?? '' })}>
-              <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </fieldset>
-
-      {/* ─── Government / Institutional IDs ─────── */}
-      <fieldset className="space-y-4">
-        <legend className="text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">Government / Institutional IDs</legend>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="pan">PAN Number</Label>
-            <Input id="pan" value={p.panNumber} onChange={(e) => updatePersonalInfo({ panNumber: maskPAN(e.target.value) })} placeholder="ABCDE1234F" maxLength={10} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="aadhaar">Aadhaar Number</Label>
-            <Input id="aadhaar" value={p.aadhaarNumber} onChange={(e) => updatePersonalInfo({ aadhaarNumber: maskAadhaar(e.target.value) })} placeholder="12-digit number" maxLength={12} />
-          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="abcId">ABC ID</Label>
             <Input id="abcId" value={p.abcId} onChange={(e) => updatePersonalInfo({ abcId: e.target.value })} placeholder="ABC-XXXX-XXXXX" />

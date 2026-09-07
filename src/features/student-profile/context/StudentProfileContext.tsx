@@ -23,6 +23,22 @@ import {
   addStudentProject,
   updateStudentProject,
   deleteStudentProject,
+  getStudentCertifications,
+  addStudentCertification,
+  updateStudentCertification,
+  deleteStudentCertification,
+  addStudentInternship,
+  updateStudentInternship,
+  deleteStudentInternship,
+  getStudentInternships,
+  addStudentAchievement,
+  updateStudentAchievement,
+  deleteStudentAchievement,
+  getStudentAchievements,
+  addStudentSocialLink,
+  updateStudentSocialLink,
+  deleteStudentSocialLink,
+  getStudentSocialLinks,
 } from "@/lib/student-profile-api";
 
 
@@ -34,6 +50,7 @@ import type {
   Internship,
   Achievement,
 } from "@/types/student-profile";
+
 
 /* ============================================================
    EMPTY PROFILE
@@ -163,26 +180,26 @@ interface StudentProfileContextType {
   deleteProject: (projectId: string) => Promise<void>;
 
   addCertification: (
-    cert: Omit<Certification, "id">
-  ) => void;
+  cert: Omit<Certification, "id">
+  ) => Promise<void>;
 
   updateCertification: (
     certId: string,
     updates: Partial<Certification>
-  ) => void;
+  ) => Promise<void>;
 
-  deleteCertification: (certId: string) => void;
+  deleteCertification: (certId: string) => Promise<void>;
 
   addInternship: (
-    internship: Omit<Internship, "id">
-  ) => void;
+  internship: Omit<Internship, "id">
+) => Promise<void>;
 
-  updateInternship: (
-    internId: string,
-    updates: Partial<Internship>
-  ) => void;
+updateInternship: (
+  internId: string,
+  updates: Partial<Internship>
+) => Promise<void>;
 
-  deleteInternship: (internId: string) => void;
+deleteInternship: (internId: string) => Promise<void>;
 
   addAchievement: (
     achievement: Omit<Achievement, "id">
@@ -207,6 +224,13 @@ interface StudentProfileContextType {
   simulateError: (msg?: string) => void;
   clearError: () => void;
 }
+
+type BackendSocialLink = {
+  social_link_id: string;
+  student_id: string;
+  platform: string;
+  profile_url: string;
+};
 
 /* ============================================================
    CONTEXT
@@ -279,18 +303,7 @@ function mapBackendProfileToStudentProfile(
       annualFamilyIncome:
         previousProfile.personalInfo.annualFamilyIncome,
 
-      religion:
-        previousProfile.personalInfo.religion,
-
-      category:
-        previousProfile.personalInfo.category,
-
-      panNumber:
-        previousProfile.personalInfo.panNumber,
-
-      aadhaarNumber:
-        previousProfile.personalInfo.aadhaarNumber,
-
+    
       abcId:
         backendProfile.abc_id || "",
 
@@ -416,6 +429,213 @@ const mapProjectToBackend = (project: Omit<Project, "id">) => ({
   github_url: project.githubUrl || null,
   live_demo_url: project.liveUrl || null,
 });
+
+const mapCertificationFromBackend = (cert: any): Certification => ({
+  id: cert.certificate_id,
+  name: cert.certificate_name,
+  organization: cert.issuing_organization,
+  date: cert.issue_date || '',
+  link: cert.credential_url || '',
+});
+
+const mapAchievementFromBackend = (
+  achievement: any
+): Achievement => ({
+  id: achievement.achievement_id,
+  title: achievement.title,
+  description: achievement.description ?? "",
+  date: achievement.achievement_date
+    ? achievement.achievement_date.slice(0, 7)
+    : "",
+});
+
+const parseInternshipDuration = (
+  duration: string
+): {
+  start_date: string | null;
+  end_date: string | null;
+  is_current: boolean;
+} => {
+  const value = duration.trim();
+
+  if (!value) {
+    return {
+      start_date: null,
+      end_date: null,
+      is_current: false,
+    };
+  }
+
+  const parts = value.split(/\s*[–-]\s*/);
+
+  const parseMonth = (month: string): string | null => {
+    const match = month.trim().match(
+      /^([A-Za-z]+)\s+(\d{4})$/
+    );
+
+    if (!match) return null;
+
+    const [, monthName, year] = match;
+
+    const monthIndex = [
+      "jan", "feb", "mar", "apr",
+      "may", "jun", "jul", "aug",
+      "sep", "oct", "nov", "dec",
+    ].indexOf(monthName.slice(0, 3).toLowerCase());
+
+    if (monthIndex === -1) return null;
+
+    return `${year}-${String(monthIndex + 1).padStart(2, "0")}-01`;
+  };
+
+  const startDate = parseMonth(parts[0]);
+
+  if (!startDate) {
+    return {
+      start_date: null,
+      end_date: null,
+      is_current: false,
+    };
+  }
+
+  const endText = parts[1]?.trim().toLowerCase();
+
+  if (!endText || endText === "present" || endText === "current") {
+    return {
+      start_date: startDate,
+      end_date: null,
+      is_current: true,
+    };
+  }
+
+  return {
+    start_date: startDate,
+    end_date: parseMonth(parts[1]),
+    is_current: false,
+  };
+};
+
+const formatInternshipDuration = (
+  startDate: string | null,
+  endDate: string | null,
+  isCurrent: boolean | null
+): string => {
+  const formatMonth = (date: string | null): string => {
+    if (!date) return "";
+
+    const parsed = new Date(`${date}T00:00:00`);
+
+    return parsed.toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const start = formatMonth(startDate);
+
+  if (!start) return "";
+
+  if (isCurrent || !endDate) {
+    return `${start} – Present`;
+  }
+
+  return `${start} – ${formatMonth(endDate)}`;
+};
+
+
+const mapInternshipFromBackend = (
+  internship: any
+): Internship => ({
+  id: internship.internship_id,
+  organization: internship.company_name || "",
+  role: internship.role_title || "",
+  duration: formatInternshipDuration(
+    internship.start_date,
+    internship.end_date,
+    internship.is_current
+  ),
+  description: internship.description || "",
+});
+
+const mapSocialLinksToOnlinePresence = (
+  socialLinks: any[]
+): StudentProfile["onlinePresence"] => {
+  const onlinePresence = {
+    githubUrl: "",
+    linkedinUrl: "",
+    portfolioUrl: "",
+    codingProfileUrl: "",
+  };
+
+  socialLinks.forEach((link) => {
+    switch (link.platform) {
+      case "github":
+        onlinePresence.githubUrl = link.profile_url;
+        break;
+      case "linkedin":
+        onlinePresence.linkedinUrl = link.profile_url;
+        break;
+      case "portfolio":
+        onlinePresence.portfolioUrl = link.profile_url;
+        break;
+      case "coding":
+        onlinePresence.codingProfileUrl = link.profile_url;
+        break;
+    }
+  });
+
+  return onlinePresence;
+};
+
+const saveSocialLinks = async (
+  studentId: string,
+  onlinePresence: StudentProfile["onlinePresence"]
+) => {
+  const existingLinks =
+    (await getStudentSocialLinks(studentId)) as BackendSocialLink[];
+
+  const socialLinks = [
+    {
+      platform: "github",
+      profile_url: onlinePresence.githubUrl,
+    },
+    {
+      platform: "linkedin",
+      profile_url: onlinePresence.linkedinUrl,
+    },
+    {
+      platform: "portfolio",
+      profile_url: onlinePresence.portfolioUrl,
+    },
+    {
+      platform: "coding",
+      profile_url: onlinePresence.codingProfileUrl,
+    },
+  ];
+
+  for (const link of socialLinks) {
+    const existing = existingLinks.find(
+      (item) => item.platform === link.platform
+    );
+
+    if (link.profile_url.trim()) {
+      if (existing) {
+        await updateStudentSocialLink(
+          studentId,
+          existing.social_link_id,
+          link
+        );
+      } else {
+        await addStudentSocialLink(studentId, link);
+      }
+    } else if (existing) {
+      await deleteStudentSocialLink(
+        studentId,
+        existing.social_link_id
+      );
+    }
+  }
+};
 
 /* ============================================================
    LOCAL ID GENERATOR
@@ -581,8 +801,30 @@ const backendProfile =
 
 
         const backendProjects = await getStudentProjects(
-  backendProfile.student_id
-);
+          backendProfile.student_id
+        );
+
+        const certificationsResponse = await getStudentCertifications(
+          backendProfile.student_id
+        );
+
+        const certifications = certificationsResponse.map(
+          mapCertificationFromBackend
+        );
+
+        const internshipsResponse =
+          await getStudentInternships(
+            backendProfile.student_id
+          );
+
+        const internships: Internship[] =
+          internshipsResponse.map(
+            mapInternshipFromBackend
+          );
+
+        
+
+
 
         const projects: Project[] = backendProjects.map(
       (project: {
@@ -613,6 +855,18 @@ const backendProfile =
       })
     );
 
+      const achievementsResponse =
+        await getStudentAchievements(backendProfile.student_id);
+
+      const achievements: Achievement[] =
+        achievementsResponse.map(mapAchievementFromBackend);
+
+      const socialLinksResponse =
+        await getStudentSocialLinks(backendProfile.student_id);
+
+      const onlinePresence =
+        mapSocialLinksToOnlinePresence(socialLinksResponse);
+
         console.log(
           "BACKEND STUDENT PROFILE:",
           backendProfile
@@ -626,6 +880,10 @@ const backendProfile =
           );
           mappedProfile.technicalSkills = technicalSkills;
           mappedProfile.projects = projects;
+          mappedProfile.certifications = certifications;
+          mappedProfile.internships = internships;
+          mappedProfile.achievements = achievements;
+          mappedProfile.onlinePresence = onlinePresence;
 
         setProfile(mappedProfile);
 
@@ -962,18 +1220,31 @@ const deleteProject = useCallback(
   [studentId]
 );
 
-  /* ============================================================
+    /* ============================================================
      CERTIFICATIONS
   ============================================================ */
 
   const addCertification = useCallback(
-    (
-      cert: Omit<Certification, "id">
-    ) => {
-      const newCert: Certification = {
-        ...cert,
-        id: genId("cert"),
-      };
+    async (cert: Omit<Certification, "id">) => {
+      if (!studentId) {
+        throw new Error("Student ID is not available");
+      }
+
+      const response = await addStudentCertification(
+        studentId,
+        {
+          certificate_name: cert.name,
+          issuing_organization: cert.organization,
+          issue_date: cert.date
+            ? `${cert.date}-01`
+            : null,
+          expiry_date: null,
+          credential_url: cert.link || null,
+        }
+      );
+
+      const newCert =
+        mapCertificationFromBackend(response);
 
       setProfile((prev) => ({
         ...prev,
@@ -991,14 +1262,51 @@ const deleteProject = useCallback(
         ],
       }));
     },
-    []
+    [studentId]
   );
 
   const updateCertification = useCallback(
-    (
+    async (
       certId: string,
       updates: Partial<Certification>
     ) => {
+      if (!studentId) {
+        throw new Error("Student ID is not available");
+      }
+
+      const backendUpdates: Record<string, unknown> = {};
+
+      if (updates.name !== undefined) {
+        backendUpdates.certificate_name =
+          updates.name;
+      }
+
+      if (updates.organization !== undefined) {
+        backendUpdates.issuing_organization =
+          updates.organization;
+      }
+
+      if (updates.date !== undefined) {
+      backendUpdates.issue_date = updates.date
+        ? `${updates.date}-01`
+        : null;
+    }
+
+      if (updates.link !== undefined) {
+        backendUpdates.credential_url =
+          updates.link || null;
+      }
+
+      const response =
+        await updateStudentCertification(
+          studentId,
+          certId,
+          backendUpdates
+        );
+
+      const updatedCert =
+        mapCertificationFromBackend(response);
+
       const updater = (
         prev: StudentProfile
       ): StudentProfile => ({
@@ -1007,10 +1315,7 @@ const deleteProject = useCallback(
           prev.certifications.map(
             (cert) =>
               cert.id === certId
-                ? {
-                    ...cert,
-                    ...updates,
-                  }
+                ? updatedCert
                 : cert
           ),
       });
@@ -1018,147 +1323,289 @@ const deleteProject = useCallback(
       setProfile(updater);
       setEditDraft(updater);
     },
-    []
+    [studentId]
   );
 
   const deleteCertification = useCallback(
-    (certId: string) => {
+    async (certId: string) => {
+      if (!studentId) {
+        throw new Error("Student ID is not available");
+      }
+
+      await deleteStudentCertification(
+        studentId,
+        certId
+      );
+
       const updater = (
         prev: StudentProfile
       ): StudentProfile => ({
         ...prev,
         certifications:
           prev.certifications.filter(
-            (cert) =>
-              cert.id !== certId
+            (cert) => cert.id !== certId
           ),
       });
 
       setProfile(updater);
       setEditDraft(updater);
     },
-    []
+    [studentId]
   );
 
   /* ============================================================
-     INTERNSHIPS
-  ============================================================ */
+   INTERNSHIPS
+============================================================ */
 
-  const addInternship = useCallback(
-    (
-      internship: Omit<Internship, "id">
-    ) => {
-      const newInternship: Internship = {
-        ...internship,
-        id: genId("intern"),
-      };
+const addInternship = useCallback(
+  async (
+    internship: Omit<Internship, "id">
+  ) => {
+    if (!studentId) {
+      throw new Error("Student ID is not available");
+    }
 
-      setEditDraft((prev) => ({
-        ...prev,
-        internships: [
-          ...prev.internships,
-          newInternship,
-        ],
-      }));
-    },
-    []
+    const duration = parseInternshipDuration(
+      internship.duration
+    );
+
+    const response = await addStudentInternship(
+      studentId,
+      {
+        company_name: internship.organization,
+        role_title: internship.role || null,
+        location: null,
+        start_date: duration.start_date,
+        end_date: duration.end_date,
+        is_current: duration.is_current,
+        description: internship.description || null,
+        certificate_url: null,
+      }
+    );
+
+    const newInternship =
+      mapInternshipFromBackend(response);
+
+    setProfile((prev) => ({
+      ...prev,
+      internships: [
+        ...prev.internships,
+        newInternship,
+      ],
+    }));
+
+    setEditDraft((prev) => ({
+      ...prev,
+      internships: [
+        ...prev.internships,
+        newInternship,
+      ],
+    }));
+  },
+  [studentId]
+);
+
+const updateInternship = useCallback(
+  async (
+    internId: string,
+    updates: Partial<Internship>
+  ) => {
+    if (!studentId) {
+      throw new Error("Student ID is not available");
+    }
+
+    const backendUpdates: Record<string, unknown> = {};
+    if (updates.duration !== undefined) {
+  const duration = parseInternshipDuration(
+    updates.duration
   );
 
-  const updateInternship = useCallback(
-    (
-      internId: string,
-      updates: Partial<Internship>
-    ) => {
-      setEditDraft((prev) => ({
-        ...prev,
-        internships:
-          prev.internships.map(
-            (internship) =>
-              internship.id === internId
-                ? {
-                    ...internship,
-                    ...updates,
-                  }
-                : internship
-          ),
-      }));
-    },
-    []
-  );
+  backendUpdates.start_date =
+    duration.start_date;
 
-  const deleteInternship = useCallback(
-    (internId: string) => {
-      setEditDraft((prev) => ({
-        ...prev,
-        internships:
-          prev.internships.filter(
-            (internship) =>
-              internship.id !== internId
-          ),
-      }));
-    },
-    []
-  );
+  backendUpdates.end_date =
+    duration.end_date;
+
+  backendUpdates.is_current =
+    duration.is_current;
+}
+
+    if (updates.organization !== undefined) {
+      backendUpdates.company_name =
+        updates.organization;
+    }
+
+    if (updates.role !== undefined) {
+      backendUpdates.role_title =
+        updates.role || null;
+    }
+
+    if (updates.description !== undefined) {
+      backendUpdates.description =
+        updates.description || null;
+    }
+
+    const response =
+      await updateStudentInternship(
+        studentId,
+        internId,
+        backendUpdates
+      );
+
+    const updatedInternship =
+      mapInternshipFromBackend(response);
+
+    const updater = (
+      prev: StudentProfile
+    ): StudentProfile => ({
+      ...prev,
+      internships:
+        prev.internships.map(
+          (internship) =>
+            internship.id === internId
+              ? {
+                  ...internship,
+                  ...updatedInternship,
+                  duration:
+                    internship.duration,
+                }
+              : internship
+        ),
+    });
+
+    setProfile(updater);
+    setEditDraft(updater);
+  },
+  [studentId]
+);
+
+const deleteInternship = useCallback(
+  async (internId: string) => {
+    if (!studentId) {
+      throw new Error("Student ID is not available");
+    }
+
+    await deleteStudentInternship(
+      studentId,
+      internId
+    );
+
+    const updater = (
+      prev: StudentProfile
+    ): StudentProfile => ({
+      ...prev,
+      internships:
+        prev.internships.filter(
+          (internship) =>
+            internship.id !== internId
+        ),
+    });
+
+    setProfile(updater);
+    setEditDraft(updater);
+  },
+  [studentId]
+);
 
   /* ============================================================
      ACHIEVEMENTS
   ============================================================ */
 
   const addAchievement = useCallback(
-    (
-      achievement: Omit<Achievement, "id">
-    ) => {
-      const newAchievement: Achievement = {
-        ...achievement,
-        id: genId("ach"),
-      };
+  async (achievement: Omit<Achievement, "id">) => {
+    if (!studentId) return;
 
-      setEditDraft((prev) => ({
-        ...prev,
-        achievements: [
-          ...prev.achievements,
-          newAchievement,
-        ],
-      }));
-    },
-    []
-  );
+    const response = await addStudentAchievement(
+      studentId,
+      {
+        title: achievement.title,
+        description: achievement.description || null,
+        achievement_date: achievement.date
+          ? `${achievement.date}-01`
+          : null,
+      }
+    );
+
+    const newAchievement: Achievement = {
+      id: response.achievement_id,
+      title: response.title,
+      description: response.description ?? "",
+      date: response.achievement_date
+        ? response.achievement_date.slice(0, 7)
+        : "",
+    };
+
+    setEditDraft((prev) => ({
+      ...prev,
+      achievements: [
+        ...prev.achievements,
+        newAchievement,
+      ],
+    }));
+  },
+  [studentId]
+);
 
   const updateAchievement = useCallback(
-    (
-      achId: string,
-      updates: Partial<Achievement>
-    ) => {
-      setEditDraft((prev) => ({
-        ...prev,
-        achievements:
-          prev.achievements.map(
-            (achievement) =>
-              achievement.id === achId
-                ? {
-                    ...achievement,
-                    ...updates,
-                  }
-                : achievement
-          ),
-      }));
-    },
-    []
-  );
+  async (
+    achId: string,
+    updates: Partial<Achievement>
+  ) => {
+    if (!studentId) return;
+
+    const response = await updateStudentAchievement(
+      studentId,
+      achId,
+      {
+        title: updates.title,
+        description: updates.description || null,
+        achievement_date: updates.date
+          ? `${updates.date}-01`
+          : null,
+      }
+    );
+
+    const updatedAchievement: Achievement = {
+      id: response.achievement_id,
+      title: response.title,
+      description: response.description ?? "",
+      date: response.achievement_date
+        ? response.achievement_date.slice(0, 7)
+        : "",
+    };
+
+    setEditDraft((prev) => ({
+      ...prev,
+      achievements: prev.achievements.map(
+        (achievement) =>
+          achievement.id === achId
+            ? updatedAchievement
+            : achievement
+      ),
+    }));
+  },
+  [studentId]
+);
 
   const deleteAchievement = useCallback(
-    (achId: string) => {
-      setEditDraft((prev) => ({
-        ...prev,
-        achievements:
-          prev.achievements.filter(
-            (achievement) =>
-              achievement.id !== achId
-          ),
-      }));
-    },
-    []
-  );
+  async (achId: string) => {
+    if (!studentId) return;
+
+    await deleteStudentAchievement(
+      studentId,
+      achId
+    );
+
+    setEditDraft((prev) => ({
+      ...prev,
+      achievements: prev.achievements.filter(
+        (achievement) =>
+          achievement.id !== achId
+      ),
+    }));
+  },
+  [studentId]
+);
 
   /* ============================================================
      SOFT SKILLS
@@ -1283,6 +1730,11 @@ const deleteProject = useCallback(
           degree:
             editDraft.academicInfo.degree ||
             undefined,
+
+          graduation_year:
+            editDraft.academicInfo.academicYear !== ""
+              ? Number(editDraft.academicInfo.academicYear)
+              : undefined,
 
           ssc_percentage:
             editDraft.academicInfo
@@ -1413,6 +1865,13 @@ const deleteProject = useCallback(
             studentId,
             payload
           );
+
+
+        await saveSocialLinks(
+          studentId,
+          editDraft.onlinePresence
+        );
+
 
         const mappedProfile =
           mapBackendProfileToStudentProfile(
