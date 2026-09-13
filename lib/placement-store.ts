@@ -12,7 +12,16 @@ import {
 const driveStore: PlacementDrive[] = seedDrives.map((drive) => ({ ...drive }));
 const applicationStore: ApplicationRecord[] = seedApplications.map((application) => ({
   ...application,
-  timeline: application.timeline.map((item) => ({ ...item }))
+  timeline: application.timeline.map((item) => ({ ...item })),
+  history: application.history?.map((item) => ({ ...item })) ?? [
+    {
+      id: `${application.id}_applied`,
+      toStatus: "APPLIED",
+      remarks: "Application submitted.",
+      source: "STUDENT",
+      createdAt: application.appliedAt
+    }
+  ]
 }));
 
 export function listDrives() {
@@ -37,6 +46,12 @@ export function getApplication(applicationId: string) {
 
 export function getApplicationByDrive(driveId: string) {
   return applicationStore.find((application) => application.driveId === driveId);
+}
+
+export function getApplicationByStudentAndDrive(studentId: string, driveId: string) {
+  // The mock data represents one authenticated student. Keep this lookup shaped
+  // like the production unique (student_id, drive_id) constraint.
+  return studentId === "student_001" ? getApplicationByDrive(driveId) : undefined;
 }
 
 export function addApplication(application: ApplicationRecord) {

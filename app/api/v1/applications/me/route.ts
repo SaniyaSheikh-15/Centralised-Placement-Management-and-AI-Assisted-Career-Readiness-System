@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listApplications } from "@/lib/placement-store";
+import { getStudentApplications } from "@/lib/application-management-service";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const company = url.searchParams.get("company");
   const role = url.searchParams.get("role");
 
-  let applications = listApplications();
+  let applications = getStudentApplications("student_001");
   if (status) {
     applications = applications.filter((item) => item.status === status);
   }

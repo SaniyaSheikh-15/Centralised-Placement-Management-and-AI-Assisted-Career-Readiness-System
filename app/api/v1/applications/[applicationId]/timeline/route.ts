@@ -3,12 +3,14 @@ import { ApplicationServiceError, getApplicationOrThrow } from "@/lib/applicatio
 
 interface RouteContext { params: Promise<{ applicationId: string }>; }
 
+/** Returns lifecycle milestones plus immutable status-update history. */
 export async function GET(_request: Request, { params }: RouteContext) {
   try {
     const { applicationId } = await params;
-    return NextResponse.json({ application: getApplicationOrThrow(applicationId) });
+    const application = getApplicationOrThrow(applicationId);
+    return NextResponse.json({ applicationId: application.applicationId, timeline: application.timeline, history: application.history ?? [] });
   } catch (error) {
     const status = error instanceof ApplicationServiceError ? error.statusCode : 500;
-    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to retrieve application." }, { status });
+    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to retrieve application timeline." }, { status });
   }
 }

@@ -88,6 +88,16 @@ export interface ApplicationTimelineItem {
   actionHref?: string;
 }
 
+/** An immutable audit entry. Unlike the timeline, history retains every update. */
+export interface ApplicationHistoryItem {
+  id: string;
+  fromStatus?: ApplicationStatus;
+  toStatus: ApplicationStatus;
+  remarks?: string;
+  source: "STUDENT" | "PLACEMENT_OFFICER" | "ELIGIBILITY_ENGINE" | "SYSTEM";
+  createdAt: string;
+}
+
 export interface ApplicationRecord {
   id: string;
   applicationId: string;
@@ -101,6 +111,8 @@ export interface ApplicationRecord {
   nextStepDate?: string;
   resumeName?: string;
   timeline: ApplicationTimelineItem[];
+  updatedAt?: string;
+  history?: ApplicationHistoryItem[];
 }
 
 export interface StudentProfile {
