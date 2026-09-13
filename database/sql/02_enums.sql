@@ -24,13 +24,14 @@ CREATE TYPE drive_status_enum AS ENUM (
 -- Application Status
 CREATE TYPE application_status_enum AS ENUM (
     'APPLIED',
+    'ELIGIBILITY_VERIFIED',
     'SHORTLISTED',
-    'INTERVIEW_SCHEDULED',
-    'INTERVIEW_COMPLETED',
+    'ASSESSMENT',
+    'TECHNICAL_INTERVIEW',
+    'HR_INTERVIEW',
     'SELECTED',
     'REJECTED',
-    'OFFER_ACCEPTED',
-    'OFFER_DECLINED'
+    'WITHDRAWN'
 );
 
 -- Interview Round Status
