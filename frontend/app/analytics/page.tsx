@@ -42,6 +42,27 @@ import AppLayout from "@/components/layout/AppLayout";
 import type { AppUser } from "@/components/layout/AppLayout";
 import type { UserRole } from "@/components/navigation/sidebarConfig";
 
+import {
+  getOverview,
+  getPlacements,
+  getApplications,
+  getHiringTrends,
+  getDepartmentWise,
+  getYearWise,
+  getCompanyWise,
+  getSalaryDistribution,
+  getRoleOffers,
+  getCompanyRecruitmentTrends,
+  getHiringUpdates,
+  getPlacementInsights,
+  getEligibleStudents,
+} from "@/lib/analytics";
+
+import type {
+  EligibleStudent as ApiEligibleStudent,
+  PlacementInsights,
+} from "@/lib/analytics";
+
 /* =========================================================
    TYPES
 ========================================================= */
@@ -179,439 +200,6 @@ const kpiConfig: KPI[] = [
 ];
 
 /* =========================================================
-   DUMMY DATA
-========================================================= */
-
-const mockDashboardData = {
-  kpis: [
-    {
-      title: "Total Students",
-      value: "1248",
-      icon: Users,
-      description: "Registered students",
-    },
-    {
-      title: "Eligible Students",
-      value: "982",
-      icon: GraduationCap,
-      description: "Currently eligible",
-    },
-    {
-      title: "Applications",
-      value: "2864",
-      icon: BriefcaseBusiness,
-      description: "Total applications",
-    },
-    {
-      title: "Students Placed",
-      value: "764",
-      icon: CheckCircle2,
-      description: "Successfully placed",
-    },
-    {
-      title: "Placement Rate",
-      value: "77.8%",
-      icon: TrendingUp,
-      description: "Overall placement rate",
-    },
-    {
-      title: "Active Drives",
-      value: "18",
-      icon: Activity,
-      description: "Currently active",
-    },
-  ] as KPI[],
-
-  departmentPlacement: [
-    {
-      department: "CSE",
-      placed: 245,
-      eligible: 290,
-      rate: 84.5,
-    },
-    {
-      department: "IT",
-      placed: 198,
-      eligible: 240,
-      rate: 82.5,
-    },
-    {
-      department: "ECE",
-      placed: 156,
-      eligible: 220,
-      rate: 70.9,
-    },
-    {
-      department: "EEE",
-      placed: 92,
-      eligible: 132,
-      rate: 69.7,
-    },
-    {
-      department: "ME",
-      placed: 73,
-      eligible: 100,
-      rate: 73.0,
-    },
-  ] as DepartmentPlacement[],
-
-  yearPlacement: [
-    {
-      year: "2022-23",
-      placed: 620,
-      eligible: 850,
-    },
-    {
-      year: "2023-24",
-      placed: 680,
-      eligible: 900,
-    },
-    {
-      year: "2024-25",
-      placed: 720,
-      eligible: 940,
-    },
-    {
-      year: "2025-26",
-      placed: 764,
-      eligible: 982,
-    },
-  ] as YearPlacement[],
-
-  companyHiring: [
-    {
-      company: "TCS",
-      students: 126,
-    },
-    {
-      company: "Infosys",
-      students: 108,
-    },
-    {
-      company: "Accenture",
-      students: 96,
-    },
-    {
-      company: "Wipro",
-      students: 82,
-    },
-    {
-      company: "Deloitte",
-      students: 64,
-    },
-  ] as CompanyHiring[],
-
-  salaryDistribution: [
-    {
-      range: "3-5 LPA",
-      students: 286,
-    },
-    {
-      range: "5-8 LPA",
-      students: 244,
-    },
-    {
-      range: "8-12 LPA",
-      students: 142,
-    },
-    {
-      range: "12-18 LPA",
-      students: 64,
-    },
-    {
-      range: "18+ LPA",
-      students: 28,
-    },
-  ] as SalaryDistribution[],
-
-  ctc: [
-    {
-      range: "Minimum",
-      value: 3.2,
-    },
-    {
-      range: "Average",
-      value: 7.8,
-    },
-    {
-      range: "Median",
-      value: 7.1,
-    },
-    {
-      range: "Maximum",
-      value: 24.5,
-    },
-  ] as CTCData[],
-
-  roleOffers: [
-    {
-      role: "Software Engineer",
-      offers: 210,
-    },
-    {
-      role: "Data Analyst",
-      offers: 86,
-    },
-    {
-      role: "Business Analyst",
-      offers: 72,
-    },
-    {
-      role: "Consultant",
-      offers: 58,
-    },
-    {
-      role: "Other",
-      offers: 42,
-    },
-  ] as RoleOffer[],
-
-  monthlyHiring: [
-    {
-      month: "Jan",
-      hired: 42,
-    },
-    {
-      month: "Feb",
-      hired: 56,
-    },
-    {
-      month: "Mar",
-      hired: 72,
-    },
-    {
-      month: "Apr",
-      hired: 68,
-    },
-    {
-      month: "May",
-      hired: 94,
-    },
-    {
-      month: "Jun",
-      hired: 112,
-    },
-  ] as MonthlyHiring[],
-
-  applicationSelection: [
-    {
-      month: "Jan",
-      applications: 280,
-      selections: 42,
-    },
-    {
-      month: "Feb",
-      applications: 340,
-      selections: 56,
-    },
-    {
-      month: "Mar",
-      applications: 410,
-      selections: 72,
-    },
-    {
-      month: "Apr",
-      applications: 450,
-      selections: 68,
-    },
-    {
-      month: "May",
-      applications: 520,
-      selections: 94,
-    },
-    {
-      month: "Jun",
-      applications: 610,
-      selections: 112,
-    },
-  ] as ApplicationSelection[],
-
-  selectionRate: [
-    {
-      month: "Jan",
-      rate: 15,
-    },
-    {
-      month: "Feb",
-      rate: 16.5,
-    },
-    {
-      month: "Mar",
-      rate: 17.6,
-    },
-    {
-      month: "Apr",
-      rate: 15.1,
-    },
-    {
-      month: "May",
-      rate: 18.1,
-    },
-    {
-      month: "Jun",
-      rate: 18.4,
-    },
-  ] as SelectionRate[],
-
-  recruitmentTrend: [
-    {
-      month: "Jan",
-      recruitments: 8,
-    },
-    {
-      month: "Feb",
-      recruitments: 11,
-    },
-    {
-      month: "Mar",
-      recruitments: 14,
-    },
-    {
-      month: "Apr",
-      recruitments: 13,
-    },
-    {
-      month: "May",
-      recruitments: 18,
-    },
-    {
-      month: "Jun",
-      recruitments: 21,
-    },
-  ] as RecruitmentTrend[],
-
-  students: [
-    {
-      id: 1,
-      name: "Aarav Sharma",
-      department: "CSE",
-      branch: "Computer Science",
-      cgpa: "9.2",
-      company: "TCS",
-      drives: 8,
-      applications: 6,
-      interview: "Completed",
-      placement: "Placed",
-      academicYear: "2025-26",
-    },
-    {
-      id: 2,
-      name: "Priya Patel",
-      department: "IT",
-      branch: "Information Technology",
-      cgpa: "8.7",
-      company: "Infosys",
-      drives: 7,
-      applications: 5,
-      interview: "Completed",
-      placement: "Placed",
-      academicYear: "2025-26",
-    },
-    {
-      id: 3,
-      name: "Rohan Verma",
-      department: "ECE",
-      branch: "Electronics",
-      cgpa: "7.8",
-      company: "Accenture",
-      drives: 6,
-      applications: 4,
-      interview: "Scheduled",
-      placement: "In Progress",
-      academicYear: "2025-26",
-    },
-    {
-      id: 4,
-      name: "Ananya Singh",
-      department: "CSE",
-      branch: "Computer Science",
-      cgpa: "9.5",
-      company: "Deloitte",
-      drives: 9,
-      applications: 7,
-      interview: "Completed",
-      placement: "Placed",
-      academicYear: "2025-26",
-    },
-    {
-      id: 5,
-      name: "Aditya Joshi",
-      department: "EEE",
-      branch: "Electrical Engineering",
-      cgpa: "7.2",
-      company: "",
-      drives: 5,
-      applications: 3,
-      interview: "Pending",
-      placement: "Not Placed",
-      academicYear: "2025-26",
-    },
-    {
-      id: 6,
-      name: "Sneha Kulkarni",
-      department: "IT",
-      branch: "Information Technology",
-      cgpa: "8.3",
-      company: "Wipro",
-      drives: 7,
-      applications: 5,
-      interview: "Completed",
-      placement: "Placed",
-      academicYear: "2025-26",
-    },
-    {
-      id: 7,
-      name: "Karan Mehta",
-      department: "ME",
-      branch: "Mechanical Engineering",
-      cgpa: "6.8",
-      company: "",
-      drives: 4,
-      applications: 2,
-      interview: "Pending",
-      placement: "Not Placed",
-      academicYear: "2025-26",
-    },
-    {
-      id: 8,
-      name: "Isha Deshmukh",
-      department: "CSE",
-      branch: "Computer Science",
-      cgpa: "8.9",
-      company: "Accenture",
-      drives: 8,
-      applications: 6,
-      interview: "Completed",
-      placement: "Placed",
-      academicYear: "2025-26",
-    },
-  ] as Student[],
-
-  hiringUpdates: [
-    {
-      company: "TCS",
-      selected: 126,
-    },
-    {
-      company: "Infosys",
-      selected: 108,
-    },
-    {
-      company: "Accenture",
-      selected: 96,
-    },
-    {
-      company: "Wipro",
-      selected: 82,
-    },
-    {
-      company: "Deloitte",
-      selected: 64,
-    },
-  ] as HiringUpdate[],
-};
-
-/* =========================================================
    CHART COLORS
 ========================================================= */
 
@@ -624,43 +212,125 @@ const chartColors = [
 ];
 
 /* =========================================================
-   STATUS COLORS
+   SEMANTIC STATUS COLORS
 ========================================================= */
 
-const getPlacementStatusClass = (status: string) => {
-  switch (status) {
-    case "Placed":
-      return "border-[#22C55E]/30 bg-[#22C55E]/10 text-[#22C55E]";
-
-    case "In Progress":
-      return "border-[#F59E0B]/30 bg-[#F59E0B]/10 text-[#F59E0B]";
-
-    case "Not Placed":
-      return "border-[#EF4444]/30 bg-[#EF4444]/10 text-[#EF4444]";
-
-    default:
-      return "border-[#1E3045] bg-[#0B1422] text-slate-400";
-  }
+const placementStatusColors = {
+  Placed: "#22C55E",
+  "In Progress": "#F59E0B",
+  "Not Placed": "#EF4444",
 };
 
 /* =========================================================
-   STATUS BADGE
+   HELPERS
 ========================================================= */
 
-function PlacementStatusBadge({
-  status,
-}: {
-  status: string;
-}) {
-  return (
-    <span
-      className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${getPlacementStatusClass(
-        status
-      )}`}
-    >
-      {status}
-    </span>
+function graduationYearToAcademicYear(year: number): string {
+  const previousYear = year - 1;
+
+  return `${previousYear}-${String(year).slice(-2)}`;
+}
+
+function formatPlacementStatus(
+  status?: string | null
+): string {
+  switch ((status ?? "").toUpperCase()) {
+    case "SELECTED":
+      return "Placed";
+
+    case "REJECTED":
+      return "Not Placed";
+
+    case "IN_PROGRESS":
+    case "APPLIED":
+    case "SHORTLISTED":
+    case "INTERVIEW":
+      return "In Progress";
+
+    default:
+      return "In Progress";
+  }
+}
+
+function formatInterviewStatus(
+  status?: string | null
+): string {
+  if (!status) {
+    return "Pending";
+  }
+
+  return status
+    .toLowerCase()
+    .split("_")
+    .map(
+      (word) =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+    )
+    .join(" ");
+}
+
+function formatMonth(month: string): string {
+  if (!month) {
+    return "";
+  }
+
+  const parts = month.split("-");
+
+  if (parts.length !== 2) {
+    return month;
+  }
+
+  const year = Number(parts[0]);
+  const monthNumber = Number(parts[1]);
+
+  if (
+    Number.isNaN(year) ||
+    Number.isNaN(monthNumber) ||
+    monthNumber < 1 ||
+    monthNumber > 12
+  ) {
+    return month;
+  }
+
+  const date = new Date(
+    Date.UTC(year, monthNumber - 1, 1)
   );
+
+  return date.toLocaleString("en-US", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+function mapApiStudent(
+  student: ApiEligibleStudent
+): Student {
+  const academicYear =
+    student.academic_year ?? undefined;
+
+  return {
+    id: student.student_id,
+    name: student.student_name,
+    department: student.department ?? "",
+    branch: student.branch ?? "",
+    cgpa:
+      student.cgpa !== null &&
+      student.cgpa !== undefined
+        ? String(student.cgpa)
+        : "—",
+    company:
+      student.company ?? undefined,
+    drives: student.eligible_drives ?? 0,
+    applications: student.applications ?? 0,
+    interview: formatInterviewStatus(
+      student.interview_status
+    ),
+    placement: formatPlacementStatus(
+      student.placement_status
+    ),
+    academicYear,
+  };
 }
 
 /* =========================================================
@@ -727,7 +397,11 @@ function ChartCard({
    KPI ICON
 ========================================================= */
 
-function KPIIcon({ Icon }: { Icon: ElementType }) {
+function KPIIcon({
+  Icon,
+}: {
+  Icon: ElementType;
+}) {
   return (
     <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#1683FF]/10">
       <Icon className="h-5 w-5 text-[#1683FF]" />
@@ -736,40 +410,101 @@ function KPIIcon({ Icon }: { Icon: ElementType }) {
 }
 
 /* =========================================================
+   INSIGHT LIST
+========================================================= */
+
+function InsightList({
+  items,
+  emptyMessage,
+}: {
+  items: string[];
+  emptyMessage: string;
+}) {
+  if (items.length === 0) {
+    return (
+      <p className="mt-2 text-sm leading-6 text-slate-500">
+        {emptyMessage}
+      </p>
+    );
+  }
+
+  return (
+    <ul className="mt-3 space-y-3">
+      {items.map((item, index) => (
+        <li
+          key={`${item}-${index}`}
+          className="flex items-start gap-2"
+        >
+          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-current" />
+
+          <span className="text-sm leading-6 text-slate-400">
+            {item}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* =========================================================
    MAIN DASHBOARD
 ========================================================= */
 
 export default function PlacementOfficerDashboard() {
-  const [kpis, setKpis] = useState<KPI[]>([]);
-  const [departmentPlacementData, setDepartmentPlacementData] =
-    useState<DepartmentPlacement[]>([]);
+  /* =======================================================
+     API DATA STATE
+  ======================================================= */
 
-  const [yearPlacementData, setYearPlacementData] =
-    useState<YearPlacement[]>([]);
+  const [kpis, setKpis] =
+    useState<KPI[]>(kpiConfig);
 
-  const [companyHiringData, setCompanyHiringData] =
-    useState<CompanyHiring[]>([]);
+  const [
+    departmentPlacementData,
+    setDepartmentPlacementData,
+  ] = useState<DepartmentPlacement[]>([]);
 
-  const [salaryDistributionData, setSalaryDistributionData] =
-    useState<SalaryDistribution[]>([]);
+  const [
+    yearPlacementData,
+    setYearPlacementData,
+  ] = useState<YearPlacement[]>([]);
+
+  const [
+    companyHiringData,
+    setCompanyHiringData,
+  ] = useState<CompanyHiring[]>([]);
+
+  const [
+    salaryDistributionData,
+    setSalaryDistributionData,
+  ] = useState<SalaryDistribution[]>([]);
 
   const [ctcData, setCtcData] =
     useState<CTCData[]>([]);
 
-  const [roleOffersData, setRoleOffersData] =
-    useState<RoleOffer[]>([]);
+  const [
+    roleOffersData,
+    setRoleOffersData,
+  ] = useState<RoleOffer[]>([]);
 
-  const [monthlyHiringData, setMonthlyHiringData] =
-    useState<MonthlyHiring[]>([]);
+  const [
+    monthlyHiringData,
+    setMonthlyHiringData,
+  ] = useState<MonthlyHiring[]>([]);
 
-  const [applicationSelectionData, setApplicationSelectionData] =
-    useState<ApplicationSelection[]>([]);
+  const [
+    applicationSelectionData,
+    setApplicationSelectionData,
+  ] = useState<ApplicationSelection[]>([]);
 
-  const [selectionRateData, setSelectionRateData] =
-    useState<SelectionRate[]>([]);
+  const [
+    selectionRateData,
+    setSelectionRateData,
+  ] = useState<SelectionRate[]>([]);
 
-  const [recruitmentTrendData, setRecruitmentTrendData] =
-    useState<RecruitmentTrend[]>([]);
+  const [
+    recruitmentTrendData,
+    setRecruitmentTrendData,
+  ] = useState<RecruitmentTrend[]>([]);
 
   const [students, setStudents] =
     useState<Student[]>([]);
@@ -777,17 +512,50 @@ export default function PlacementOfficerDashboard() {
   const [hiringUpdates, setHiringUpdates] =
     useState<HiringUpdate[]>([]);
 
+  const [
+    placementInsights,
+    setPlacementInsights,
+  ] = useState<PlacementInsights | null>(null);
+
+  /* =======================================================
+     LOADING / ERROR STATE
+  ======================================================= */
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [studentLoading, setStudentLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const [studentError, setStudentError] =
+    useState<string | null>(null);
+
   /* =======================================================
      FILTER STATE
   ======================================================= */
 
   const [search, setSearch] = useState("");
-  const [department, setDepartment] = useState("");
-  const [cgpa, setCgpa] = useState("");
-  const [company, setCompany] = useState("");
-  const [branch, setBranch] = useState("");
-  const [placementStatus, setPlacementStatus] = useState("");
-  const [academicYear, setAcademicYear] = useState("2025-26");
+
+  const [department, setDepartment] =
+    useState("");
+
+  const [cgpa, setCgpa] =
+    useState("");
+
+  const [company, setCompany] =
+    useState("");
+
+  const [branch, setBranch] =
+    useState("");
+
+  const [placementStatus, setPlacementStatus] =
+    useState("");
+
+  const [academicYear, setAcademicYear] =
+    useState("");
 
   /* =======================================================
      CURRENT USER
@@ -797,71 +565,445 @@ export default function PlacementOfficerDashboard() {
     useState<AppUser>(developmentUser);
 
   /* =======================================================
-     LOAD DASHBOARD DATA
+     LOAD MAIN ANALYTICS DATA
   ======================================================= */
 
   useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        await new Promise((resolve) =>
-          setTimeout(resolve, 300)
-        );
+    let cancelled = false;
 
-        setKpis(mockDashboardData.kpis);
+    const loadAnalytics = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const [
+          overview,
+          placements,
+          applications,
+          hiringTrends,
+          departmentWise,
+          yearWise,
+          companyWise,
+          salaryDistribution,
+          roleOffers,
+          companyRecruitmentTrends,
+          hiringUpdatesResponse,
+          insights,
+        ] = await Promise.all([
+          getOverview(),
+          getPlacements(),
+          getApplications(),
+          getHiringTrends(),
+          getDepartmentWise(),
+          getYearWise(),
+          getCompanyWise(),
+          getSalaryDistribution(),
+          getRoleOffers(),
+          getCompanyRecruitmentTrends(),
+          getHiringUpdates(),
+          getPlacementInsights(),
+        ]);
+
+        if (cancelled) {
+          return;
+        }
+
+        /* =================================================
+           KPI CARDS
+        ================================================= */
+
+        setKpis([
+          {
+            title: "Total Students",
+            value: String(
+              overview.total_students
+            ),
+            icon: Users,
+            description:
+              "Registered students",
+          },
+          {
+            title: "Eligible Students",
+            value: String(
+              overview.eligible_students
+            ),
+            icon: GraduationCap,
+            description:
+              "Currently eligible",
+          },
+          {
+            title: "Applications",
+            value: String(
+              overview.total_applications
+            ),
+            icon: BriefcaseBusiness,
+            description:
+              "Total applications",
+          },
+          {
+            title: "Students Placed",
+            value: String(
+              overview.students_placed
+            ),
+            icon: CheckCircle2,
+            description:
+              "Successfully placed",
+          },
+          {
+            title: "Placement Rate",
+            value: `${Number(
+              overview.placement_rate ?? 0
+            ).toFixed(1)}%`,
+            icon: TrendingUp,
+            description:
+              "Overall placement rate",
+          },
+          {
+            title: "Active Drives",
+            value: String(
+              overview.active_drives
+            ),
+            icon: Activity,
+            description:
+              "Currently active",
+          },
+        ]);
+
+        /* =================================================
+           DEPARTMENT-WISE PLACEMENT
+        ================================================= */
 
         setDepartmentPlacementData(
-          mockDashboardData.departmentPlacement
+          departmentWise.map((item) => ({
+            department:
+              item.department,
+            placed:
+              item.students_placed,
+            eligible:
+              item.total_students,
+            rate:
+              item.placement_rate,
+          }))
         );
+
+        /* =================================================
+           YEAR-WISE PLACEMENT
+        ================================================= */
 
         setYearPlacementData(
-          mockDashboardData.yearPlacement
+          yearWise.map((item) => ({
+            year:
+              graduationYearToAcademicYear(
+                item.graduation_year
+              ),
+            placed:
+              item.students_placed,
+            eligible:
+              item.total_students,
+          }))
         );
+
+        /* =================================================
+           COMPANY-WISE HIRING
+        ================================================= */
 
         setCompanyHiringData(
-          mockDashboardData.companyHiring
+          companyWise.map((item) => ({
+            company:
+              item.company_name,
+            students:
+              item.students_placed,
+          }))
         );
+
+        /* =================================================
+           SALARY DISTRIBUTION
+        ================================================= */
 
         setSalaryDistributionData(
-          mockDashboardData.salaryDistribution
+          salaryDistribution.map((item) => ({
+            range:
+              item.salary_range,
+            students:
+              item.students,
+          }))
         );
 
-        setCtcData(mockDashboardData.ctc);
+        /* =================================================
+           CTC STATISTICS
+        ================================================= */
+
+        const ctc: CTCData[] = [];
+
+        if (
+          placements.lowest_package !==
+            null &&
+          placements.lowest_package !==
+            undefined
+        ) {
+          ctc.push({
+            range: "Minimum",
+            value:
+              placements.lowest_package,
+          });
+        }
+
+        if (
+          placements.average_package !==
+            null &&
+          placements.average_package !==
+            undefined
+        ) {
+          ctc.push({
+            range: "Average",
+            value:
+              placements.average_package,
+          });
+        }
+
+        if (
+          placements.highest_package !==
+            null &&
+          placements.highest_package !==
+            undefined
+        ) {
+          ctc.push({
+            range: "Maximum",
+            value:
+              placements.highest_package,
+          });
+        }
+
+        setCtcData(ctc);
+
+        /* =================================================
+           OFFERS BY ROLE
+        ================================================= */
 
         setRoleOffersData(
-          mockDashboardData.roleOffers
+          roleOffers.map((item) => ({
+            role: item.role,
+            offers: item.offers,
+          }))
         );
 
+        /* =================================================
+           MONTHLY HIRING + APPLICATIONS
+        ================================================= */
+
         setMonthlyHiringData(
-          mockDashboardData.monthlyHiring
+          hiringTrends.map((item) => ({
+            month:
+              formatMonth(item.month),
+            hired:
+              item.selections,
+          }))
         );
 
         setApplicationSelectionData(
-          mockDashboardData.applicationSelection
+          hiringTrends.map((item) => ({
+            month:
+              formatMonth(item.month),
+            applications:
+              item.applications,
+            selections:
+              item.selections,
+          }))
         );
 
+        /* =================================================
+           SELECTION RATE
+        ================================================= */
+
         setSelectionRateData(
-          mockDashboardData.selectionRate
+          hiringTrends.map((item) => {
+            const rate =
+              item.applications > 0
+                ? (item.selections /
+                    item.applications) *
+                  100
+                : 0;
+
+            return {
+              month:
+                formatMonth(item.month),
+              rate: Number(
+                rate.toFixed(1)
+              ),
+            };
+          })
+        );
+
+        /* =================================================
+           COMPANY RECRUITMENT TRENDS
+        ================================================= */
+
+        const recruitmentByMonth =
+          new Map<string, number>();
+
+        companyRecruitmentTrends.forEach(
+          (item) => {
+            const current =
+              recruitmentByMonth.get(
+                item.month
+              ) ?? 0;
+
+            recruitmentByMonth.set(
+              item.month,
+              current + item.recruitments
+            );
+          }
         );
 
         setRecruitmentTrendData(
-          mockDashboardData.recruitmentTrend
+          Array.from(
+            recruitmentByMonth.entries()
+          )
+            .sort(([a], [b]) =>
+              a.localeCompare(b)
+            )
+            .map(
+              ([month, recruitments]) => ({
+                month:
+                  formatMonth(month),
+                recruitments,
+              })
+            )
         );
 
-        setStudents(mockDashboardData.students);
+        /* =================================================
+           HIRING UPDATES
+        ================================================= */
 
         setHiringUpdates(
-          mockDashboardData.hiringUpdates
+          hiringUpdatesResponse.map(
+            (item) => ({
+              company: item.company,
+              selected: item.selected,
+            })
+          )
         );
-      } catch (error) {
+
+        /* =================================================
+           PLACEMENT INSIGHTS
+        ================================================= */
+
+        setPlacementInsights(insights);
+
+        /*
+         * Applications endpoint is still loaded as part
+         * of the analytics layer and can be used by
+         * future dashboard components.
+         */
+        void applications;
+      } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
         console.error(
-          "Unable to load dashboard data:",
-          error
+          "Unable to load analytics data:",
+          err
         );
+
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unable to load analytics data."
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    loadDashboardData();
-  }, [academicYear]);
+    loadAnalytics();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /* =======================================================
+     LOAD ELIGIBLE STUDENTS
+  ======================================================= */
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadEligibleStudents =
+      async () => {
+        setStudentLoading(true);
+        setStudentError(null);
+
+        try {
+          const apiStudents =
+            await getEligibleStudents({
+              academic_year:
+                academicYear ||
+                undefined,
+
+              department:
+                department ||
+                undefined,
+
+              company:
+                company ||
+                undefined,
+
+              branch:
+                branch ||
+                undefined,
+
+              placement_status:
+                placementStatus ||
+                undefined,
+            });
+
+          if (cancelled) {
+            return;
+          }
+
+          setStudents(
+            apiStudents.map(mapApiStudent)
+          );
+        } catch (err) {
+          if (cancelled) {
+            return;
+          }
+
+          console.error(
+            "Unable to load eligible students:",
+            err
+          );
+
+          setStudents([]);
+
+          setStudentError(
+            err instanceof Error
+              ? err.message
+              : "Unable to load eligible students."
+          );
+        } finally {
+          if (!cancelled) {
+            setStudentLoading(false);
+          }
+        }
+      };
+
+    loadEligibleStudents();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    academicYear,
+    department,
+    company,
+    branch,
+    placementStatus,
+  ]);
 
   /* =======================================================
      LOAD CURRENT USER
@@ -870,17 +1012,26 @@ export default function PlacementOfficerDashboard() {
   useEffect(() => {
     try {
       const storedUser =
-        localStorage.getItem("currentUser") ||
-        sessionStorage.getItem("currentUser");
+        localStorage.getItem(
+          "currentUser"
+        ) ||
+        sessionStorage.getItem(
+          "currentUser"
+        );
 
-      if (!storedUser) return;
+      if (!storedUser) {
+        return;
+      }
 
-      const parsedUser = JSON.parse(storedUser);
+      const parsedUser =
+        JSON.parse(storedUser);
 
       if (
         parsedUser &&
-        typeof parsedUser.name === "string" &&
-        typeof parsedUser.role === "string"
+        typeof parsedUser.name ===
+          "string" &&
+        typeof parsedUser.role ===
+          "string"
       ) {
         const allowedRoles: UserRole[] = [
           "student",
@@ -896,14 +1047,15 @@ export default function PlacementOfficerDashboard() {
         ) {
           setCurrentUser({
             name: parsedUser.name,
-            role: parsedUser.role as UserRole,
+            role:
+              parsedUser.role as UserRole,
           });
         }
       }
-    } catch (error) {
+    } catch (err) {
       console.error(
         "Unable to read current user:",
-        error
+        err
       );
     }
   }, []);
@@ -914,10 +1066,15 @@ export default function PlacementOfficerDashboard() {
 
   const handleLogout = () => {
     try {
-      localStorage.removeItem("currentUser");
-      sessionStorage.removeItem("currentUser");
+      localStorage.removeItem(
+        "currentUser"
+      );
+
+      sessionStorage.removeItem(
+        "currentUser"
+      );
     } catch {
-      // Ignore storage errors
+      // Ignore storage errors.
     }
 
     console.log("Logout requested");
@@ -931,7 +1088,10 @@ export default function PlacementOfficerDashboard() {
     return Array.from(
       new Set(
         students
-          .map((student) => student.department)
+          .map(
+            (student) =>
+              student.department
+          )
           .filter(Boolean)
       )
     ).sort();
@@ -941,7 +1101,10 @@ export default function PlacementOfficerDashboard() {
     return Array.from(
       new Set(
         students
-          .map((student) => student.branch)
+          .map(
+            (student) =>
+              student.branch
+          )
           .filter(Boolean)
       )
     ).sort();
@@ -951,7 +1114,10 @@ export default function PlacementOfficerDashboard() {
     return Array.from(
       new Set(
         students
-          .map((student) => student.company)
+          .map(
+            (student) =>
+              student.company
+          )
           .filter(Boolean)
       )
     ).sort();
@@ -969,97 +1135,78 @@ export default function PlacementOfficerDashboard() {
      FILTER STUDENTS
   ======================================================= */
 
-  const filteredStudents = useMemo(() => {
-    const normalizedSearch =
-      search.trim().toLowerCase();
+  const filteredStudents =
+    useMemo(() => {
+      const normalizedSearch =
+        search.trim().toLowerCase();
 
-    return students.filter((student) => {
-      const matchesSearch =
-        !normalizedSearch ||
-        student.name
-          .toLowerCase()
-          .includes(normalizedSearch) ||
-        student.department
-          .toLowerCase()
-          .includes(normalizedSearch) ||
-        student.branch
-          .toLowerCase()
-          .includes(normalizedSearch) ||
-        (student.company ?? "")
-          .toLowerCase()
-          .includes(normalizedSearch);
+      return students.filter(
+        (student) => {
+          const matchesSearch =
+            !normalizedSearch ||
+            student.name
+              .toLowerCase()
+              .includes(normalizedSearch) ||
+            student.department
+              .toLowerCase()
+              .includes(normalizedSearch) ||
+            student.branch
+              .toLowerCase()
+              .includes(normalizedSearch) ||
+            (student.company ?? "")
+              .toLowerCase()
+              .includes(normalizedSearch);
 
-      const matchesDepartment =
-        !department ||
-        student.department === department;
+          const numericCgpa =
+            Number(student.cgpa);
 
-      const matchesBranch =
-        !branch ||
-        student.branch === branch;
+          let matchesCgpa = true;
 
-      const matchesCompany =
-        !company ||
-        student.company === company;
+          if (cgpa === "9.0+") {
+            matchesCgpa =
+              numericCgpa >= 9;
+          }
 
-      const matchesPlacementStatus =
-        !placementStatus ||
-        student.placement === placementStatus;
+          if (
+            cgpa === "8.0 - 8.99"
+          ) {
+            matchesCgpa =
+              numericCgpa >= 8 &&
+              numericCgpa < 9;
+          }
 
-      const matchesAcademicYear =
-        !academicYear ||
-        student.academicYear === academicYear;
+          if (
+            cgpa === "7.0 - 7.99"
+          ) {
+            matchesCgpa =
+              numericCgpa >= 7 &&
+              numericCgpa < 8;
+          }
 
-      const numericCgpa =
-        Number(student.cgpa) || 0;
+          if (
+            cgpa === "6.0 - 6.99"
+          ) {
+            matchesCgpa =
+              numericCgpa >= 6 &&
+              numericCgpa < 7;
+          }
 
-      let matchesCgpa = true;
+          if (cgpa === "Below 6.0") {
+            matchesCgpa =
+              numericCgpa < 6;
+          }
 
-      if (cgpa === "9.0+") {
-        matchesCgpa = numericCgpa >= 9;
-      }
-
-      if (cgpa === "8.0 - 8.99") {
-        matchesCgpa =
-          numericCgpa >= 8 &&
-          numericCgpa < 9;
-      }
-
-      if (cgpa === "7.0 - 7.99") {
-        matchesCgpa =
-          numericCgpa >= 7 &&
-          numericCgpa < 8;
-      }
-
-      if (cgpa === "6.0 - 6.99") {
-        matchesCgpa =
-          numericCgpa >= 6 &&
-          numericCgpa < 7;
-      }
-
-      if (cgpa === "Below 6.0") {
-        matchesCgpa = numericCgpa < 6;
-      }
-
-      return (
-        matchesSearch &&
-        matchesDepartment &&
-        matchesBranch &&
-        matchesCompany &&
-        matchesPlacementStatus &&
-        matchesAcademicYear &&
-        matchesCgpa
+          return (
+            matchesSearch &&
+            matchesCgpa
+          );
+        }
       );
-    });
-  }, [
-    students,
-    search,
-    department,
-    branch,
-    company,
-    placementStatus,
-    academicYear,
-    cgpa,
-  ]);
+    }, [
+      students,
+      search,
+      cgpa,
+    ]);
 
   /* =======================================================
      CLEAR FILTERS
@@ -1072,6 +1219,7 @@ export default function PlacementOfficerDashboard() {
     setCompany("");
     setBranch("");
     setPlacementStatus("");
+    setAcademicYear("");
   };
 
   /* =======================================================
@@ -1085,7 +1233,9 @@ export default function PlacementOfficerDashboard() {
     >
       <div className="mx-auto max-w-[1600px]">
 
-        {/* HEADER */}
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
         <header className="mb-8">
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
@@ -1144,11 +1294,34 @@ export default function PlacementOfficerDashboard() {
                 <Activity className="h-4 w-4" />
                 Dashboard
               </button>
+
             </div>
           </div>
         </header>
 
-        {/* KPI CARDS */}
+        {/* =================================================
+            ERROR MESSAGE
+        ================================================= */}
+
+        {error && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#EF4444]" />
+
+            <div>
+              <p className="text-sm font-medium text-red-300">
+                Unable to load some dashboard data
+              </p>
+
+              <p className="mt-1 text-xs text-red-200/70">
+                {error}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* =================================================
+            KPI CARDS
+        ================================================= */}
 
         <section className="mb-8">
           <div className="mb-4">
@@ -1166,8 +1339,9 @@ export default function PlacementOfficerDashboard() {
             {kpis.map((kpi) => {
               const Icon = kpi.icon;
 
-              const isRate =
-                kpi.title === "Placement Rate";
+              const isPlacementRate =
+                kpi.title ===
+                "Placement Rate";
 
               return (
                 <div
@@ -1182,12 +1356,14 @@ export default function PlacementOfficerDashboard() {
 
                   <div
                     className={`mt-1 min-h-[36px] text-2xl font-bold ${
-                      isRate
+                      isPlacementRate
                         ? "text-[#22C55E]"
                         : "text-white"
                     }`}
                   >
-                    {kpi.value || "—"}
+                    {loading
+                      ? "..."
+                      : kpi.value || "—"}
                   </div>
 
                   <p className="mt-1 text-xs text-slate-500">
@@ -1196,10 +1372,13 @@ export default function PlacementOfficerDashboard() {
                 </div>
               );
             })}
+
           </div>
         </section>
 
-        {/* HIRING UPDATES */}
+        {/* =================================================
+            HIRING UPDATES
+        ================================================= */}
 
         <section className="mb-8">
           <div className="mb-4">
@@ -1224,7 +1403,13 @@ export default function PlacementOfficerDashboard() {
               </span>
             </div>
 
-            {hiringUpdates.length === 0 ? (
+            {loading ? (
+              <div className="flex min-h-[180px] items-center justify-center">
+                <p className="text-sm text-slate-500">
+                  Loading hiring updates...
+                </p>
+              </div>
+            ) : hiringUpdates.length === 0 ? (
               <div className="flex min-h-[180px] items-center justify-center">
                 <div className="text-center">
                   <BriefcaseBusiness className="mx-auto h-8 w-8 text-slate-600" />
@@ -1250,10 +1435,13 @@ export default function PlacementOfficerDashboard() {
                 </div>
               ))
             )}
+
           </div>
         </section>
 
-        {/* PLACEMENT SCENARIO */}
+        {/* =================================================
+            PLACEMENT SCENARIO
+        ================================================= */}
 
         <section className="mb-8">
 
@@ -1287,7 +1475,9 @@ export default function PlacementOfficerDashboard() {
                   height={280}
                 >
                   <LineChart
-                    data={departmentPlacementData}
+                    data={
+                      departmentPlacementData
+                    }
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -1299,7 +1489,9 @@ export default function PlacementOfficerDashboard() {
                       stroke="#64748B"
                     />
 
-                    <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
                     <Tooltip />
 
@@ -1331,7 +1523,9 @@ export default function PlacementOfficerDashboard() {
                   height={280}
                 >
                   <BarChart
-                    data={departmentPlacementData}
+                    data={
+                      departmentPlacementData
+                    }
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -1343,13 +1537,15 @@ export default function PlacementOfficerDashboard() {
                       stroke="#64748B"
                     />
 
-                    <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
                     <Tooltip />
 
                     <Bar
                       dataKey="placed"
-                      fill="#1683FF"
+                      fill="#22C55E"
                     />
                   </BarChart>
                 </ResponsiveContainer>
@@ -1373,7 +1569,9 @@ export default function PlacementOfficerDashboard() {
                   height={280}
                 >
                   <LineChart
-                    data={yearPlacementData}
+                    data={
+                      yearPlacementData
+                    }
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -1385,14 +1583,16 @@ export default function PlacementOfficerDashboard() {
                       stroke="#64748B"
                     />
 
-                    <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
                     <Tooltip />
 
                     <Line
                       type="monotone"
                       dataKey="placed"
-                      stroke="#7C5CFF"
+                      stroke="#22C55E"
                       strokeWidth={3}
                     />
                   </LineChart>
@@ -1417,7 +1617,9 @@ export default function PlacementOfficerDashboard() {
                   height={280}
                 >
                   <BarChart
-                    data={companyHiringData}
+                    data={
+                      companyHiringData
+                    }
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -1429,7 +1631,9 @@ export default function PlacementOfficerDashboard() {
                       stroke="#64748B"
                     />
 
-                    <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
                     <Tooltip />
 
@@ -1459,7 +1663,9 @@ export default function PlacementOfficerDashboard() {
                   height={280}
                 >
                   <BarChart
-                    data={salaryDistributionData}
+                    data={
+                      salaryDistributionData
+                    }
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -1471,7 +1677,9 @@ export default function PlacementOfficerDashboard() {
                       stroke="#64748B"
                     />
 
-                    <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
                     <Tooltip />
 
@@ -1500,7 +1708,9 @@ export default function PlacementOfficerDashboard() {
                   width="100%"
                   height={280}
                 >
-                  <LineChart data={ctcData}>
+                  <LineChart
+                    data={ctcData}
+                  >
                     <CartesianGrid
                       strokeDasharray="3 3"
                       stroke="#1E3045"
@@ -1511,7 +1721,9 @@ export default function PlacementOfficerDashboard() {
                       stroke="#64748B"
                     />
 
-                    <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
                     <Tooltip />
 
@@ -1544,7 +1756,9 @@ export default function PlacementOfficerDashboard() {
                 >
                   <PieChart>
                     <Pie
-                      data={roleOffersData}
+                      data={
+                        roleOffersData
+                      }
                       dataKey="offers"
                       nameKey="role"
                       cx="50%"
@@ -1573,10 +1787,13 @@ export default function PlacementOfficerDashboard() {
                 </ResponsiveContainer>
               )}
             </ChartCard>
+
           </div>
         </section>
 
-        {/* ELIGIBLE STUDENTS */}
+        {/* =================================================
+            ELIGIBLE STUDENTS
+        ================================================= */}
 
         <section className="mb-8">
 
@@ -1612,14 +1829,19 @@ export default function PlacementOfficerDashboard() {
               >
                 Clear Filters
               </button>
+
             </div>
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
 
+              {/* Department */}
+
               <select
                 value={department}
                 onChange={(event) =>
-                  setDepartment(event.target.value)
+                  setDepartment(
+                    event.target.value
+                  )
                 }
                 className="rounded-lg border border-[#1E3045] bg-[#0B1422] px-3 py-2.5 text-sm text-slate-400 outline-none focus:border-[#1683FF]"
               >
@@ -1627,20 +1849,26 @@ export default function PlacementOfficerDashboard() {
                   Department
                 </option>
 
-                {departmentOptions.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                  >
-                    {option}
-                  </option>
-                ))}
+                {departmentOptions.map(
+                  (option) => (
+                    <option
+                      key={option}
+                      value={option}
+                    >
+                      {option}
+                    </option>
+                  )
+                )}
               </select>
+
+              {/* CGPA */}
 
               <select
                 value={cgpa}
                 onChange={(event) =>
-                  setCgpa(event.target.value)
+                  setCgpa(
+                    event.target.value
+                  )
                 }
                 className="rounded-lg border border-[#1E3045] bg-[#0B1422] px-3 py-2.5 text-sm text-slate-400 outline-none focus:border-[#1683FF]"
               >
@@ -1648,20 +1876,26 @@ export default function PlacementOfficerDashboard() {
                   CGPA
                 </option>
 
-                {cgpaOptions.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                  >
-                    {option}
-                  </option>
-                ))}
+                {cgpaOptions.map(
+                  (option) => (
+                    <option
+                      key={option}
+                      value={option}
+                    >
+                      {option}
+                    </option>
+                  )
+                )}
               </select>
+
+              {/* Company */}
 
               <select
                 value={company}
                 onChange={(event) =>
-                  setCompany(event.target.value)
+                  setCompany(
+                    event.target.value
+                  )
                 }
                 className="rounded-lg border border-[#1E3045] bg-[#0B1422] px-3 py-2.5 text-sm text-slate-400 outline-none focus:border-[#1683FF]"
               >
@@ -1669,20 +1903,26 @@ export default function PlacementOfficerDashboard() {
                   Company
                 </option>
 
-                {companyOptions.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                  >
-                    {option}
-                  </option>
-                ))}
+                {companyOptions.map(
+                  (option) => (
+                    <option
+                      key={option}
+                      value={option}
+                    >
+                      {option}
+                    </option>
+                  )
+                )}
               </select>
+
+              {/* Branch */}
 
               <select
                 value={branch}
                 onChange={(event) =>
-                  setBranch(event.target.value)
+                  setBranch(
+                    event.target.value
+                  )
                 }
                 className="rounded-lg border border-[#1E3045] bg-[#0B1422] px-3 py-2.5 text-sm text-slate-400 outline-none focus:border-[#1683FF]"
               >
@@ -1690,15 +1930,19 @@ export default function PlacementOfficerDashboard() {
                   Branch
                 </option>
 
-                {branchOptions.map((option) => (
-                  <option
-                    key={option}
-                    value={option}
-                  >
-                    {option}
-                  </option>
-                ))}
+                {branchOptions.map(
+                  (option) => (
+                    <option
+                      key={option}
+                      value={option}
+                    >
+                      {option}
+                    </option>
+                  )
+                )}
               </select>
+
+              {/* Placement */}
 
               <select
                 value={placementStatus}
@@ -1713,19 +1957,22 @@ export default function PlacementOfficerDashboard() {
                   Placement Status
                 </option>
 
-                <option value="Placed">
+                <option value="SELECTED">
                   Placed
                 </option>
 
-                <option value="Not Placed">
+                <option value="REJECTED">
                   Not Placed
                 </option>
 
-                <option value="In Progress">
+                <option value="IN_PROGRESS">
                   In Progress
                 </option>
               </select>
+
             </div>
+
+            {/* SEARCH */}
 
             <div className="mt-3 flex items-center rounded-lg border border-[#1E3045] bg-[#0B1422] px-3">
 
@@ -1735,29 +1982,65 @@ export default function PlacementOfficerDashboard() {
                 type="search"
                 value={search}
                 onChange={(event) =>
-                  setSearch(event.target.value)
+                  setSearch(
+                    event.target.value
+                  )
                 }
                 placeholder="Search student, department, branch or company..."
                 className="w-full bg-transparent px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600"
               />
+
             </div>
+
           </div>
 
           {/* RESULT COUNT */}
 
           <div className="mb-3 text-xs text-slate-500">
+
             Showing{" "}
+
             <span className="font-medium text-slate-300">
-              {filteredStudents.length}
+              {studentLoading
+                ? "..."
+                : filteredStudents.length}
             </span>{" "}
+
             of{" "}
+
             <span className="font-medium text-slate-300">
-              {students.length}
+              {studentLoading
+                ? "..."
+                : students.length}
             </span>{" "}
+
             students
+
           </div>
 
-          {/* TABLE */}
+          {/* STUDENT ERROR */}
+
+          {studentError && (
+            <div className="mb-3 rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4">
+              <div className="flex items-start gap-3">
+
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#EF4444]" />
+
+                <div>
+                  <p className="text-sm font-medium text-red-300">
+                    Unable to load eligible students
+                  </p>
+
+                  <p className="mt-1 text-xs text-red-200/70">
+                    {studentError}
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* RESPONSIVE TABLE */}
 
           <div className="w-full overflow-x-auto rounded-xl border border-[#1E3045] bg-[#101C2C]">
 
@@ -1800,17 +2083,35 @@ export default function PlacementOfficerDashboard() {
                   </th>
 
                 </tr>
+
               </thead>
 
               <tbody>
 
-                {filteredStudents.length === 0 ? (
-
+                {studentLoading ? (
                   <tr>
                     <td
                       colSpan={8}
                       className="px-5 py-16 text-center"
                     >
+                      <div className="flex flex-col items-center">
+                        <Activity className="h-8 w-8 animate-pulse text-[#1683FF]" />
+
+                        <p className="mt-3 text-sm text-slate-400">
+                          Loading eligible students...
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredStudents.length === 0 ? (
+
+                  <tr>
+
+                    <td
+                      colSpan={8}
+                      className="px-5 py-16 text-center"
+                    >
+
                       <div className="flex flex-col items-center">
 
                         <Users className="h-9 w-9 text-slate-600" />
@@ -1825,69 +2126,89 @@ export default function PlacementOfficerDashboard() {
                         </p>
 
                       </div>
+
                     </td>
+
                   </tr>
 
                 ) : (
 
                   filteredStudents.map(
-                    (student) => (
-                      <tr
-                        key={student.id}
-                        className="border-b border-[#1E3045] transition hover:bg-[#0B1422]"
-                      >
+                    (student) => {
 
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-white">
-                          {student.name}
-                        </td>
+                      const placementColor =
+                        placementStatusColors[
+                          student.placement as keyof typeof placementStatusColors
+                        ];
 
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-400">
-                          {student.department}
-                        </td>
+                      return (
+                        <tr
+                          key={student.id}
+                          className="border-b border-[#1E3045] transition hover:bg-[#0B1422]"
+                        >
 
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-400">
-                          {student.branch}
-                        </td>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-white">
+                            {student.name}
+                          </td>
 
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-300">
-                          {student.cgpa}
-                        </td>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-400">
+                            {student.department}
+                          </td>
 
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-300">
-                          {student.drives}
-                        </td>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-400">
+                            {student.branch}
+                          </td>
 
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-300">
-                          {student.applications}
-                        </td>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-300">
+                            {student.cgpa}
+                          </td>
 
-                        <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-400">
-                          {student.interview}
-                        </td>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-300">
+                            {student.drives}
+                          </td>
 
-                        {/* STATUS HIGHLIGHT */}
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-300">
+                            {student.applications}
+                          </td>
 
-                        <td className="whitespace-nowrap px-5 py-4">
-                          <PlacementStatusBadge
-                            status={student.placement}
-                          />
-                        </td>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-400">
+                            {student.interview}
+                          </td>
 
-                      </tr>
-                    )
+                          <td
+                            className="whitespace-nowrap px-5 py-4 text-sm font-medium"
+                            style={{
+                              color:
+                                placementColor ||
+                                "#94A3B8",
+                            }}
+                          >
+                            {student.placement}
+                          </td>
+
+                        </tr>
+                      );
+                    }
                   )
+
                 )}
 
               </tbody>
+
             </table>
+
           </div>
+
         </section>
 
-        {/* HIRING TRENDS */}
+        {/* =================================================
+            HIRING TRENDS
+        ================================================= */}
 
         <section className="mb-8">
 
           <div className="mb-4">
+
             <h2 className="text-lg font-semibold text-white">
               Hiring Trends
             </h2>
@@ -1895,163 +2216,227 @@ export default function PlacementOfficerDashboard() {
             <p className="text-sm text-slate-500">
               Analyze recruitment activity and selection performance.
             </p>
+
           </div>
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+
+            {/* Monthly Hiring */}
 
             <ChartCard
               title="Monthly Hiring"
               description="Monthly student hiring trend"
             >
-              <ResponsiveContainer
-                width="100%"
-                height={280}
-              >
-                <LineChart data={monthlyHiringData}>
+              {monthlyHiringData.length ===
+              0 ? (
+                <EmptyChart
+                  title="No hiring trend data"
+                  description="Data will appear when API data is available."
+                />
+              ) : (
+                <ResponsiveContainer
+                  width="100%"
+                  height={280}
+                >
+                  <LineChart
+                    data={
+                      monthlyHiringData
+                    }
+                  >
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#1E3045"
-                  />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#1E3045"
+                    />
 
-                  <XAxis
-                    dataKey="month"
-                    stroke="#64748B"
-                  />
+                    <XAxis
+                      dataKey="month"
+                      stroke="#64748B"
+                    />
 
-                  <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
-                  <Tooltip />
+                    <Tooltip />
 
-                  <Line
-                    type="monotone"
-                    dataKey="hired"
-                    stroke="#1683FF"
-                    strokeWidth={3}
-                  />
+                    <Line
+                      type="monotone"
+                      dataKey="hired"
+                      stroke="#22C55E"
+                      strokeWidth={3}
+                    />
 
-                </LineChart>
-              </ResponsiveContainer>
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </ChartCard>
+
+            {/* Applications vs Selections */}
 
             <ChartCard
               title="Applications vs Selections"
               description="Compare applications and successful selections"
             >
-              <ResponsiveContainer
-                width="100%"
-                height={280}
-              >
-                <BarChart
-                  data={applicationSelectionData}
+              {applicationSelectionData.length ===
+              0 ? (
+                <EmptyChart
+                  title="No application data"
+                  description="Data will appear when API data is available."
+                />
+              ) : (
+                <ResponsiveContainer
+                  width="100%"
+                  height={280}
                 >
+                  <BarChart
+                    data={
+                      applicationSelectionData
+                    }
+                  >
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#1E3045"
-                  />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#1E3045"
+                    />
 
-                  <XAxis
-                    dataKey="month"
-                    stroke="#64748B"
-                  />
+                    <XAxis
+                      dataKey="month"
+                      stroke="#64748B"
+                    />
 
-                  <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
-                  <Tooltip />
+                    <Tooltip />
 
-                  <Legend />
+                    <Legend />
 
-                  <Bar
-                    dataKey="applications"
-                    fill="#1683FF"
-                  />
+                    <Bar
+                      dataKey="applications"
+                      fill="#1683FF"
+                    />
 
-                  <Bar
-                    dataKey="selections"
-                    fill="#7C5CFF"
-                  />
+                    <Bar
+                      dataKey="selections"
+                      fill="#22C55E"
+                    />
 
-                </BarChart>
-              </ResponsiveContainer>
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </ChartCard>
 
-            {/* SELECTION RATE — SEMANTIC GREEN */}
+            {/* Selection Rate */}
 
             <ChartCard
               title="Selection Rate"
               description="Selection percentage over time"
             >
-              <ResponsiveContainer
-                width="100%"
-                height={280}
-              >
-                <LineChart data={selectionRateData}>
+              {selectionRateData.length ===
+              0 ? (
+                <EmptyChart
+                  title="No selection rate data"
+                  description="Data will appear when API data is available."
+                />
+              ) : (
+                <ResponsiveContainer
+                  width="100%"
+                  height={280}
+                >
+                  <LineChart
+                    data={
+                      selectionRateData
+                    }
+                  >
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#1E3045"
-                  />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#1E3045"
+                    />
 
-                  <XAxis
-                    dataKey="month"
-                    stroke="#64748B"
-                  />
+                    <XAxis
+                      dataKey="month"
+                      stroke="#64748B"
+                    />
 
-                  <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
-                  <Tooltip />
+                    <Tooltip />
 
-                  <Line
-                    type="monotone"
-                    dataKey="rate"
-                    stroke="#22C55E"
-                    strokeWidth={3}
-                  />
+                    <Line
+                      type="monotone"
+                      dataKey="rate"
+                      stroke="#22C55E"
+                      strokeWidth={3}
+                    />
 
-                </LineChart>
-              </ResponsiveContainer>
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </ChartCard>
+
+            {/* Company Recruitment Trends */}
 
             <ChartCard
               title="Company Recruitment Trends"
               description="Company recruitment activity over time"
             >
-              <ResponsiveContainer
-                width="100%"
-                height={280}
-              >
-                <LineChart data={recruitmentTrendData}>
+              {recruitmentTrendData.length ===
+              0 ? (
+                <EmptyChart
+                  title="No recruitment trend data"
+                  description="Data will appear when API data is available."
+                />
+              ) : (
+                <ResponsiveContainer
+                  width="100%"
+                  height={280}
+                >
+                  <LineChart
+                    data={
+                      recruitmentTrendData
+                    }
+                  >
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#1E3045"
-                  />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#1E3045"
+                    />
 
-                  <XAxis
-                    dataKey="month"
-                    stroke="#64748B"
-                  />
+                    <XAxis
+                      dataKey="month"
+                      stroke="#64748B"
+                    />
 
-                  <YAxis stroke="#64748B" />
+                    <YAxis
+                      stroke="#64748B"
+                    />
 
-                  <Tooltip />
+                    <Tooltip />
 
-                  <Line
-                    type="monotone"
-                    dataKey="recruitments"
-                    stroke="#7C5CFF"
-                    strokeWidth={3}
-                  />
+                    <Line
+                      type="monotone"
+                      dataKey="recruitments"
+                      stroke="#7C5CFF"
+                      strokeWidth={3}
+                    />
 
-                </LineChart>
-              </ResponsiveContainer>
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </ChartCard>
 
           </div>
+
         </section>
 
-        {/* PLACEMENT INSIGHTS */}
+        {/* =================================================
+            PLACEMENT INSIGHTS
+        ================================================= */}
 
         <section className="pb-8">
 
@@ -2062,12 +2447,16 @@ export default function PlacementOfficerDashboard() {
             </h2>
 
             <p className="text-sm text-slate-500">
-              AI-assisted insights generated from placement data.
+              Automated insights generated from PostgreSQL placement analytics.
             </p>
 
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+
+            {/* =================================================
+                PLACEMENT PERFORMANCE
+            ================================================= */}
 
             <div className="rounded-xl border border-[#1E3045] bg-[#101C2C] p-5">
 
@@ -2081,12 +2470,27 @@ export default function PlacementOfficerDashboard() {
                 Placement Performance
               </p>
 
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                Placement performance insights will be
-                generated from historical placement data.
-              </p>
+              {loading ? (
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Generating placement performance insights...
+                </p>
+              ) : (
+                <div className="text-[#1683FF]">
+                  <InsightList
+                    items={
+                      placementInsights?.placement_performance ??
+                      []
+                    }
+                    emptyMessage="No placement performance insights are available."
+                  />
+                </div>
+              )}
 
             </div>
+
+            {/* =================================================
+                ATTENTION REQUIRED
+            ================================================= */}
 
             <div className="rounded-xl border border-[#1E3045] bg-[#101C2C] p-5">
 
@@ -2100,12 +2504,27 @@ export default function PlacementOfficerDashboard() {
                 Attention Required
               </p>
 
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                Student application gaps and inactive
-                eligible students will be highlighted here.
-              </p>
+              {loading ? (
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Checking placement risks and student gaps...
+                </p>
+              ) : (
+                <div className="text-[#F59E0B]">
+                  <InsightList
+                    items={
+                      placementInsights?.attention_required ??
+                      []
+                    }
+                    emptyMessage="No major attention items were detected."
+                  />
+                </div>
+              )}
 
             </div>
+
+            {/* =================================================
+                RECOMMENDATIONS
+            ================================================= */}
 
             <div className="rounded-xl border border-[#1E3045] bg-[#101C2C] p-5">
 
@@ -2119,14 +2538,26 @@ export default function PlacementOfficerDashboard() {
                 Recommendation
               </p>
 
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                AI-based recommendations will appear
-                after placement analytics are connected.
-              </p>
+              {loading ? (
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Generating recommendations...
+                </p>
+              ) : (
+                <div className="text-[#7C5CFF]">
+                  <InsightList
+                    items={
+                      placementInsights?.recommendations ??
+                      []
+                    }
+                    emptyMessage="No recommendations are currently available."
+                  />
+                </div>
+              )}
 
             </div>
 
           </div>
+
         </section>
 
       </div>

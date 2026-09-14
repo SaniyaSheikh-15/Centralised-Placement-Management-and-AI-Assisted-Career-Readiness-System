@@ -8,7 +8,7 @@ import type {
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-async function apiRequest<T>(
+export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
