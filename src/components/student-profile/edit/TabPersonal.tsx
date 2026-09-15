@@ -5,22 +5,44 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
+import { getBranches } from '@/lib/student-profile-api';
 import { maskPhone, maskAadhaar, maskPAN } from '@/features/student-profile/utils/profileValidation';
+import { useEffect, useState } from 'react';
 
-const BRANCHES = [
-  'Computer Science Engineering', 'Artificial Intelligence & Data Science',
-  'AI & Machine Learning', 'Information Technology', 'Electronics & Communication',
-  'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering',
-];
 
 const GENDERS = ['Male', 'Female', 'Other', 'Prefer not to say'];
 const CATEGORIES = ['General', 'OBC', 'SC', 'ST', 'EWS', 'Other'];
 const INCOME_RANGES = ['Below 1 Lakh', '1-3 Lakhs', '3-5 Lakhs', '5-8 Lakhs', '8-12 Lakhs', 'Above 12 Lakhs'];
 
-export default function TabPersonal() {
-  const { editDraft, updatePersonalInfo } = useStudentProfile();
-  const p = editDraft.personalInfo;
+  type Branch = {
+    branch_id: string;
+    branch_code: string;
+    branch_name: string;
+    department: string | null;
+  };
 
+
+export default function TabPersonal() {
+ const {
+  editDraft,
+  updatePersonalInfo,
+  updateAcademicInfo,
+} = useStudentProfile();
+const p = editDraft.personalInfo;
+
+const [branches, setBranches] = useState<Branch[]>([]);
+useEffect(() => {
+  const loadBranches = async () => {
+    try {
+      const data = await getBranches();
+      setBranches(data);
+    } catch (error) {
+      console.error("Failed to load branches:", error);
+    }
+  };
+
+  loadBranches();
+}, []);
   return (
     <div className="space-y-6">
       {/* ─── Core Identity ──────────────────────── */}
@@ -49,14 +71,48 @@ export default function TabPersonal() {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Branch <span className="text-[var(--color-danger)]">*</span></Label>
-            <Select value={p.branch ?? undefined} onValueChange={(v: string | null) => updatePersonalInfo({ branch: v ?? '' })}>
-              <SelectTrigger><SelectValue placeholder="Select branch" /></SelectTrigger>
-              <SelectContent>
-                {BRANCHES.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
+  <Label>
+    Branch <span className="text-[var(--color-danger)]">*</span>
+  </Label>
+
+  <Select
+  value={p.branchId || ''}
+    onValueChange={(branchId: string | null) => {
+      const selectedBranch = branches.find(
+        (branch) => branch.branch_id === branchId
+      );
+
+      updatePersonalInfo({
+        branchId: branchId ?? '',
+        branch: selectedBranch?.branch_name ?? '',
+      });
+
+      updateAcademicInfo({
+        department: selectedBranch?.department ?? '',
+      });
+    }}
+  >
+    <SelectTrigger>
+  <SelectValue placeholder="Select branch">
+    {branches.find(
+      (branch) => branch.branch_id === p.branchId
+    )?.branch_name}
+  </SelectValue>
+</SelectTrigger>
+
+    <SelectContent>
+      {branches.map((branch) => (
+        <SelectItem
+          key={branch.branch_id}
+          value={branch.branch_id}
+        >
+          {branch.branch_name}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

@@ -67,6 +67,18 @@ console.log("Response status:", response.status);
    PROFILE
 ============================================================ */
 
+
+export function createStudentProfile(
+  data: unknown
+) {
+  return apiRequest(
+    "/students/profile",
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
+}
 export function getStudentProfile(
   studentId: string
 ) {
@@ -94,6 +106,14 @@ export function updateStudentProfile(
       body: JSON.stringify(data),
     }
   );
+}
+
+/* ============================================================
+   MASTER DATA
+============================================================ */
+
+export function getMasterBranches() {
+  return apiRequest("/master-data/branches");
 }
 
 /* ============================================================
@@ -412,4 +432,55 @@ export function getStudentResumes(
   return apiRequest(
     `/students/${studentId}/resumes`
   );
+}
+
+export function uploadStudentResume(
+  studentId: string,
+  file: File
+) {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  return apiRequest(
+    `/students/${studentId}/resumes`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+}
+
+export function getBranches() {
+  return apiRequest("/master-data/branches");
+}
+
+export async function getStudentResumeFile(
+  studentId: string,
+  resumeId: string
+): Promise<Blob> {
+  const token =
+    localStorage.getItem("accessToken") ||
+    sessionStorage.getItem("accessToken");
+
+  const response = await fetch(
+    `${API_URL}/students/${studentId}/resumes/${resumeId}/file`,
+    {
+      headers: {
+        ...(token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {}),
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to load resume file"
+    );
+  }
+
+  return response.blob();
 }

@@ -8,8 +8,9 @@ from fastapi import (
     UploadFile,
     status,
 )
+from pathlib import Path
 from sqlalchemy.orm import Session
-
+from fastapi.responses import FileResponse
 from backend.app.core.dependencies import get_current_user
 from backend.app.db.session import get_db
 from backend.app.models.auth import User
@@ -1235,6 +1236,49 @@ def delete_student_resume(
 
     return None
 
+@router.get(
+        "/{student_id}/resumes/{resume_id}/file",
+        summary="Get Student Resume File",
+    )
+def get_student_resume_file(
+            student_id: UUID,
+            resume_id: UUID,
+            current_user: User = Depends(get_current_user),
+            db: Session = Depends(get_db),
+        ):
+            verify_student_ownership(
+                db,
+                student_id,
+                current_user,
+            )
+
+            resume = StudentService.get_resume(
+                db,
+                student_id,
+                resume_id,
+            )
+
+            if resume is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Resume not found",
+                )
+
+            file_path = Path(
+                resume.resume_storage_path
+            )
+
+            if not file_path.exists():
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Resume file not found in storage",
+                )
+
+            return FileResponse(
+                path=file_path,
+                media_type=resume.mime_type,
+                filename=resume.resume_file_name,
+            )
 
 @router.get(
     "/{student_id}/resumes/{resume_id}/extract",
@@ -1280,3 +1324,5 @@ def extract_student_resume(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
         ) from exc
+
+    

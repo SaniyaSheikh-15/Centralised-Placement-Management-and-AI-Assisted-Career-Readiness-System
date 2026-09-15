@@ -14,7 +14,9 @@ import {
 
 import {
   getStudentProfileByUserId,
+  createStudentProfile,
   updateStudentProfile,
+  getBranches,
   addStudentSkill,
   getStudentSkills,
   updateStudentSkill,
@@ -39,8 +41,9 @@ import {
   updateStudentSocialLink,
   deleteStudentSocialLink,
   getStudentSocialLinks,
+  getStudentResumes,
+  uploadStudentResume,
 } from "@/lib/student-profile-api";
-
 
 import type {
   StudentProfile,
@@ -50,7 +53,6 @@ import type {
   Internship,
   Achievement,
 } from "@/types/student-profile";
-
 
 /* ============================================================
    EMPTY PROFILE
@@ -78,6 +80,7 @@ const EMPTY_PROFILE: StudentProfile = {
     aadhaarNumber: "",
     abcId: "",
     branch: "",
+    branchId: "",
   },
 
   academicInfo: {
@@ -160,13 +163,13 @@ interface StudentProfileContextType {
   ) => void;
 
   addSkill: (
-  skill: Omit<TechnicalSkill, "id">
-) => Promise<void>;
+    skill: Omit<TechnicalSkill, "id">
+  ) => Promise<void>;
 
   updateSkillProficiency: (
-  skillId: string,
-  proficiency: TechnicalSkill["proficiency"]
-) => Promise<void>;
+    skillId: string,
+    proficiency: TechnicalSkill["proficiency"]
+  ) => Promise<void>;
 
   removeSkill: (skillId: string) => Promise<void>;
 
@@ -180,7 +183,7 @@ interface StudentProfileContextType {
   deleteProject: (projectId: string) => Promise<void>;
 
   addCertification: (
-  cert: Omit<Certification, "id">
+    cert: Omit<Certification, "id">
   ) => Promise<void>;
 
   updateCertification: (
@@ -191,15 +194,15 @@ interface StudentProfileContextType {
   deleteCertification: (certId: string) => Promise<void>;
 
   addInternship: (
-  internship: Omit<Internship, "id">
-) => Promise<void>;
+    internship: Omit<Internship, "id">
+  ) => Promise<void>;
 
-updateInternship: (
-  internId: string,
-  updates: Partial<Internship>
-) => Promise<void>;
+  updateInternship: (
+    internId: string,
+    updates: Partial<Internship>
+  ) => Promise<void>;
 
-deleteInternship: (internId: string) => Promise<void>;
+  deleteInternship: (internId: string) => Promise<void>;
 
   addAchievement: (
     achievement: Omit<Achievement, "id">
@@ -233,6 +236,17 @@ type BackendSocialLink = {
 };
 
 /* ============================================================
+   BRANCH TYPE
+============================================================ */
+
+type BackendBranch = {
+  branch_id: string;
+  branch_code: string;
+  branch_name: string;
+  department: string | null;
+};
+
+/* ============================================================
    CONTEXT
 ============================================================ */
 
@@ -246,8 +260,45 @@ const StudentProfileContext =
 function mapBackendProfileToStudentProfile(
   backendProfile: any,
   user: any,
-  previousProfile: StudentProfile
+  previousProfile: StudentProfile,
+  branches: BackendBranch[] = []
 ): StudentProfile {
+  /*
+   * ============================================================
+   * BRANCH + DEPARTMENT
+   * ============================================================
+   *
+   * Backend student profile gives us branch_id.
+   *
+   * Master branch data gives us:
+   * - branch_name
+   * - department
+   *
+   * Find the matching branch using branch_id.
+   */
+
+  const branchId =
+    backendProfile.branch_id ||
+    previousProfile.personalInfo.branchId ||
+    "";
+
+  const selectedBranch = branches.find(
+    (branch) => branch.branch_id === branchId
+  );
+
+  const branchName =
+    selectedBranch?.branch_name ||
+    backendProfile.branch_name ||
+    backendProfile.branch ||
+    previousProfile.personalInfo.branch ||
+    "";
+
+  const department =
+    selectedBranch?.department ||
+    backendProfile.department ||
+    previousProfile.academicInfo.department ||
+    "";
+
   return {
     ...previousProfile,
 
@@ -303,15 +354,18 @@ function mapBackendProfileToStudentProfile(
       annualFamilyIncome:
         previousProfile.personalInfo.annualFamilyIncome,
 
-    
       abcId:
         backendProfile.abc_id || "",
 
-      branch:
-        backendProfile.branch_name ||
-        backendProfile.branch ||
-        previousProfile.personalInfo.branch ||
-        "",
+      /*
+       * BRANCH NAME
+       */
+      branch: branchName,
+
+      /*
+       * BRANCH UUID
+       */
+      branchId: branchId,
     },
 
     academicInfo: {
@@ -323,10 +377,10 @@ function mapBackendProfileToStudentProfile(
       college:
         backendProfile.college || "",
 
-      department:
-        backendProfile.department ||
-        previousProfile.academicInfo.department ||
-        "",
+      /*
+       * DEPARTMENT FROM MASTER BRANCH DATA
+       */
+      department: department,
 
       degree:
         backendProfile.degree || "",
@@ -423,19 +477,23 @@ function mapBackendProfileToStudentProfile(
   };
 }
 
-const mapProjectToBackend = (project: Omit<Project, "id">) => ({
+const mapProjectToBackend = (
+  project: Omit<Project, "id">
+) => ({
   title: project.name,
   description: project.description,
   github_url: project.githubUrl || null,
   live_demo_url: project.liveUrl || null,
 });
 
-const mapCertificationFromBackend = (cert: any): Certification => ({
+const mapCertificationFromBackend = (
+  cert: any
+): Certification => ({
   id: cert.certificate_id,
   name: cert.certificate_name,
   organization: cert.issuing_organization,
-  date: cert.issue_date || '',
-  link: cert.credential_url || '',
+  date: cert.issue_date || "",
+  link: cert.credential_url || "",
 });
 
 const mapAchievementFromBackend = (
@@ -468,24 +526,39 @@ const parseInternshipDuration = (
 
   const parts = value.split(/\s*[–-]\s*/);
 
-  const parseMonth = (month: string): string | null => {
-    const match = month.trim().match(
-      /^([A-Za-z]+)\s+(\d{4})$/
-    );
+  const parseMonth = (
+    month: string
+  ): string | null => {
+    const match = month
+      .trim()
+      .match(/^([A-Za-z]+)\s+(\d{4})$/);
 
     if (!match) return null;
 
     const [, monthName, year] = match;
 
     const monthIndex = [
-      "jan", "feb", "mar", "apr",
-      "may", "jun", "jul", "aug",
-      "sep", "oct", "nov", "dec",
-    ].indexOf(monthName.slice(0, 3).toLowerCase());
+      "jan",
+      "feb",
+      "mar",
+      "apr",
+      "may",
+      "jun",
+      "jul",
+      "aug",
+      "sep",
+      "oct",
+      "nov",
+      "dec",
+    ].indexOf(
+      monthName.slice(0, 3).toLowerCase()
+    );
 
     if (monthIndex === -1) return null;
 
-    return `${year}-${String(monthIndex + 1).padStart(2, "0")}-01`;
+    return `${year}-${String(
+      monthIndex + 1
+    ).padStart(2, "0")}-01`;
   };
 
   const startDate = parseMonth(parts[0]);
@@ -498,9 +571,14 @@ const parseInternshipDuration = (
     };
   }
 
-  const endText = parts[1]?.trim().toLowerCase();
+  const endText =
+    parts[1]?.trim().toLowerCase();
 
-  if (!endText || endText === "present" || endText === "current") {
+  if (
+    !endText ||
+    endText === "present" ||
+    endText === "current"
+  ) {
     return {
       start_date: startDate,
       end_date: null,
@@ -520,15 +598,22 @@ const formatInternshipDuration = (
   endDate: string | null,
   isCurrent: boolean | null
 ): string => {
-  const formatMonth = (date: string | null): string => {
+  const formatMonth = (
+    date: string | null
+  ): string => {
     if (!date) return "";
 
-    const parsed = new Date(`${date}T00:00:00`);
+    const parsed = new Date(
+      `${date}T00:00:00`
+    );
 
-    return parsed.toLocaleDateString("en-US", {
-      month: "short",
-      year: "numeric",
-    });
+    return parsed.toLocaleDateString(
+      "en-US",
+      {
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
   const start = formatMonth(startDate);
@@ -542,19 +627,22 @@ const formatInternshipDuration = (
   return `${start} – ${formatMonth(endDate)}`;
 };
 
-
 const mapInternshipFromBackend = (
   internship: any
 ): Internship => ({
   id: internship.internship_id,
-  organization: internship.company_name || "",
-  role: internship.role_title || "",
-  duration: formatInternshipDuration(
-    internship.start_date,
-    internship.end_date,
-    internship.is_current
-  ),
-  description: internship.description || "",
+  organization:
+    internship.company_name || "",
+  role:
+    internship.role_title || "",
+  duration:
+    formatInternshipDuration(
+      internship.start_date,
+      internship.end_date,
+      internship.is_current
+    ),
+  description:
+    internship.description || "",
 });
 
 const mapSocialLinksToOnlinePresence = (
@@ -570,16 +658,23 @@ const mapSocialLinksToOnlinePresence = (
   socialLinks.forEach((link) => {
     switch (link.platform) {
       case "github":
-        onlinePresence.githubUrl = link.profile_url;
+        onlinePresence.githubUrl =
+          link.profile_url;
         break;
+
       case "linkedin":
-        onlinePresence.linkedinUrl = link.profile_url;
+        onlinePresence.linkedinUrl =
+          link.profile_url;
         break;
+
       case "portfolio":
-        onlinePresence.portfolioUrl = link.profile_url;
+        onlinePresence.portfolioUrl =
+          link.profile_url;
         break;
+
       case "coding":
-        onlinePresence.codingProfileUrl = link.profile_url;
+        onlinePresence.codingProfileUrl =
+          link.profile_url;
         break;
     }
   });
@@ -592,31 +687,40 @@ const saveSocialLinks = async (
   onlinePresence: StudentProfile["onlinePresence"]
 ) => {
   const existingLinks =
-    (await getStudentSocialLinks(studentId)) as BackendSocialLink[];
+    (await getStudentSocialLinks(
+      studentId
+    )) as BackendSocialLink[];
 
   const socialLinks = [
     {
       platform: "github",
-      profile_url: onlinePresence.githubUrl,
+      profile_url:
+        onlinePresence.githubUrl,
     },
     {
       platform: "linkedin",
-      profile_url: onlinePresence.linkedinUrl,
+      profile_url:
+        onlinePresence.linkedinUrl,
     },
     {
       platform: "portfolio",
-      profile_url: onlinePresence.portfolioUrl,
+      profile_url:
+        onlinePresence.portfolioUrl,
     },
     {
       platform: "coding",
-      profile_url: onlinePresence.codingProfileUrl,
+      profile_url:
+        onlinePresence.codingProfileUrl,
     },
   ];
 
   for (const link of socialLinks) {
-    const existing = existingLinks.find(
-      (item) => item.platform === link.platform
-    );
+    const existing =
+      existingLinks.find(
+        (item) =>
+          item.platform ===
+          link.platform
+      );
 
     if (link.profile_url.trim()) {
       if (existing) {
@@ -626,7 +730,10 @@ const saveSocialLinks = async (
           link
         );
       } else {
-        await addStudentSocialLink(studentId, link);
+        await addStudentSocialLink(
+          studentId,
+          link
+        );
       }
     } else if (existing) {
       await deleteStudentSocialLink(
@@ -643,7 +750,9 @@ const saveSocialLinks = async (
 
 let idCounter = 100;
 
-const genId = (prefix: string): string =>
+const genId = (
+  prefix: string
+): string =>
   `${prefix}-${++idCounter}`;
 
 /* ============================================================
@@ -700,44 +809,31 @@ export function StudentProfileProvider({
   ========================================================== */
 
   useEffect(() => {
-    /*
-     * DO NOT attempt profile loading while AuthProvider
-     * is still restoring the authentication state.
-     */
     if (authLoading) {
       return;
     }
 
-    /*
-     * No authenticated session.
-     */
-    if (!isAuthenticated || !token || !user) {
+    if (
+      !isAuthenticated ||
+      !token ||
+      !user
+    ) {
       setIsLoading(false);
       setError(null);
       setStudentId(null);
       return;
     }
 
-    /*
-     * Only students should load the student profile.
-     */
-    if (user.role?.toLowerCase() !== "student") {
+    if (
+      user.role?.toLowerCase() !==
+      "student"
+    ) {
       setIsLoading(false);
       setError(null);
       setStudentId(null);
       return;
     }
 
-    /*
-     * IMPORTANT:
-     * Create stable non-null references AFTER the guards.
-     *
-     * This fixes:
-     * "user is possibly null"
-     *
-     * TypeScript can safely understand that these constants
-     * cannot be null inside the async function.
-     */
     const authenticatedUser = user;
     const authenticatedToken = token;
 
@@ -762,32 +858,28 @@ export function StudentProfileProvider({
           Boolean(authenticatedToken)
         );
 
-        /*
- * IMPORTANT:
- * Profile is loaded using the authenticated
- * user's user_id.
- */
+        console.log(
+          "AUTHENTICATED USER:",
+          authenticatedUser
+        );
 
-console.log(
-  "AUTHENTICATED USER:",
-  authenticatedUser
-);
+        console.log(
+          "AUTHENTICATED USER_ID:",
+          authenticatedUser.user_id
+        );
 
-console.log(
-  "AUTHENTICATED USER_ID:",
-  authenticatedUser.user_id
-);
-
-const backendProfile =
-  await getStudentProfileByUserId(
-    authenticatedUser.user_id
-  );
+        const backendProfile =
+          await getStudentProfileByUserId(
+            authenticatedUser.user_id
+          );
 
         if (cancelled) {
           return;
         }
 
-        if (!backendProfile?.student_id) {
+        if (
+          !backendProfile?.student_id
+        ) {
           throw new Error(
             "Student profile was not found for this account."
           );
@@ -797,20 +889,46 @@ const backendProfile =
           backendProfile.student_id
         );
 
-        const backendSkills = await getStudentSkills(backendProfile.student_id);
+        /*
+         * ========================================================
+         * LOAD MASTER BRANCHES
+         * ========================================================
+         *
+         * This is only for resolving:
+         * branch_id → branch_name + department
+         *
+         * No branch data is modified here.
+         */
 
+        const branchesResponse =
+          await getBranches();
 
-        const backendProjects = await getStudentProjects(
-          backendProfile.student_id
-        );
+        const branches =
+          branchesResponse as BackendBranch[];
 
-        const certificationsResponse = await getStudentCertifications(
-          backendProfile.student_id
-        );
+        if (cancelled) {
+          return;
+        }
 
-        const certifications = certificationsResponse.map(
-          mapCertificationFromBackend
-        );
+        const backendSkills =
+          await getStudentSkills(
+            backendProfile.student_id
+          );
+
+        const backendProjects =
+          await getStudentProjects(
+            backendProfile.student_id
+          );
+
+        const certificationsResponse =
+          await getStudentCertifications(
+            backendProfile.student_id
+          );
+
+        const certifications =
+          certificationsResponse.map(
+            mapCertificationFromBackend
+          );
 
         const internshipsResponse =
           await getStudentInternships(
@@ -822,68 +940,134 @@ const backendProfile =
             mapInternshipFromBackend
           );
 
-        
+        const projects: Project[] =
+          backendProjects.map(
+            (project: {
+              project_id: string;
+              title: string | null;
+              description: string | null;
+              github_url: string | null;
+              live_demo_url: string | null;
+            }) => ({
+              id: project.project_id,
+              name: project.title || "",
+              description:
+                project.description || "",
+              techStack: [],
+              githubUrl:
+                project.github_url || "",
+              liveUrl:
+                project.live_demo_url || "",
+            })
+          );
 
+        const technicalSkills: TechnicalSkill[] =
+          backendSkills.map(
+            (skill: {
+              student_skill_id: string;
+              skill_name: string;
+              proficiency_level:
+                TechnicalSkill["proficiency"];
+            }) => ({
+              id: skill.student_skill_id,
+              name: skill.skill_name,
+              proficiency:
+                skill.proficiency_level,
+            })
+          );
 
+        const achievementsResponse =
+          await getStudentAchievements(
+            backendProfile.student_id
+          );
 
-        const projects: Project[] = backendProjects.map(
-      (project: {
-        project_id: string;
-        title: string | null;
-        description: string | null;
-        github_url: string | null;
-        live_demo_url: string | null;
-      }) => ({
-        id: project.project_id,
-        name: project.title || "",
-        description: project.description || "",
-        techStack: [],
-        githubUrl: project.github_url || "",
-        liveUrl: project.live_demo_url || "",
-      })
+        const achievements: Achievement[] =
+          achievementsResponse.map(
+            mapAchievementFromBackend
+          );
+
+        const socialLinksResponse =
+          await getStudentSocialLinks(
+            backendProfile.student_id
+          );
+        const resumesResponse =
+      await getStudentResumes(
+        backendProfile.student_id
+      );
+
+      console.log(
+      "STUDENT RESUMES FROM BACKEND:",
+      resumesResponse
     );
 
-    const technicalSkills: TechnicalSkill[] = backendSkills.map(
-      (skill: {
-        student_skill_id: string;
-        skill_name: string;
-        proficiency_level: TechnicalSkill["proficiency"];
-      }) => ({
-        id: skill.student_skill_id,
-        name: skill.skill_name,
-        proficiency: skill.proficiency_level,
-      })
-    );
+    const latestResume =
+      resumesResponse?.length > 0
+        ? resumesResponse[0]
+        : null;
 
-      const achievementsResponse =
-        await getStudentAchievements(backendProfile.student_id);
+    const resumeData = latestResume
+      ? {
+          uploadedResume: null,
+          fileName:
+            latestResume.resume_file_name,
+          fileSize:
+            (latestResume.file_size_kb ?? 0) *
+            1024,
+          uploadDate:
+            latestResume.uploaded_at,
+        }
+      : {
+          uploadedResume: null,
+          fileName: "",
+          fileSize: 0,
+          uploadDate: "",
+        };
 
-      const achievements: Achievement[] =
-        achievementsResponse.map(mapAchievementFromBackend);
-
-      const socialLinksResponse =
-        await getStudentSocialLinks(backendProfile.student_id);
-
-      const onlinePresence =
-        mapSocialLinksToOnlinePresence(socialLinksResponse);
+        const onlinePresence =
+          mapSocialLinksToOnlinePresence(
+            socialLinksResponse
+          );
 
         console.log(
           "BACKEND STUDENT PROFILE:",
           backendProfile
         );
 
+        /*
+         * ========================================================
+         * MAP BRANCH + DEPARTMENT
+         * ========================================================
+         */
+
         const mappedProfile =
           mapBackendProfileToStudentProfile(
             backendProfile,
             authenticatedUser,
-            EMPTY_PROFILE
+            EMPTY_PROFILE,
+            branches
           );
-          mappedProfile.technicalSkills = technicalSkills;
-          mappedProfile.projects = projects;
-          mappedProfile.certifications = certifications;
-          mappedProfile.internships = internships;
-          mappedProfile.achievements = achievements;
-          mappedProfile.onlinePresence = onlinePresence;
+
+        mappedProfile.technicalSkills =
+          technicalSkills;
+
+        mappedProfile.projects =
+          projects;
+
+        mappedProfile.certifications =
+          certifications;
+
+        mappedProfile.internships =
+          internships;
+
+        mappedProfile.achievements =
+          achievements;
+
+        mappedProfile.onlinePresence =
+          onlinePresence;
+
+        mappedProfile.resume = resumeData;
+
+        
 
         setProfile(mappedProfile);
 
@@ -974,277 +1158,378 @@ const backendProfile =
      PLACEMENT READINESS
   ============================================================ */
 
-  const updatePlacementReadiness = useCallback(
-    (
-      updates: Partial<
-        StudentProfile["placementReadiness"]
-      >
-    ) => {
-      setEditDraft((prev) => ({
-        ...prev,
-        placementReadiness: {
-          ...prev.placementReadiness,
-          ...updates,
-        },
-      }));
-    },
-    []
-  );
+  const updatePlacementReadiness =
+    useCallback(
+      (
+        updates: Partial<
+          StudentProfile["placementReadiness"]
+        >
+      ) => {
+        setEditDraft((prev) => ({
+          ...prev,
+          placementReadiness: {
+            ...prev.placementReadiness,
+            ...updates,
+          },
+        }));
+      },
+      []
+    );
 
   /* ============================================================
      ONLINE PRESENCE
   ============================================================ */
 
-  const updateOnlinePresence = useCallback(
-    (
-      updates: Partial<
-        StudentProfile["onlinePresence"]
-      >
-    ) => {
-      setEditDraft((prev) => ({
-        ...prev,
-        onlinePresence: {
-          ...prev.onlinePresence,
-          ...updates,
-        },
-      }));
-    },
-    []
-  );
+  const updateOnlinePresence =
+    useCallback(
+      (
+        updates: Partial<
+          StudentProfile["onlinePresence"]
+        >
+      ) => {
+        setEditDraft((prev) => ({
+          ...prev,
+          onlinePresence: {
+            ...prev.onlinePresence,
+            ...updates,
+          },
+        }));
+      },
+      []
+    );
 
   /* ============================================================
      TECHNICAL SKILLS
   ============================================================ */
 
   const addSkill = useCallback(
-  async (skill: Omit<TechnicalSkill, "id">) => {
-    if (!studentId) {
-      throw new Error("Student ID is not available");
-    }
-
-    const backendSkill = await addStudentSkill(
-      studentId,
-      {
-        skill_name: skill.name,
-        proficiency_level: skill.proficiency,
-        years_of_experience: 0,
+    async (
+      skill: Omit<TechnicalSkill, "id">
+    ) => {
+      if (!studentId) {
+        throw new Error(
+          "Student ID is not available"
+        );
       }
+
+      const backendSkill =
+        await addStudentSkill(
+          studentId,
+          {
+            skill_name: skill.name,
+            proficiency_level:
+              skill.proficiency,
+            years_of_experience: 0,
+          }
+        );
+
+      const newSkill: TechnicalSkill = {
+        id: backendSkill.student_skill_id,
+        name: backendSkill.skill_name,
+        proficiency:
+          backendSkill.proficiency_level,
+      };
+
+      setProfile((prev) => ({
+        ...prev,
+        technicalSkills: [
+          ...prev.technicalSkills,
+          newSkill,
+        ],
+      }));
+
+      setEditDraft((prev) => ({
+        ...prev,
+        technicalSkills: [
+          ...prev.technicalSkills,
+          newSkill,
+        ],
+      }));
+    },
+    [studentId]
+  );
+
+  const updateSkillProficiency =
+    useCallback(
+      async (
+        skillId: string,
+        proficiency: TechnicalSkill["proficiency"]
+      ) => {
+        if (!studentId) {
+          throw new Error(
+            "Student ID is not available"
+          );
+        }
+
+        const existingSkill =
+          profile.technicalSkills.find(
+            (skill) =>
+              skill.id === skillId
+          );
+
+        if (!existingSkill) {
+          throw new Error(
+            "Skill not found"
+          );
+        }
+
+        await updateStudentSkill(
+          studentId,
+          skillId,
+          {
+            skill_name:
+              existingSkill.name,
+            proficiency_level:
+              proficiency,
+          }
+        );
+
+        const updater = (
+          prev: StudentProfile
+        ): StudentProfile => ({
+          ...prev,
+          technicalSkills:
+            prev.technicalSkills.map(
+              (skill) =>
+                skill.id === skillId
+                  ? {
+                      ...skill,
+                      proficiency,
+                    }
+                  : skill
+            ),
+        });
+
+        setProfile(updater);
+        setEditDraft(updater);
+      },
+      [
+        studentId,
+        profile.technicalSkills,
+      ]
     );
-
-    const newSkill: TechnicalSkill = {
-      id: backendSkill.student_skill_id,
-      name: backendSkill.skill_name,
-      proficiency: backendSkill.proficiency_level,
-    };
-
-    setProfile((prev) => ({
-      ...prev,
-      technicalSkills: [
-        ...prev.technicalSkills,
-        newSkill,
-      ],
-    }));
-
-    setEditDraft((prev) => ({
-      ...prev,
-      technicalSkills: [
-        ...prev.technicalSkills,
-        newSkill,
-      ],
-    }));
-  },
-  [studentId]
-);
-
-  const updateSkillProficiency = useCallback(
-  async (
-    skillId: string,
-    proficiency: TechnicalSkill["proficiency"]
-  ) => {
-    if (!studentId) {
-      throw new Error("Student ID is not available");
-    }
-
-    const existingSkill = profile.technicalSkills.find(
-      (skill) => skill.id === skillId
-    );
-
-    if (!existingSkill) {
-      throw new Error("Skill not found");
-    }
-
-    await updateStudentSkill(studentId, skillId, {
-      skill_name: existingSkill.name,
-      proficiency_level: proficiency,
-    });
-
-    const updater = (prev: StudentProfile): StudentProfile => ({
-      ...prev,
-      technicalSkills: prev.technicalSkills.map((skill) =>
-        skill.id === skillId ? { ...skill, proficiency } : skill
-      ),
-    });
-
-    setProfile(updater);
-    setEditDraft(updater);
-  },
-  [studentId, profile.technicalSkills]
-);
-
 
   const removeSkill = useCallback(
-  async (skillId: string) => {
-    if (!studentId) {
-      throw new Error("Student ID is not available");
-    }
+    async (skillId: string) => {
+      if (!studentId) {
+        throw new Error(
+          "Student ID is not available"
+        );
+      }
 
-    // First delete from the backend database
-    await deleteStudentSkill(studentId, skillId);
+      await deleteStudentSkill(
+        studentId,
+        skillId
+      );
 
-    // Then update the local UI
-    const updater = (prev: StudentProfile): StudentProfile => ({
-      ...prev,
-      technicalSkills: prev.technicalSkills.filter(
-        (skill) => skill.id !== skillId
-      ),
-    });
+      const updater = (
+        prev: StudentProfile
+      ): StudentProfile => ({
+        ...prev,
+        technicalSkills:
+          prev.technicalSkills.filter(
+            (skill) =>
+              skill.id !== skillId
+          ),
+      });
 
-    setProfile(updater);
-    setEditDraft(updater);
-  },
-  [studentId]
-);
+      setProfile(updater);
+      setEditDraft(updater);
+    },
+    [studentId]
+  );
+
   /* ============================================================
      PROJECTS
   ============================================================ */
 
   const addProject = useCallback(
-  async (project: Omit<Project, "id">) => {
-    if (!studentId) return;
+    async (
+      project: Omit<Project, "id">
+    ) => {
+      if (!studentId) return;
 
-    const backendProject = await addStudentProject(
-      studentId,
-      mapProjectToBackend(project)
-    );
+      const backendProject =
+        await addStudentProject(
+          studentId,
+          mapProjectToBackend(project)
+        );
 
-    const newProject: Project = {
-      id: backendProject.project_id,
-      name: backendProject.title ?? "",
-      description: backendProject.description ?? "",
-      techStack: project.techStack,
-      githubUrl: backendProject.github_url ?? "",
-      liveUrl: backendProject.live_demo_url ?? "",
-    };
+      const newProject: Project = {
+        id: backendProject.project_id,
+        name:
+          backendProject.title ?? "",
+        description:
+          backendProject.description ??
+          "",
+        techStack:
+          project.techStack,
+        githubUrl:
+          backendProject.github_url ??
+          "",
+        liveUrl:
+          backendProject.live_demo_url ??
+          "",
+      };
 
-    setProfile((prev) => ({
-      ...prev,
-      projects: [...prev.projects, newProject],
-    }));
+      setProfile((prev) => ({
+        ...prev,
+        projects: [
+          ...prev.projects,
+          newProject,
+        ],
+      }));
 
-    setEditDraft((prev) => ({
-      ...prev,
-      projects: [...prev.projects, newProject],
-    }));
-  },
-  [studentId]
-);
+      setEditDraft((prev) => ({
+        ...prev,
+        projects: [
+          ...prev.projects,
+          newProject,
+        ],
+      }));
+    },
+    [studentId]
+  );
 
-const updateProject = useCallback(
-  async (projectId: string, updates: Partial<Project>) => {
-    if (!studentId) return;
+  const updateProject = useCallback(
+    async (
+      projectId: string,
+      updates: Partial<Project>
+    ) => {
+      if (!studentId) return;
 
-    const backendUpdates: Record<string, unknown> = {};
+      const backendUpdates: Record<
+        string,
+        unknown
+      > = {};
 
-    if (updates.name !== undefined) {
-      backendUpdates.title = updates.name;
-    }
+      if (updates.name !== undefined) {
+        backendUpdates.title =
+          updates.name;
+      }
 
-    if (updates.description !== undefined) {
-      backendUpdates.description = updates.description;
-    }
+      if (
+        updates.description !==
+        undefined
+      ) {
+        backendUpdates.description =
+          updates.description;
+      }
 
-    if (updates.githubUrl !== undefined) {
-      backendUpdates.github_url = updates.githubUrl || null;
-    }
+      if (
+        updates.githubUrl !==
+        undefined
+      ) {
+        backendUpdates.github_url =
+          updates.githubUrl || null;
+      }
 
-    if (updates.liveUrl !== undefined) {
-      backendUpdates.live_demo_url = updates.liveUrl || null;
-    }
+      if (
+        updates.liveUrl !== undefined
+      ) {
+        backendUpdates.live_demo_url =
+          updates.liveUrl || null;
+      }
 
-    const backendProject = await updateStudentProject(
-      studentId,
-      projectId,
-      backendUpdates
-    );
+      const backendProject =
+        await updateStudentProject(
+          studentId,
+          projectId,
+          backendUpdates
+        );
 
-    const updater = (prev: StudentProfile): StudentProfile => ({
-      ...prev,
-      projects: prev.projects.map((project) =>
-        project.id === projectId
-          ? {
-              ...project,
-              name: backendProject.title ?? project.name,
-              description:
-                backendProject.description ?? project.description,
-              githubUrl:
-                backendProject.github_url ?? project.githubUrl,
-              liveUrl:
-                backendProject.live_demo_url ?? project.liveUrl,
-            }
-          : project
-      ),
-    });
+      const updater = (
+        prev: StudentProfile
+      ): StudentProfile => ({
+        ...prev,
+        projects: prev.projects.map(
+          (project) =>
+            project.id === projectId
+              ? {
+                  ...project,
+                  name:
+                    backendProject.title ??
+                    project.name,
+                  description:
+                    backendProject.description ??
+                    project.description,
+                  githubUrl:
+                    backendProject.github_url ??
+                    project.githubUrl,
+                  liveUrl:
+                    backendProject.live_demo_url ??
+                    project.liveUrl,
+                }
+              : project
+        ),
+      });
 
-    setProfile(updater);
-    setEditDraft(updater);
-  },
-  [studentId]
-);
+      setProfile(updater);
+      setEditDraft(updater);
+    },
+    [studentId]
+  );
 
-const deleteProject = useCallback(
-  async (projectId: string) => {
-    if (!studentId) return;
+  const deleteProject = useCallback(
+    async (projectId: string) => {
+      if (!studentId) return;
 
-    await deleteStudentProject(studentId, projectId);
+      await deleteStudentProject(
+        studentId,
+        projectId
+      );
 
-    const updater = (prev: StudentProfile): StudentProfile => ({
-      ...prev,
-      projects: prev.projects.filter(
-        (project) => project.id !== projectId
-      ),
-    });
+      const updater = (
+        prev: StudentProfile
+      ): StudentProfile => ({
+        ...prev,
+        projects:
+          prev.projects.filter(
+            (project) =>
+              project.id !== projectId
+          ),
+      });
 
-    setProfile(updater);
-    setEditDraft(updater);
-  },
-  [studentId]
-);
+      setProfile(updater);
+      setEditDraft(updater);
+    },
+    [studentId]
+  );
 
-    /* ============================================================
+  /* ============================================================
      CERTIFICATIONS
   ============================================================ */
 
   const addCertification = useCallback(
-    async (cert: Omit<Certification, "id">) => {
+    async (
+      cert: Omit<Certification, "id">
+    ) => {
       if (!studentId) {
-        throw new Error("Student ID is not available");
+        throw new Error(
+          "Student ID is not available"
+        );
       }
 
-      const response = await addStudentCertification(
-        studentId,
-        {
-          certificate_name: cert.name,
-          issuing_organization: cert.organization,
-          issue_date: cert.date
-            ? `${cert.date}-01`
-            : null,
-          expiry_date: null,
-          credential_url: cert.link || null,
-        }
-      );
+      const response =
+        await addStudentCertification(
+          studentId,
+          {
+            certificate_name: cert.name,
+            issuing_organization:
+              cert.organization,
+            issue_date: cert.date
+              ? `${cert.date}-01`
+              : null,
+            expiry_date: null,
+            credential_url:
+              cert.link || null,
+          }
+        );
 
       const newCert =
-        mapCertificationFromBackend(response);
+        mapCertificationFromBackend(
+          response
+        );
 
       setProfile((prev) => ({
         ...prev,
@@ -1265,347 +1550,423 @@ const deleteProject = useCallback(
     [studentId]
   );
 
-  const updateCertification = useCallback(
-    async (
-      certId: string,
-      updates: Partial<Certification>
-    ) => {
-      if (!studentId) {
-        throw new Error("Student ID is not available");
-      }
+  const updateCertification =
+    useCallback(
+      async (
+        certId: string,
+        updates: Partial<Certification>
+      ) => {
+        if (!studentId) {
+          throw new Error(
+            "Student ID is not available"
+          );
+        }
 
-      const backendUpdates: Record<string, unknown> = {};
+        const backendUpdates: Record<
+          string,
+          unknown
+        > = {};
 
-      if (updates.name !== undefined) {
-        backendUpdates.certificate_name =
-          updates.name;
-      }
+        if (updates.name !== undefined) {
+          backendUpdates.certificate_name =
+            updates.name;
+        }
 
-      if (updates.organization !== undefined) {
-        backendUpdates.issuing_organization =
-          updates.organization;
-      }
+        if (
+          updates.organization !==
+          undefined
+        ) {
+          backendUpdates.issuing_organization =
+            updates.organization;
+        }
 
-      if (updates.date !== undefined) {
-      backendUpdates.issue_date = updates.date
-        ? `${updates.date}-01`
-        : null;
-    }
+        if (updates.date !== undefined) {
+          backendUpdates.issue_date =
+            updates.date
+              ? `${updates.date}-01`
+              : null;
+        }
 
-      if (updates.link !== undefined) {
-        backendUpdates.credential_url =
-          updates.link || null;
-      }
+        if (updates.link !== undefined) {
+          backendUpdates.credential_url =
+            updates.link || null;
+        }
 
-      const response =
-        await updateStudentCertification(
+        const response =
+          await updateStudentCertification(
+            studentId,
+            certId,
+            backendUpdates
+          );
+
+        const updatedCert =
+          mapCertificationFromBackend(
+            response
+          );
+
+        const updater = (
+          prev: StudentProfile
+        ): StudentProfile => ({
+          ...prev,
+          certifications:
+            prev.certifications.map(
+              (cert) =>
+                cert.id === certId
+                  ? updatedCert
+                  : cert
+            ),
+        });
+
+        setProfile(updater);
+        setEditDraft(updater);
+      },
+      [studentId]
+    );
+
+  const deleteCertification =
+    useCallback(
+      async (certId: string) => {
+        if (!studentId) {
+          throw new Error(
+            "Student ID is not available"
+          );
+        }
+
+        await deleteStudentCertification(
           studentId,
-          certId,
-          backendUpdates
+          certId
         );
 
-      const updatedCert =
-        mapCertificationFromBackend(response);
+        const updater = (
+          prev: StudentProfile
+        ): StudentProfile => ({
+          ...prev,
+          certifications:
+            prev.certifications.filter(
+              (cert) =>
+                cert.id !== certId
+            ),
+        });
 
-      const updater = (
-        prev: StudentProfile
-      ): StudentProfile => ({
-        ...prev,
-        certifications:
-          prev.certifications.map(
-            (cert) =>
-              cert.id === certId
-                ? updatedCert
-                : cert
-          ),
-      });
-
-      setProfile(updater);
-      setEditDraft(updater);
-    },
-    [studentId]
-  );
-
-  const deleteCertification = useCallback(
-    async (certId: string) => {
-      if (!studentId) {
-        throw new Error("Student ID is not available");
-      }
-
-      await deleteStudentCertification(
-        studentId,
-        certId
-      );
-
-      const updater = (
-        prev: StudentProfile
-      ): StudentProfile => ({
-        ...prev,
-        certifications:
-          prev.certifications.filter(
-            (cert) => cert.id !== certId
-          ),
-      });
-
-      setProfile(updater);
-      setEditDraft(updater);
-    },
-    [studentId]
-  );
+        setProfile(updater);
+        setEditDraft(updater);
+      },
+      [studentId]
+    );
 
   /* ============================================================
-   INTERNSHIPS
-============================================================ */
+     INTERNSHIPS
+  ============================================================ */
 
-const addInternship = useCallback(
-  async (
-    internship: Omit<Internship, "id">
-  ) => {
-    if (!studentId) {
-      throw new Error("Student ID is not available");
-    }
-
-    const duration = parseInternshipDuration(
-      internship.duration
-    );
-
-    const response = await addStudentInternship(
-      studentId,
-      {
-        company_name: internship.organization,
-        role_title: internship.role || null,
-        location: null,
-        start_date: duration.start_date,
-        end_date: duration.end_date,
-        is_current: duration.is_current,
-        description: internship.description || null,
-        certificate_url: null,
+  const addInternship = useCallback(
+    async (
+      internship: Omit<Internship, "id">
+    ) => {
+      if (!studentId) {
+        throw new Error(
+          "Student ID is not available"
+        );
       }
-    );
 
-    const newInternship =
-      mapInternshipFromBackend(response);
+      const duration =
+        parseInternshipDuration(
+          internship.duration
+        );
 
-    setProfile((prev) => ({
-      ...prev,
-      internships: [
-        ...prev.internships,
-        newInternship,
-      ],
-    }));
+      const response =
+        await addStudentInternship(
+          studentId,
+          {
+            company_name:
+              internship.organization,
+            role_title:
+              internship.role || null,
+            location: null,
+            start_date:
+              duration.start_date,
+            end_date:
+              duration.end_date,
+            is_current:
+              duration.is_current,
+            description:
+              internship.description ||
+              null,
+            certificate_url: null,
+          }
+        );
 
-    setEditDraft((prev) => ({
-      ...prev,
-      internships: [
-        ...prev.internships,
-        newInternship,
-      ],
-    }));
-  },
-  [studentId]
-);
+      const newInternship =
+        mapInternshipFromBackend(
+          response
+        );
 
-const updateInternship = useCallback(
-  async (
-    internId: string,
-    updates: Partial<Internship>
-  ) => {
-    if (!studentId) {
-      throw new Error("Student ID is not available");
-    }
+      setProfile((prev) => ({
+        ...prev,
+        internships: [
+          ...prev.internships,
+          newInternship,
+        ],
+      }));
 
-    const backendUpdates: Record<string, unknown> = {};
-    if (updates.duration !== undefined) {
-  const duration = parseInternshipDuration(
-    updates.duration
+      setEditDraft((prev) => ({
+        ...prev,
+        internships: [
+          ...prev.internships,
+          newInternship,
+        ],
+      }));
+    },
+    [studentId]
   );
 
-  backendUpdates.start_date =
-    duration.start_date;
+  const updateInternship =
+    useCallback(
+      async (
+        internId: string,
+        updates: Partial<Internship>
+      ) => {
+        if (!studentId) {
+          throw new Error(
+            "Student ID is not available"
+          );
+        }
 
-  backendUpdates.end_date =
-    duration.end_date;
+        const backendUpdates: Record<
+          string,
+          unknown
+        > = {};
 
-  backendUpdates.is_current =
-    duration.is_current;
-}
+        if (
+          updates.duration !==
+          undefined
+        ) {
+          const duration =
+            parseInternshipDuration(
+              updates.duration
+            );
 
-    if (updates.organization !== undefined) {
-      backendUpdates.company_name =
-        updates.organization;
-    }
+          backendUpdates.start_date =
+            duration.start_date;
 
-    if (updates.role !== undefined) {
-      backendUpdates.role_title =
-        updates.role || null;
-    }
+          backendUpdates.end_date =
+            duration.end_date;
 
-    if (updates.description !== undefined) {
-      backendUpdates.description =
-        updates.description || null;
-    }
+          backendUpdates.is_current =
+            duration.is_current;
+        }
 
-    const response =
-      await updateStudentInternship(
-        studentId,
-        internId,
-        backendUpdates
-      );
+        if (
+          updates.organization !==
+          undefined
+        ) {
+          backendUpdates.company_name =
+            updates.organization;
+        }
 
-    const updatedInternship =
-      mapInternshipFromBackend(response);
+        if (updates.role !== undefined) {
+          backendUpdates.role_title =
+            updates.role || null;
+        }
 
-    const updater = (
-      prev: StudentProfile
-    ): StudentProfile => ({
-      ...prev,
-      internships:
-        prev.internships.map(
-          (internship) =>
-            internship.id === internId
-              ? {
-                  ...internship,
-                  ...updatedInternship,
-                  duration:
-                    internship.duration,
-                }
-              : internship
-        ),
-    });
+        if (
+          updates.description !==
+          undefined
+        ) {
+          backendUpdates.description =
+            updates.description || null;
+        }
 
-    setProfile(updater);
-    setEditDraft(updater);
-  },
-  [studentId]
-);
+        const response =
+          await updateStudentInternship(
+            studentId,
+            internId,
+            backendUpdates
+          );
 
-const deleteInternship = useCallback(
-  async (internId: string) => {
-    if (!studentId) {
-      throw new Error("Student ID is not available");
-    }
+        const updatedInternship =
+          mapInternshipFromBackend(
+            response
+          );
 
-    await deleteStudentInternship(
-      studentId,
-      internId
+        const updater = (
+          prev: StudentProfile
+        ): StudentProfile => ({
+          ...prev,
+          internships:
+            prev.internships.map(
+              (internship) =>
+                internship.id === internId
+                  ? {
+                      ...internship,
+                      ...updatedInternship,
+                      duration:
+                        internship.duration,
+                    }
+                  : internship
+            ),
+        });
+
+        setProfile(updater);
+        setEditDraft(updater);
+      },
+      [studentId]
     );
 
-    const updater = (
-      prev: StudentProfile
-    ): StudentProfile => ({
-      ...prev,
-      internships:
-        prev.internships.filter(
-          (internship) =>
-            internship.id !== internId
-        ),
-    });
+  const deleteInternship =
+    useCallback(
+      async (internId: string) => {
+        if (!studentId) {
+          throw new Error(
+            "Student ID is not available"
+          );
+        }
 
-    setProfile(updater);
-    setEditDraft(updater);
-  },
-  [studentId]
-);
+        await deleteStudentInternship(
+          studentId,
+          internId
+        );
+
+        const updater = (
+          prev: StudentProfile
+        ): StudentProfile => ({
+          ...prev,
+          internships:
+            prev.internships.filter(
+              (internship) =>
+                internship.id !==
+                internId
+            ),
+        });
+
+        setProfile(updater);
+        setEditDraft(updater);
+      },
+      [studentId]
+    );
 
   /* ============================================================
      ACHIEVEMENTS
   ============================================================ */
 
   const addAchievement = useCallback(
-  async (achievement: Omit<Achievement, "id">) => {
-    if (!studentId) return;
+    async (
+      achievement: Omit<Achievement, "id">
+    ) => {
+      if (!studentId) return;
 
-    const response = await addStudentAchievement(
-      studentId,
-      {
-        title: achievement.title,
-        description: achievement.description || null,
-        achievement_date: achievement.date
-          ? `${achievement.date}-01`
-          : null,
-      }
+      const response =
+        await addStudentAchievement(
+          studentId,
+          {
+            title: achievement.title,
+            description:
+              achievement.description ||
+              null,
+            achievement_date:
+              achievement.date
+                ? `${achievement.date}-01`
+                : null,
+          }
+        );
+
+      const newAchievement: Achievement =
+        {
+          id: response.achievement_id,
+          title: response.title,
+          description:
+            response.description ?? "",
+          date: response.achievement_date
+            ? response.achievement_date.slice(
+                0,
+                7
+              )
+            : "",
+        };
+
+      setEditDraft((prev) => ({
+        ...prev,
+        achievements: [
+          ...prev.achievements,
+          newAchievement,
+        ],
+      }));
+    },
+    [studentId]
+  );
+
+  const updateAchievement =
+    useCallback(
+      async (
+        achId: string,
+        updates: Partial<Achievement>
+      ) => {
+        if (!studentId) return;
+
+        const response =
+          await updateStudentAchievement(
+            studentId,
+            achId,
+            {
+              title: updates.title,
+              description:
+                updates.description ||
+                null,
+              achievement_date:
+                updates.date
+                  ? `${updates.date}-01`
+                  : null,
+            }
+          );
+
+        const updatedAchievement: Achievement =
+          {
+            id: response.achievement_id,
+            title: response.title,
+            description:
+              response.description ?? "",
+            date: response.achievement_date
+              ? response.achievement_date.slice(
+                  0,
+                  7
+                )
+              : "",
+          };
+
+        setEditDraft((prev) => ({
+          ...prev,
+          achievements:
+            prev.achievements.map(
+              (achievement) =>
+                achievement.id === achId
+                  ? updatedAchievement
+                  : achievement
+            ),
+        }));
+      },
+      [studentId]
     );
 
-    const newAchievement: Achievement = {
-      id: response.achievement_id,
-      title: response.title,
-      description: response.description ?? "",
-      date: response.achievement_date
-        ? response.achievement_date.slice(0, 7)
-        : "",
-    };
+  const deleteAchievement =
+    useCallback(
+      async (achId: string) => {
+        if (!studentId) return;
 
-    setEditDraft((prev) => ({
-      ...prev,
-      achievements: [
-        ...prev.achievements,
-        newAchievement,
-      ],
-    }));
-  },
-  [studentId]
-);
+        await deleteStudentAchievement(
+          studentId,
+          achId
+        );
 
-  const updateAchievement = useCallback(
-  async (
-    achId: string,
-    updates: Partial<Achievement>
-  ) => {
-    if (!studentId) return;
-
-    const response = await updateStudentAchievement(
-      studentId,
-      achId,
-      {
-        title: updates.title,
-        description: updates.description || null,
-        achievement_date: updates.date
-          ? `${updates.date}-01`
-          : null,
-      }
+        setEditDraft((prev) => ({
+          ...prev,
+          achievements:
+            prev.achievements.filter(
+              (achievement) =>
+                achievement.id !== achId
+            ),
+        }));
+      },
+      [studentId]
     );
-
-    const updatedAchievement: Achievement = {
-      id: response.achievement_id,
-      title: response.title,
-      description: response.description ?? "",
-      date: response.achievement_date
-        ? response.achievement_date.slice(0, 7)
-        : "",
-    };
-
-    setEditDraft((prev) => ({
-      ...prev,
-      achievements: prev.achievements.map(
-        (achievement) =>
-          achievement.id === achId
-            ? updatedAchievement
-            : achievement
-      ),
-    }));
-  },
-  [studentId]
-);
-
-  const deleteAchievement = useCallback(
-  async (achId: string) => {
-    if (!studentId) return;
-
-    await deleteStudentAchievement(
-      studentId,
-      achId
-    );
-
-    setEditDraft((prev) => ({
-      ...prev,
-      achievements: prev.achievements.filter(
-        (achievement) =>
-          achievement.id !== achId
-      ),
-    }));
-  },
-  [studentId]
-);
 
   /* ============================================================
      SOFT SKILLS
@@ -1626,27 +1987,43 @@ const deleteInternship = useCallback(
   ============================================================ */
 
   const setResume = useCallback(
-    (file: File) => {
-      const resumeData = {
-        uploadedResume: file,
-        fileName: file.name,
-        fileSize: file.size,
-        uploadDate:
-          new Date().toISOString(),
-      };
+  async (file: File) => {
+    if (!studentId) {
+      throw new Error(
+        "Student ID is not available"
+      );
+    }
 
-      setProfile((prev) => ({
-        ...prev,
-        resume: resumeData,
-      }));
+    const response =
+      await uploadStudentResume(
+        studentId,
+        file
+      );
 
-      setEditDraft((prev) => ({
-        ...prev,
-        resume: resumeData,
-      }));
-    },
-    []
-  );
+    const resumeData = {
+      uploadedResume: file,
+      fileName:
+        response.resume_file_name ||
+        file.name,
+      fileSize:
+        (response.file_size_kb ?? 0) * 1024,
+      uploadDate:
+        response.uploaded_at ||
+        new Date().toISOString(),
+    };
+
+    setProfile((prev) => ({
+      ...prev,
+      resume: resumeData,
+    }));
+
+    setEditDraft((prev) => ({
+      ...prev,
+      resume: resumeData,
+    }));
+  },
+  [studentId]
+);
 
   const deleteResume = useCallback(() => {
     const emptyResume = {
@@ -1667,260 +2044,323 @@ const deleteInternship = useCallback(
     }));
   }, []);
 
-  /* ============================================================
-     SAVE DRAFT
-  ============================================================ */
+  
 
-  const saveDraft = useCallback(
-    async () => {
+/* ============================================================
+   SAVE DRAFT
+============================================================ */
+
+const saveDraft = useCallback(
+  async () => {
+    try {
+      setIsSaving(true);
+      setError(null);
+
+      const payload = {
+        branch_id:
+          editDraft.personalInfo.branchId ||
+          undefined,
+
+        date_of_birth:
+          editDraft.personalInfo.dateOfBirth ||
+          undefined,
+
+        gender:
+          editDraft.personalInfo.gender ||
+          undefined,
+
+        alternate_phone:
+          editDraft.personalInfo.altPhone ||
+          undefined,
+
+        alternate_email:
+          editDraft.personalInfo.altEmail ||
+          undefined,
+
+        father_name:
+          editDraft.personalInfo.fatherName ||
+          undefined,
+
+        mother_name:
+          editDraft.personalInfo.motherName ||
+          undefined,
+
+        father_occupation:
+          editDraft.personalInfo.fatherOccupation ||
+          undefined,
+
+        abc_id:
+          editDraft.personalInfo.abcId ||
+          undefined,
+
+        enrollment_no:
+          editDraft.academicInfo
+            .universityEnrollmentNo ||
+          undefined,
+
+        college:
+          editDraft.academicInfo.college ||
+          undefined,
+
+        degree:
+          editDraft.academicInfo.degree ||
+          undefined,
+
+        graduation_year:
+          editDraft.academicInfo.academicYear !== ""
+            ? Number(
+                editDraft.academicInfo.academicYear
+              )
+            : undefined,
+
+        ssc_percentage:
+          editDraft.academicInfo.sscPercentage !== ""
+            ? Number(
+                editDraft.academicInfo.sscPercentage
+              )
+            : undefined,
+
+        ssc_passing_year:
+          editDraft.academicInfo.sscPassingYear !== ""
+            ? Number(
+                editDraft.academicInfo.sscPassingYear
+              )
+            : undefined,
+
+        hsc_diploma_percentage:
+          editDraft.academicInfo
+            .hscDiplomaPercentage !== ""
+            ? Number(
+                editDraft.academicInfo
+                  .hscDiplomaPercentage
+              )
+            : undefined,
+
+        hsc_diploma_passing_year:
+          editDraft.academicInfo
+            .hscDiplomaPassingYear !== ""
+            ? Number(
+                editDraft.academicInfo
+                  .hscDiplomaPassingYear
+              )
+            : undefined,
+
+        btech_aggregate:
+          editDraft.academicInfo.btechAggregate !== ""
+            ? Number(
+                editDraft.academicInfo.btechAggregate
+              )
+            : undefined,
+
+        cgpa:
+          editDraft.academicInfo.cgpaCurrent !== ""
+            ? Number(
+                editDraft.academicInfo.cgpaCurrent
+              )
+            : undefined,
+
+        active_backlogs:
+          editDraft.academicInfo.hasLiveBacklogs ===
+          "Yes"
+            ? 1
+            : editDraft.academicInfo.hasLiveBacklogs ===
+                "No"
+              ? 0
+              : undefined,
+
+        t_and_p_interest:
+          editDraft.placementReadiness
+            .interestedInTpActivities ||
+          undefined,
+
+        placement_interest:
+          editDraft.placementReadiness
+            .interestedInCollegePlacement ||
+          undefined,
+
+        career_area:
+          editDraft.placementReadiness
+            .areaOfInterestAfterGraduation ||
+          undefined,
+
+        aptitude_prepared:
+          editDraft.placementReadiness
+            .preparedForAptitude === "Yes"
+            ? true
+            : editDraft.placementReadiness
+                  .preparedForAptitude === "No"
+              ? false
+              : undefined,
+
+        aptitude_training_details:
+          editDraft.placementReadiness
+            .aptitudeTrainingDetails ||
+          undefined,
+
+        languages_known:
+          editDraft.placementReadiness
+            .softwareLanguagesKnown ||
+          undefined,
+
+        english_rating:
+          editDraft.placementReadiness
+            .englishCommunicationRating ||
+          undefined,
+
+        ready_to_relocate:
+          editDraft.placementReadiness
+            .readyToRelocate === "Yes"
+            ? true
+            : editDraft.placementReadiness
+                  .readyToRelocate === "No"
+              ? false
+              : undefined,
+
+        linkedin_url:
+          editDraft.onlinePresence.linkedinUrl ||
+          undefined,
+
+        github_url:
+          editDraft.onlinePresence.githubUrl ||
+          undefined,
+
+        portfolio_url:
+          editDraft.onlinePresence.portfolioUrl ||
+          undefined,
+      };
+
+      /* ========================================================
+         CREATE OR UPDATE STUDENT PROFILE
+      ======================================================== */
+
+      let savedProfile: any;
+
       if (!studentId) {
-        throw new Error(
-          "Student ID is not available"
+        /*
+         * FIRST TIME:
+         * Student has no profile yet.
+         *
+         * POST /students/profile
+         */
+        console.log(
+          "No student profile found. Creating profile..."
         );
-      }
 
-      try {
-        setIsSaving(true);
-        setError(null);
+        savedProfile =
+          await createStudentProfile(payload);
 
-        const payload = {
-          branch_id: undefined,
+        if (!savedProfile?.student_id) {
+          throw new Error(
+            "Student profile was created but student_id was not returned."
+          );
+        }
 
-          date_of_birth:
-            editDraft.personalInfo
-              .dateOfBirth || undefined,
+        setStudentId(
+          savedProfile.student_id
+        );
 
-          gender:
-            editDraft.personalInfo.gender ||
-            undefined,
+        console.log(
+          "Student profile created successfully:",
+          savedProfile.student_id
+        );
+      } else {
+        /*
+         * EXISTING PROFILE:
+         * Update the existing profile.
+         *
+         * PUT /students/profile/{student_id}
+         */
+        console.log(
+          "Existing student profile found. Updating profile..."
+        );
 
-          alternate_phone:
-            editDraft.personalInfo.altPhone ||
-            undefined,
-
-          alternate_email:
-            editDraft.personalInfo.altEmail ||
-            undefined,
-
-          father_name:
-            editDraft.personalInfo
-              .fatherName || undefined,
-
-          mother_name:
-            editDraft.personalInfo
-              .motherName || undefined,
-
-          father_occupation:
-            editDraft.personalInfo
-              .fatherOccupation || undefined,
-
-          abc_id:
-            editDraft.personalInfo.abcId ||
-            undefined,
-
-          enrollment_no:
-            editDraft.academicInfo
-              .universityEnrollmentNo ||
-            undefined,
-
-          college:
-            editDraft.academicInfo.college ||
-            undefined,
-
-          degree:
-            editDraft.academicInfo.degree ||
-            undefined,
-
-          graduation_year:
-            editDraft.academicInfo.academicYear !== ""
-              ? Number(editDraft.academicInfo.academicYear)
-              : undefined,
-
-          ssc_percentage:
-            editDraft.academicInfo
-              .sscPercentage !== ""
-              ? Number(
-                  editDraft.academicInfo
-                    .sscPercentage
-                )
-              : undefined,
-
-          ssc_passing_year:
-            editDraft.academicInfo
-              .sscPassingYear !== ""
-              ? Number(
-                  editDraft.academicInfo
-                    .sscPassingYear
-                )
-              : undefined,
-
-          hsc_diploma_percentage:
-            editDraft.academicInfo
-              .hscDiplomaPercentage !== ""
-              ? Number(
-                  editDraft.academicInfo
-                    .hscDiplomaPercentage
-                )
-              : undefined,
-
-          hsc_diploma_passing_year:
-            editDraft.academicInfo
-              .hscDiplomaPassingYear !== ""
-              ? Number(
-                  editDraft.academicInfo
-                    .hscDiplomaPassingYear
-                )
-              : undefined,
-
-          btech_aggregate:
-            editDraft.academicInfo
-              .btechAggregate !== ""
-              ? Number(
-                  editDraft.academicInfo
-                    .btechAggregate
-                )
-              : undefined,
-
-          cgpa:
-            editDraft.academicInfo
-              .cgpaCurrent !== ""
-              ? Number(
-                  editDraft.academicInfo
-                    .cgpaCurrent
-                )
-              : undefined,
-
-          active_backlogs:
-            editDraft.academicInfo
-              .hasLiveBacklogs === "Yes"
-              ? 1
-              : editDraft.academicInfo
-                    .hasLiveBacklogs === "No"
-                ? 0
-                : undefined,
-
-          t_and_p_interest:
-            editDraft.placementReadiness
-              .interestedInTpActivities ||
-            undefined,
-
-          placement_interest:
-            editDraft.placementReadiness
-              .interestedInCollegePlacement ||
-            undefined,
-
-          career_area:
-            editDraft.placementReadiness
-              .areaOfInterestAfterGraduation ||
-            undefined,
-
-          aptitude_prepared:
-            editDraft.placementReadiness
-              .preparedForAptitude === "Yes"
-              ? true
-              : editDraft.placementReadiness
-                    .preparedForAptitude === "No"
-                ? false
-                : undefined,
-
-          aptitude_training_details:
-            editDraft.placementReadiness
-              .aptitudeTrainingDetails ||
-            undefined,
-
-          languages_known:
-            editDraft.placementReadiness
-              .softwareLanguagesKnown ||
-            undefined,
-
-          english_rating:
-            editDraft.placementReadiness
-              .englishCommunicationRating ||
-            undefined,
-
-          ready_to_relocate:
-            editDraft.placementReadiness
-              .readyToRelocate === "Yes"
-              ? true
-              : editDraft.placementReadiness
-                    .readyToRelocate === "No"
-                ? false
-                : undefined,
-
-          linkedin_url:
-            editDraft.onlinePresence
-              .linkedinUrl || undefined,
-
-          github_url:
-            editDraft.onlinePresence
-              .githubUrl || undefined,
-
-          portfolio_url:
-            editDraft.onlinePresence
-              .portfolioUrl || undefined,
-        };
-
-        const updatedProfile =
+        savedProfile =
           await updateStudentProfile(
             studentId,
             payload
           );
 
-
-        await saveSocialLinks(
-          studentId,
-          editDraft.onlinePresence
-        );
-
-
-        const mappedProfile =
-          mapBackendProfileToStudentProfile(
-            updatedProfile,
-            {
-              email:
-                updatedProfile.email ||
-                user?.email,
-
-              phone:
-                updatedProfile.phone ||
-                user?.phone,
-            },
-            profile
-          );
-
-        setProfile(mappedProfile);
-
-        setEditDraft(
-          structuredClone(mappedProfile)
-        );
-
         console.log(
           "Student profile updated successfully"
         );
-      } catch (err) {
-        console.error(
-          "Failed to update student profile:",
-          err
-        );
-
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to update student profile"
-        );
-
-        throw err;
-      } finally {
-        setIsSaving(false);
       }
-    },
-    [
-      studentId,
-      editDraft,
-      profile,
-      user,
-    ]
-  );
+
+      /* ========================================================
+         SAVE SOCIAL LINKS
+      ======================================================== */
+
+      const currentStudentId =
+        savedProfile.student_id ||
+        studentId;
+
+      await saveSocialLinks(
+        currentStudentId,
+        editDraft.onlinePresence
+      );
+
+      /* ========================================================
+         LOAD BRANCH MASTER DATA AGAIN
+      ======================================================== */
+
+      const branchesResponse =
+        await getBranches();
+
+      const branches =
+        branchesResponse as BackendBranch[];
+
+      /* ========================================================
+         MAP BACKEND PROFILE → FRONTEND PROFILE
+      ======================================================== */
+
+      const mappedProfile =
+        mapBackendProfileToStudentProfile(
+          savedProfile,
+          {
+            email:
+              savedProfile.email ||
+              user?.email,
+
+            phone:
+              savedProfile.phone ||
+              user?.phone,
+          },
+          profile,
+          branches
+        );
+
+      setProfile(mappedProfile);
+
+      setEditDraft(
+        structuredClone(mappedProfile)
+      );
+
+      console.log(
+        "Student profile saved successfully"
+      );
+    } catch (err) {
+      console.error(
+        "Failed to save student profile:",
+        err
+      );
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to save student profile"
+      );
+
+      throw err;
+    } finally {
+      setIsSaving(false);
+    }
+  },
+  [
+    studentId,
+    editDraft,
+    profile,
+    user,
+  ]
+);
 
   /* ============================================================
      RESET DRAFT
@@ -1941,12 +2381,14 @@ const deleteInternship = useCallback(
       setIsLoading(true);
       setError(null);
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          setIsLoading(false);
-          resolve();
-        }, ms);
-      });
+      return new Promise(
+        (resolve) => {
+          setTimeout(() => {
+            setIsLoading(false);
+            resolve();
+          }, ms);
+        }
+      );
     },
     []
   );
@@ -1980,8 +2422,7 @@ const deleteInternship = useCallback(
     activeEditTab,
 
     isLoading:
-      isLoading ||
-      authLoading,
+      isLoading || authLoading,
 
     error,
 

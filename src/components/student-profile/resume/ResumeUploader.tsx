@@ -1,10 +1,16 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+} from 'react';
 import { Progress } from '@/components/ui/progress';
 import { UploadCloud, Download, RefreshCw, FileText, Upload } from 'lucide-react';
 import { validateResumeFile } from '@/features/student-profile/utils/profileValidation';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
+import { getStudentResumeFile } from '@/lib/student-profile-api';
 
 export default function ResumeUploader() {
   const { profile, setResume, deleteResume } = useStudentProfile();
@@ -15,7 +21,9 @@ export default function ResumeUploader() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const hasResume = profile.resume.uploadedResume !== null;
+  const hasResume =
+  profile.resume.uploadedResume !== null ||
+  profile.resume.fileName !== "";
 
   const handleFile = useCallback((file: File) => {
     const validation = validateResumeFile(file);

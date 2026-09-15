@@ -33,6 +33,7 @@ export interface PersonalInfo {
 
   // 6.1.4 Academic Placement (Branch)
   branch: string;
+  branchId: string;
 }
 
 // ─── 6.2 Academic Information ─────────────────────────────────────────────
