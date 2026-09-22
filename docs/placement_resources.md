@@ -1032,5 +1032,354 @@ Before participating in placement activities, students should review the followi
 > **Important Note:** Placement preparation is not a one-time activity. Students should regularly review their progress, practice relevant skills, build practical evidence, and update their preparation according to the requirements of the roles and companies they are targeting.
 
 ## 5. Useful Career-Readiness Resources
+## 5. Useful Career-Readiness Resources
+
+Career-readiness resources help students develop technical skills, practice placement assessments, build projects, prepare resumes, and improve interview performance.
+
+The resources below are grouped according to common placement-preparation areas. Students should select resources based on their target role, current skill level, and placement requirements.
+
+### 5.1 Coding and Data Structures & Algorithms
+
+| Resource | Primary Use | Suitable For |
+|---|---|---|
+| [LeetCode](https://leetcode.com/) | Coding problems, DSA practice, and technical interview preparation | Software, AI/ML and technical roles |
+| [HackerRank](https://www.hackerrank.com/) | Programming, SQL, problem-solving, and skill assessments | Beginners and placement preparation |
+| [GeeksforGeeks](https://www.geeksforgeeks.org/) | Programming, DSA, CS subjects, and interview preparation | Beginner to intermediate learners |
+| [CodeChef](https://www.codechef.com/) | Competitive programming and coding practice | Students interested in regular coding practice |
+
+**Recommended approach:**
+- Start with basic programming problems.
+- Learn the relevant DSA concept.
+- Solve problems of increasing difficulty.
+- Review incorrect solutions.
+- Track frequently occurring weak areas.
+
+---
+
+### 5.2 Aptitude, Reasoning, and Placement Tests
+
+| Resource | Primary Use | Suitable For |
+|---|---|---|
+| [IndiaBIX](https://www.indiabix.com/) | Quantitative aptitude, logical reasoning, verbal ability, and placement-style questions | General placement preparation |
+| [HackerRank](https://www.hackerrank.com/) | Coding, problem-solving, and technical assessments | Technical placement preparation |
+
+Important preparation areas include:
+
+- Quantitative aptitude
+- Logical reasoning
+- Verbal ability
+- Data interpretation
+- Numerical problem-solving
+
+Students should practice using timed sessions to improve accuracy and time management.
+
+---
+
+### 5.3 SQL and Database Practice
+
+| Resource | Primary Use | Suitable For |
+|---|---|---|
+| [HackerRank SQL](https://www.hackerrank.com/domains/sql) | SQL query practice and assessments | Beginners to intermediate learners |
+| [LeetCode Database](https://leetcode.com/problemset/database/) | SQL and database problem solving | Technical interview preparation |
+| [W3Schools SQL](https://www.w3schools.com/sql/) | SQL syntax and beginner-friendly examples | Students learning SQL fundamentals |
+
+Students should practice:
+
+- SELECT queries
+- Filtering and sorting
+- Aggregate functions
+- GROUP BY
+- JOIN operations
+- Subqueries
+- Basic database concepts
+
+---
+
+### 5.4 AI, Machine Learning, and Data Science
+
+| Resource | Primary Use | Suitable For |
+|---|---|---|
+| [Kaggle](https://www.kaggle.com/) | Datasets, notebooks, competitions, and practical data science | AI/DS students |
+| [Google Machine Learning](https://developers.google.com/machine-learning) | Machine learning concepts and learning resources | ML beginners and intermediate learners |
+| [Microsoft Learn](https://learn.microsoft.com/) | AI, data, cloud, and technology learning paths | Students exploring Microsoft technologies |
+| [NPTEL](https://nptel.ac.in/) | Structured courses in programming, AI, ML, data science, and computer science | Students seeking structured learning |
+| [SWAYAM](https://swayam.gov.in/) | Online courses from Indian educational institutions | Students seeking academic learning |
+
+Students can use datasets and practical exercises to develop skills in:
+
+- Data cleaning
+- Exploratory Data Analysis
+- Data visualization
+- Machine learning
+- Model evaluation
+- Feature engineering
+- Basic deep learning
+
+---
+
+### 5.5 Data Analytics and Visualization
+
+| Resource | Primary Use | Suitable For |
+|---|---|---|
+| [Microsoft Learn – Power BI](https://learn.microsoft.com/power-bi/) | Power BI learning and data visualization | Data Analyst aspirants |
+| [Tableau Learning](https://www.tableau.com/learn) | Data visualization and Tableau fundamentals | Data Analyst and BI aspirants |
+| [Kaggle](https://www.kaggle.com/) | Datasets, notebooks, and data analysis practice | Data/AI students |
+| [Microsoft Excel](https://support.microsoft.com/excel) | Spreadsheet analysis and data handling resources | Data Analyst aspirants |
+
+Students should practice converting raw data into meaningful tables, charts, dashboards, and observations.
+
+---
+
+### 5.6 Cloud and DevOps
+
+| Resource | Primary Use | Suitable For |
+|---|---|---|
+| [AWS Skill Builder](https://skillbuilder.aws/) | AWS and cloud learning resources | Cloud beginners |
+| [Microsoft Learn](https://learn.microsoft.com/) | Azure and cloud learning paths | Cloud/Azure learners |
+| [Google Cloud Skills Boost](https://www.cloudskillsboost.google/) | Google Cloud learning and hands-on labs | Cloud learners |
+| [Docker Documentation](https://docs.docker.com/) | Containers and Docker fundamentals | DevOps and software students |
+| [Kubernetes Documentation](https://kubernetes.io/docs/) | Kubernetes and container orchestration | Students progressing toward DevOps |
+
+Students should first understand:
+
+- Linux
+- Networking
+- Cloud computing
+- Containers
+- Version control
+- CI/CD
+- Infrastructure fundamentals
+
+---
+
+### 5.7 Cybersecurity
+
+| Resource | Primary Use | Suitable For |
+|---|---|---|
+| [Cisco Skills for All](https://skillsforall.com/) | Networking and cybersecurity learning | Beginners |
+| [TryHackMe](https://tryhackme.com/) | Guided cybersecurity learning and practical labs | Students learning security fundamentals |
+| [Microsoft Learn Security](https://learn.microsoft.com/security/) | Security and cloud-security learning resources | Security and cloud learners |
+
+Important beginner areas include:
+
+- Networking fundamentals
+- Linux fundamentals
+- Operating systems
+- Authentication and authorization
+- Security concepts
+- Security monitoring
+- Basic vulnerability concepts
+
+Students should use legal and authorized environments when performing security exercises.
+
+---
+
+### 5.8 Git and GitHub
+
+| Resource | Primary Use | Suitable For |
+|---|---|---|
+| [GitHub Skills](https://skills.github.com/) | Interactive learning for GitHub workflows | Beginners |
+| [Git Documentation](https://git-scm.com/doc) | Git commands and version-control concepts | Students learning Git |
+| [GitHub Documentation](https://docs.github.com/) | Repositories, branches, pull requests, issues, and collaboration | Students and project teams |
+
+Students should become comfortable with:
+
+- Repositories
+- Branches
+- Commits
+- Push and pull operations
+- Pull requests
+- Issues
+- Merge conflicts
+- Collaborative workflows
+
+---
+
+### 5.9 Core Computer Science Learning
+
+Students can use structured courses and official documentation to revise important technical subjects.
+
+Important subjects include:
+
+- Object-Oriented Programming
+- Data Structures and Algorithms
+- DBMS
+- Operating Systems
+- Computer Networks
+- Software Engineering
+- Computer Architecture
+- Compiler fundamentals
+
+Recommended resources include:
+
+- [NPTEL](https://nptel.ac.in/)
+- [SWAYAM](https://swayam.gov.in/)
+- [GeeksforGeeks](https://www.geeksforgeeks.org/)
+- Official technology documentation
+- University course material
+
+Students should use academic notes for syllabus-specific preparation and external resources for additional practice.
+
+---
+
+### 5.10 Resume and Career Preparation
+
+Students should maintain a concise, accurate, and role-focused resume.
+
+Useful preparation activities include:
+
+- Reviewing professional resume formats
+- Writing clear project descriptions
+- Highlighting relevant technical skills
+- Keeping education information accurate
+- Adding internships, projects, certifications, and achievements where applicable
+- Removing unrelated or unsupported skills
+- Checking spelling, grammar, and formatting
+
+Useful resources include:
+
+- [LinkedIn](https://www.linkedin.com/)
+- [Microsoft Create](https://create.microsoft.com/) for templates and professional documents
+- College Training and Placement Cell resources
+- Company career pages
+
+Students should not list a technology or skill on their resume unless they can explain its basic use and their practical experience with it.
+
+---
+
+### 5.11 Interview Preparation
+
+Interview preparation should include both technical and behavioral preparation.
+
+**Technical Preparation**
+- Programming questions
+- DSA
+- SQL
+- DBMS
+- OOP
+- Operating Systems
+- Computer Networks
+- Role-specific concepts
+- Project-based questions
+
+**Behavioral Preparation**
+- Self-introduction
+- Academic background
+- Project experience
+- Teamwork examples
+- Problem-solving experiences
+- Career goals
+- Role-related questions
+
+Useful practice platforms include:
+
+- [LeetCode](https://leetcode.com/)
+- [HackerRank](https://www.hackerrank.com/)
+- [GeeksforGeeks](https://www.geeksforgeeks.org/)
+
+Students should practice explaining concepts in their own words rather than memorizing answers.
+
+---
+
+### 5.12 Communication and Presentation Skills
+
+Students can improve communication through:
+
+- English speaking practice
+- Technical presentations
+- Group discussions
+- Mock interviews
+- Project demonstrations
+- Peer discussions
+- Recording and reviewing presentations
+
+Useful practice activities include:
+
+1. Give a one-minute self-introduction.
+2. Explain one technical concept in simple language.
+3. Explain one project in two minutes.
+4. Answer a common interview question.
+5. Present a project to classmates or peers.
+6. Review clarity, confidence, and unnecessary repetition.
+
+---
+
+### 5.13 Career and Professional Development Platforms
+
+Students can use professional platforms to:
+
+- Research job roles
+- Understand skill requirements
+- Find internships and entry-level opportunities
+- Build professional profiles
+- Follow companies and technology trends
+- Network with professionals
+
+Useful platforms include:
+
+- [LinkedIn](https://www.linkedin.com/)
+- [Naukri](https://www.naukri.com/)
+- [Internshala](https://internshala.com/)
+- Company career portals
+- College placement portals
+
+Students should verify job details directly from the organization's official career page before applying.
+
+---
+
+### 5.14 Resource Selection Strategy
+
+Students do not need to use every resource listed in this document. Using too many platforms simultaneously can make preparation difficult to manage.
+
+A practical approach is:
+
+**Choose → Learn → Practice → Build → Review**
+
+| Goal | Suggested Resource Type |
+|---|---|
+| Learn programming | Structured course + coding platform |
+| Practice DSA | Coding practice platform |
+| Learn SQL | SQL tutorial + SQL practice platform |
+| Learn AI/ML | Structured course + datasets + projects |
+| Learn Data Analytics | Excel/Power BI/Tableau + datasets |
+| Learn Cloud | Official cloud learning platform + hands-on labs |
+| Learn Git/GitHub | Git/GitHub documentation + practical repository |
+| Prepare aptitude | Aptitude question bank + timed tests |
+| Prepare interviews | Technical question practice + mock interviews |
+| Build portfolio | GitHub + practical projects |
+
+---
+
+### 5.15 How to Use Career-Readiness Resources Effectively
+
+Students should avoid collecting resources without actually practicing.
+
+A recommended learning cycle is:
+
+**Learn → Practice → Build → Document → Review**
+
+1. **Learn** the concept from a reliable resource.
+2. **Practice** through questions or exercises.
+3. **Build** a small project or practical implementation.
+4. **Document** the work and important learnings.
+5. **Review** mistakes and identify areas for improvement.
+
+Students should maintain a simple record of completed topics, projects, practice problems, and areas that require revision.
+
+---
+
+### 5.16 Resource Quality and Verification
+
+Students should prefer resources that are:
+
+- Official or institutionally recognized
+- Clearly maintained
+- Relevant to the target role
+- Technically reliable
+- Appropriate for their current skill level
+
+For company-specific information, students should prioritize the company's official career page and the latest job description over third-party summaries.
+
+> **Important Note:** Online resources and course availability may change over time. Students should verify current availability, course content, eligibility requirements, and recruitment information directly from the respective official platform or organization.
 
 ## 6. Sources and References
