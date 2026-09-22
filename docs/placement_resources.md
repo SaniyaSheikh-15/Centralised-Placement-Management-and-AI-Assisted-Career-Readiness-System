@@ -332,6 +332,304 @@ QA and Software Test Engineers test software applications to identify defects an
 
 ## 3. Skills Required for Each Role
 
+The skills required for a technology role vary according to the organization, job description, job level, and responsibilities. For placement preparation, students should build a combination of **technical foundations, role-specific skills, practical tool knowledge, problem-solving ability, and communication skills**.
+
+The following framework is designed for students preparing for entry-level AI/DS and CSE-related roles.
+
+### 3.1 Skill Categories
+
+Students can organize their preparation into four major skill categories:
+
+1. **Core Technical Skills** – Programming, DSA, DBMS, SQL, operating systems, networking, and other fundamentals.
+2. **Role-Specific Skills** – Skills directly related to the target job role, such as machine learning for Data Scientist roles or cloud technologies for Cloud/DevOps roles.
+3. **Practical and Tool-Based Skills** – Git/GitHub, databases, cloud platforms, development frameworks, data tools, testing tools, and other technologies.
+4. **Professional Skills** – Communication, teamwork, problem-solving, documentation, presentation, and time management.
+
+### 3.2 Role-Wise Skill Matrix
+
+| Job Role | Core Technical Skills | Common Tools / Technologies | Practical Evidence |
+|---|---|---|---|
+| Software Developer / Software Engineer | Programming, DSA, OOP, DBMS, SQL, problem-solving | Git, GitHub, IDEs, APIs, development frameworks | Coding projects, applications, GitHub repositories |
+| Data Analyst | SQL, statistics, data cleaning, EDA, data analysis | Excel, Python, pandas, Power BI, Tableau | Dashboards, analysis reports, data projects |
+| Data Scientist | Python, statistics, ML, SQL, EDA, model evaluation | NumPy, pandas, scikit-learn, Jupyter, TensorFlow/PyTorch | ML projects, notebooks, experiments, reports |
+| Machine Learning Engineer | Python, ML algorithms, data preprocessing, software development, model evaluation | scikit-learn, TensorFlow/PyTorch, Git, APIs, deployment tools | End-to-end ML projects and deployed models |
+| AI Engineer | Python, ML, deep learning, AI concepts, application development | TensorFlow/PyTorch, AI APIs, Git, cloud AI services | AI applications, prototypes, integrated projects |
+| Data Engineer | SQL, databases, ETL/ELT, data modeling, data pipelines | Spark, Airflow, Kafka, cloud platforms | Data pipelines, ETL projects, database projects |
+| Cloud / DevOps Engineer | Linux, networking, cloud fundamentals, scripting, CI/CD | AWS/Azure/GCP, Docker, Kubernetes, Git | Deployment projects, CI/CD workflows, cloud labs |
+| Cybersecurity Analyst | Networking, Linux, operating systems, security fundamentals | SIEM/security monitoring tools, Linux, security tools | Security labs, monitoring exercises, documentation |
+| Systems / Business Analyst | Requirements analysis, SQL, system analysis, documentation | Spreadsheets, SQL tools, diagramming/documentation tools | Requirement documents, process diagrams, case studies |
+| QA / Test Engineer | Software testing, test cases, debugging, SQL, programming basics | Testing tools, API testing tools, Git, automation frameworks | Test plans, test cases, automation projects |
+
+### 3.3 Core Skills Common to Most Placement Roles
+
+#### 3.3.1 Programming Fundamentals
+
+Students should be comfortable with at least one programming language and should be able to write, test, debug, and explain basic programs.
+
+Common languages include:
+
+- Python
+- Java
+- C++
+- JavaScript
+
+Important concepts include:
+
+- Variables and data types
+- Conditional statements
+- Loops
+- Functions
+- Arrays and strings
+- Object-oriented programming
+- Exception handling
+- File handling
+- Debugging
+- Basic modular programming
+
+#### 3.3.2 Data Structures and Algorithms
+
+DSA helps students develop structured problem-solving skills and is relevant to many technical assessments and interviews.
+
+Important topics include:
+
+- Arrays and strings
+- Linked lists
+- Stacks and queues
+- Hash tables
+- Trees
+- Graphs
+- Searching algorithms
+- Sorting algorithms
+- Recursion
+- Time and space complexity
+- Basic algorithm design techniques
+
+Students should focus not only on memorizing algorithms but also on understanding **when and why a particular approach should be used**.
+
+#### 3.3.3 Database and SQL Skills
+
+Database and SQL knowledge is useful for software development, data analysis, data engineering, and several other technical roles.
+
+Students should understand:
+
+- Relational databases
+- Tables and relationships
+- Primary and foreign keys
+- SQL queries
+- SELECT, INSERT, UPDATE, and DELETE
+- JOIN operations
+- GROUP BY and aggregate functions
+- Subqueries
+- Views
+- Basic normalization
+- Indexing fundamentals
+
+#### 3.3.4 Git and GitHub
+
+Version-control knowledge is useful for collaborative software and project development.
+
+Students should be able to:
+
+- Create and manage repositories
+- Create and switch branches
+- Make meaningful commits
+- Push and pull changes
+- Create pull requests
+- Review changes
+- Resolve basic merge conflicts
+- Maintain a clear project history
+
+#### 3.3.5 Operating Systems and Networking Fundamentals
+
+Students targeting CSE and technical roles should have basic awareness of:
+
+**Operating Systems**
+- Processes and threads
+- Memory management
+- File systems
+- CPU scheduling
+- Basic Linux commands
+
+**Computer Networks**
+- OSI and TCP/IP models
+- IP addresses
+- DNS
+- HTTP/HTTPS
+- TCP and UDP
+- Basic networking concepts
+
+#### 3.3.6 AI, Data Science and Machine Learning Fundamentals
+
+For AI/DS students, the following areas provide a useful foundation:
+
+- Python for data analysis
+- NumPy and pandas
+- Data cleaning
+- Exploratory Data Analysis (EDA)
+- Statistics and probability
+- Supervised learning
+- Unsupervised learning
+- Classification
+- Regression
+- Clustering
+- Model evaluation
+- Feature engineering
+- Overfitting and underfitting
+- Basic deep learning concepts
+
+A typical ML workflow can be understood as:
+
+**Problem Definition → Data Collection → Data Cleaning → EDA → Feature Engineering → Model Selection → Model Training → Evaluation → Deployment/Application**
+
+#### 3.3.7 Problem-Solving and Analytical Thinking
+
+Students should practice a structured approach to solving problems:
+
+1. Understand the problem.
+2. Identify the required inputs and outputs.
+3. Break the problem into smaller tasks.
+4. Develop possible solutions.
+5. Implement the solution.
+6. Test different cases.
+7. Identify and fix errors.
+8. Explain the reasoning behind the solution.
+
+#### 3.3.8 Communication and Presentation Skills
+
+Students should be able to clearly explain:
+
+- Their technical skills
+- Academic projects
+- Internship or practical experience
+- Problem-solving approach
+- Technologies used
+- Their individual contribution to a project
+
+These skills are useful during technical interviews, HR interviews, group discussions, and project presentations.
+
+### 3.4 Role-Specific Preparation Guide
+
+| Target Role | High-Priority Skills | Supporting Skills |
+|---|---|---|
+| Software Developer | Programming, DSA, OOP, DBMS, SQL | Git, APIs, Projects |
+| Data Analyst | SQL, Excel, Statistics, Python, Visualization | Power BI/Tableau, Projects |
+| Data Scientist | Python, Statistics, ML, SQL, EDA | Deep Learning, Visualization, Projects |
+| Machine Learning Engineer | Python, ML, DSA, Software Development | APIs, Deployment, Cloud |
+| AI Engineer | Python, ML/DL, AI concepts, Application Development | APIs, Cloud, Projects |
+| Data Engineer | SQL, Python, Databases, ETL, Data Pipelines | Spark, Airflow, Cloud |
+| Cloud / DevOps Engineer | Linux, Networking, Cloud, Git, CI/CD | Docker, Kubernetes, Scripting |
+| Cybersecurity Analyst | Networking, Linux, Security Fundamentals | SIEM, Security Monitoring, Scripting |
+| Systems / Business Analyst | Requirements, SQL, Documentation | Communication, Process Modelling |
+| QA / Test Engineer | Testing, SQL, Programming | API Testing, Automation, Git |
+
+### 3.5 Practical Skills and Portfolio Evidence
+
+Students should try to demonstrate their skills through practical work rather than listing skills only on a resume.
+
+Useful forms of evidence include:
+
+- Academic projects
+- Personal projects
+- GitHub repositories
+- Data analysis dashboards
+- Machine learning projects
+- Web or software applications
+- Automation scripts
+- Cloud deployment projects
+- Testing projects
+- Hackathons
+- Internships
+- Technical presentations
+
+Each project should clearly describe:
+
+- Problem statement
+- Objective
+- Technologies used
+- Student's contribution
+- Implementation approach
+- Results
+- Limitations
+- Future improvements
+
+### 3.6 Professional and Employability Skills
+
+Along with technical knowledge, students should develop:
+
+- Communication
+- Teamwork
+- Problem-solving
+- Time management
+- Presentation skills
+- Documentation
+- Adaptability
+- Critical thinking
+- Continuous learning
+- Professional behavior
+
+### 3.7 Skill Proficiency Levels
+
+Students can evaluate their preparation using the following levels:
+
+| Level | Description |
+|---|---|
+| Awareness | Understands basic terminology and concepts |
+| Beginner | Can perform simple tasks with guidance |
+| Working Knowledge | Can independently perform common tasks |
+| Practical Proficiency | Can apply the skill in projects and solve practical problems |
+| Interview Ready | Can explain concepts, solve relevant problems, and discuss practical implementation |
+
+### 3.8 Recommended Skill-Building Approach
+
+A structured preparation approach can be followed:
+
+**Stage 1 – Build Foundations**
+- Programming
+- DSA
+- SQL
+- DBMS
+- Basic CS fundamentals
+
+**Stage 2 – Select a Career Direction**
+- Software Development
+- Data Analytics
+- Data Science
+- AI/ML
+- Data Engineering
+- Cloud/DevOps
+- Cybersecurity
+- QA/Testing
+
+**Stage 3 – Develop Role-Specific Skills**
+Focus on the technologies and concepts commonly associated with the selected role.
+
+**Stage 4 – Build Practical Projects**
+Create projects that demonstrate the skills learned and maintain them using Git/GitHub.
+
+**Stage 5 – Validate and Present Skills**
+Practice coding questions, technical interviews, project explanations, presentations, resume preparation, and mock interviews.
+
+### 3.9 Final Skill Checklist
+
+Before applying for placements, students can check whether they have:
+
+- [ ] At least one programming language
+- [ ] Basic DSA knowledge
+- [ ] Problem-solving practice
+- [ ] OOP fundamentals
+- [ ] SQL and DBMS knowledge
+- [ ] Git and GitHub experience
+- [ ] Basic CS fundamentals
+- [ ] Role-specific technical skills
+- [ ] At least one practical project
+- [ ] Ability to explain project contributions
+- [ ] Resume with relevant skills and projects
+- [ ] Communication and presentation practice
+- [ ] Technical interview preparation
+- [ ] Basic HR/interview preparation
+
+> **Important Note:** This framework is intended as a general placement-preparation guide. Actual skill requirements vary by company, role, location, experience level, and job description. Students should always prioritize the skills and qualifications mentioned in the latest official job description or campus placement notice.
+
 ## 4. Placement Preparation Areas
 
 ## 5. Useful Career-Readiness Resources
