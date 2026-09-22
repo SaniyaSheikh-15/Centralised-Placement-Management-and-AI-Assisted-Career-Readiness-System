@@ -109,6 +109,227 @@ Before applying to a placement drive, students should verify:
 
 ## 2. Common Job Roles for AI/DS & CSE Students
 
+AI/DS and CSE students can pursue a wide range of careers in software development, data, artificial intelligence, cloud computing, and cybersecurity. The exact responsibilities and required skills may vary between companies and job descriptions.
+
+### 2.1 Software Developer / Software Engineer
+
+Software developers design, develop, test, maintain, and improve software applications and systems.
+
+**Common responsibilities:**
+- Understand user and business requirements.
+- Design and develop software applications.
+- Write, test, and debug code.
+- Maintain and improve existing applications.
+- Work with databases and APIs.
+- Collaborate with developers, testers, and other team members.
+
+**Common skills:**
+- C, C++, Java, Python, or JavaScript
+- Data Structures and Algorithms (DSA)
+- Object-Oriented Programming (OOP)
+- DBMS and SQL
+- Git and version control
+- Problem-solving and debugging
+
+### 2.2 Data Analyst
+
+Data analysts collect, clean, analyze, and visualize data to identify useful patterns and support data-informed decisions.
+
+**Common responsibilities:**
+- Collect and organize data.
+- Clean and preprocess datasets.
+- Perform data analysis.
+- Create reports and dashboards.
+- Identify trends and patterns.
+- Present findings to stakeholders.
+
+**Common skills:**
+- SQL
+- Excel
+- Python or R
+- Statistics
+- Data cleaning
+- Data visualization
+- Power BI or Tableau
+
+### 2.3 Data Scientist
+
+Data scientists use programming, statistics, data analysis, and machine learning to extract insights from data and develop predictive models.
+
+**Common responsibilities:**
+- Collect and prepare datasets.
+- Perform exploratory data analysis.
+- Apply statistical techniques.
+- Build and evaluate machine learning models.
+- Create data visualizations.
+- Communicate analytical findings.
+
+**Common skills:**
+- Python or R
+- Statistics and probability
+- Machine learning
+- SQL
+- Data preprocessing
+- Data visualization
+- Feature engineering
+- Model evaluation
+
+### 2.4 Machine Learning Engineer
+
+Machine Learning Engineers develop, evaluate, integrate, and deploy machine learning models into software and data systems.
+
+**Common responsibilities:**
+- Prepare data for machine learning.
+- Develop and train ML models.
+- Evaluate model performance.
+- Integrate models into applications.
+- Deploy models and monitor their performance.
+
+**Common skills:**
+- Python
+- Machine learning algorithms
+- Statistics
+- Data preprocessing
+- Scikit-learn
+- TensorFlow or PyTorch
+- SQL
+- Git
+- Basic deployment concepts
+
+### 2.5 AI Engineer
+
+AI Engineers develop applications and systems that use artificial intelligence techniques such as machine learning, deep learning, natural language processing, and computer vision.
+
+**Common responsibilities:**
+- Develop AI-based applications.
+- Prepare and process data.
+- Integrate AI models into applications.
+- Work with AI APIs and services.
+- Evaluate and improve AI systems.
+
+**Common skills:**
+- Python
+- Machine learning
+- Deep learning
+- NLP
+- Computer Vision
+- Generative AI fundamentals
+- APIs
+- TensorFlow or PyTorch
+- Git
+
+### 2.6 Data Engineer
+
+Data Engineers build and maintain systems that collect, transform, store, and deliver data for analytics and machine learning.
+
+**Common responsibilities:**
+- Build data pipelines.
+- Extract and transform data.
+- Manage databases and data warehouses.
+- Monitor data pipelines.
+- Ensure data quality and reliability.
+
+**Common skills:**
+- SQL
+- Python, Java, or Scala
+- Database concepts
+- ETL/ELT
+- Data pipelines
+- Data warehousing
+- Apache Spark
+- Cloud platforms
+- Git
+
+### 2.7 Cloud / DevOps Engineer
+
+Cloud and DevOps Engineers help organizations deploy, automate, monitor, and maintain applications and infrastructure.
+
+**Common responsibilities:**
+- Deploy applications and services.
+- Manage cloud resources.
+- Automate development and deployment processes.
+- Work with CI/CD pipelines.
+- Monitor applications and infrastructure.
+- Troubleshoot deployment issues.
+
+**Common skills:**
+- Linux
+- Git
+- Networking fundamentals
+- Cloud fundamentals
+- CI/CD
+- Docker
+- Kubernetes fundamentals
+- Shell scripting
+
+### 2.8 Cybersecurity Analyst
+
+Cybersecurity Analysts help protect computer systems, networks, applications, and data from security threats.
+
+**Common responsibilities:**
+- Monitor systems and networks for security events.
+- Investigate security incidents.
+- Identify vulnerabilities.
+- Review security logs and alerts.
+- Support incident response activities.
+- Maintain security documentation.
+
+**Common skills:**
+- Computer networking
+- Operating systems
+- Cybersecurity fundamentals
+- Linux
+- Security monitoring
+- Basic scripting
+- Vulnerability assessment
+- Authentication and access control
+
+### 2.9 Systems / Business Analyst
+
+Systems Analysts study business and technical requirements and help organizations improve their information systems.
+
+**Common responsibilities:**
+- Understand business requirements.
+- Analyze existing systems.
+- Identify improvements.
+- Prepare documentation.
+- Communicate with technical and non-technical stakeholders.
+- Support system implementation and testing.
+
+**Common skills:**
+- Requirements analysis
+- SQL and database fundamentals
+- System analysis
+- Problem-solving
+- Documentation
+- Communication
+- Presentation skills
+
+### 2.10 QA / Software Test Engineer
+
+QA and Software Test Engineers test software applications to identify defects and verify that applications meet their requirements.
+
+**Common responsibilities:**
+- Understand software requirements.
+- Create test cases.
+- Perform functional and regression testing.
+- Identify and document defects.
+- Verify bug fixes.
+- Support automated testing.
+
+**Common skills:**
+- Software testing fundamentals
+- Test case design
+- Bug reporting
+- SQL
+- Programming basics
+- API testing
+- Automation testing concepts
+- Git
+- Problem-solving
+
+> **Note:** Job titles and responsibilities can vary between companies. Students should always read the complete job description before preparing for or applying to a particular role.
+
 ## 3. Skills Required for Each Role
 
 ## 4. Placement Preparation Areas
