@@ -1,3 +1,5 @@
+# Placement Resources
+
 ## 1. Common Placement Eligibility Criteria
 
 Placement eligibility requirements vary by college, university, and recruiting company. Students should always check the official eligibility criteria mentioned in the company's job description or placement notice before applying. The following are common criteria seen in campus placement policies and recruiter requirements.
@@ -105,4 +107,12 @@ Before applying to a placement drive, students should verify:
    Official placement page covering attendance, backlog rules, document verification, and disciplinary requirements.
    [Noida International University — Placement Guidelines](https://niu.edu.in/placement/?utm_source=chatgpt.com)
 
+## 2. Common Job Roles for AI/DS & CSE Students
 
+## 3. Skills Required for Each Role
+
+## 4. Placement Preparation Areas
+
+## 5. Useful Career-Readiness Resources
+
+## 6. Sources and References
