@@ -1032,7 +1032,6 @@ Before participating in placement activities, students should review the followi
 > **Important Note:** Placement preparation is not a one-time activity. Students should regularly review their progress, practice relevant skills, build practical evidence, and update their preparation according to the requirements of the roles and companies they are targeting.
 
 ## 5. Useful Career-Readiness Resources
-## 5. Useful Career-Readiness Resources
 
 Career-readiness resources help students develop technical skills, practice placement assessments, build projects, prepare resumes, and improve interview performance.
 
@@ -1383,3 +1382,282 @@ For company-specific information, students should prioritize the company's offic
 > **Important Note:** Online resources and course availability may change over time. Students should verify current availability, course content, eligibility requirements, and recruitment information directly from the respective official platform or organization.
 
 ## 6. Sources and References
+
+The information presented in this placement resource has been compiled using official organization websites, educational platforms, career resources, technical documentation, and publicly available placement-related information.
+
+The following sources can be used for further learning, verification, and career preparation.
+
+### 6.1 Placement Eligibility and Recruitment Sources
+
+1. **Tata Consultancy Services (TCS) – Careers**
+   - Provides information about TCS recruitment programs, eligibility criteria, hiring processes, and career opportunities.
+   - [TCS Careers – India](https://www.tcs.com/careers/india)
+
+2. **CMR University – Placement Policy**
+   - Provides an example of institutional placement policies and student participation requirements.
+   - [CMR University Placement Policy](https://www.cmr.edu.in/wp-content/uploads/2025/02/Placement-Policy.pdf)
+
+3. **Adichunchanagiri University – Placement Policy**
+   - Provides information about placement procedures and student requirements.
+   - [Adichunchanagiri University Placement Policy](https://acu.edu.in/training-and-placement-cell/placement-policy/)
+
+4. **Noida International University – Placement Guidelines**
+   - Provides an example of placement guidelines and requirements for students.
+   - [NIU Placement Guidelines](https://niu.edu.in/placement/)
+
+> **Reference Note:** Placement eligibility criteria vary between institutions and companies. Students should always verify the latest official recruitment notice before applying.
+
+---
+
+### 6.2 Career Roles and Occupational Information
+
+1. **U.S. Bureau of Labor Statistics – Occupational Outlook Handbook**
+   - Provides occupational information, job duties, education requirements, and career information for technology-related occupations.
+   - [BLS Occupational Outlook Handbook](https://www.bls.gov/ooh/)
+
+2. **O*NET OnLine**
+   - Provides information about occupations, tasks, skills, knowledge areas, and technology-related job requirements.
+   - [O*NET OnLine](https://www.onetonline.org/)
+
+These sources can help students understand different technology roles and the types of skills associated with them.
+
+---
+
+### 6.3 Programming, Coding, and DSA Resources
+
+1. **LeetCode**
+   - Coding problems, data structures and algorithms practice, and technical interview preparation.
+   - [LeetCode](https://leetcode.com/)
+
+2. **HackerRank**
+   - Programming, SQL, problem-solving, and technical skill assessments.
+   - [HackerRank](https://www.hackerrank.com/)
+
+3. **GeeksforGeeks**
+   - Programming, DSA, computer science subjects, and interview preparation.
+   - [GeeksforGeeks](https://www.geeksforgeeks.org/)
+
+4. **CodeChef**
+   - Competitive programming and coding practice.
+   - [CodeChef](https://www.codechef.com/)
+
+---
+
+### 6.4 Aptitude and Reasoning Resources
+
+1. **IndiaBIX**
+   - Quantitative aptitude, logical reasoning, verbal ability, and placement-style questions.
+   - [IndiaBIX](https://www.indiabix.com/)
+
+2. **HackerRank**
+   - Programming and problem-solving assessments that can support technical placement practice.
+   - [HackerRank](https://www.hackerrank.com/)
+
+Students should use timed practice sessions to improve accuracy and time management.
+
+---
+
+### 6.5 SQL and Database Resources
+
+1. **HackerRank SQL**
+   - SQL query practice and assessments.
+   - [HackerRank SQL](https://www.hackerrank.com/domains/sql)
+
+2. **LeetCode Database**
+   - SQL and database-related problem solving.
+   - [LeetCode Database](https://leetcode.com/problemset/database/)
+
+3. **W3Schools SQL**
+   - Beginner-friendly SQL tutorials and examples.
+   - [W3Schools SQL](https://www.w3schools.com/sql/)
+
+---
+
+### 6.6 AI, Machine Learning, and Data Science Resources
+
+1. **Kaggle**
+   - Datasets, notebooks, competitions, and practical data science exercises.
+   - [Kaggle](https://www.kaggle.com/)
+
+2. **Google for Developers – Machine Learning**
+   - Machine learning concepts, guides, and learning resources.
+   - [Google Machine Learning](https://developers.google.com/machine-learning)
+
+3. **NPTEL**
+   - Structured courses covering programming, artificial intelligence, machine learning, data science, and computer science.
+   - [NPTEL](https://nptel.ac.in/)
+
+4. **SWAYAM**
+   - Online courses provided through Indian educational institutions and organizations.
+   - [SWAYAM](https://swayam.gov.in/)
+
+5. **Microsoft Learn**
+   - Learning paths covering AI, data, cloud computing, and other technologies.
+   - [Microsoft Learn](https://learn.microsoft.com/)
+
+---
+
+### 6.7 Data Analytics and Visualization Resources
+
+1. **Microsoft Learn – Power BI**
+   - Learning resources for business intelligence and data visualization.
+   - [Power BI Learning](https://learn.microsoft.com/power-bi/)
+
+2. **Tableau Learning**
+   - Resources for data visualization and Tableau.
+   - [Tableau Learning](https://www.tableau.com/learn)
+
+3. **Microsoft Excel Support**
+   - Documentation and learning resources for spreadsheet-based data analysis.
+   - [Excel Support](https://support.microsoft.com/excel)
+
+4. **Kaggle**
+   - Datasets and practical data analysis exercises.
+   - [Kaggle](https://www.kaggle.com/)
+
+---
+
+### 6.8 Cloud and DevOps Resources
+
+1. **AWS Skill Builder**
+   - AWS and cloud learning resources.
+   - [AWS Skill Builder](https://skillbuilder.aws/)
+
+2. **Microsoft Learn – Azure**
+   - Azure and cloud learning paths.
+   - [Microsoft Learn](https://learn.microsoft.com/)
+
+3. **Google Cloud Skills Boost**
+   - Google Cloud learning resources and hands-on labs.
+   - [Google Cloud Skills Boost](https://www.cloudskillsboost.google/)
+
+4. **Docker Documentation**
+   - Official documentation for Docker and container technology.
+   - [Docker Documentation](https://docs.docker.com/)
+
+5. **Kubernetes Documentation**
+   - Official documentation for Kubernetes and container orchestration.
+   - [Kubernetes Documentation](https://kubernetes.io/docs/)
+
+---
+
+### 6.9 Cybersecurity Resources
+
+1. **Cisco Skills for All**
+   - Networking and cybersecurity learning resources.
+   - [Cisco Skills for All](https://skillsforall.com/)
+
+2. **TryHackMe**
+   - Guided cybersecurity learning and practical training environments.
+   - [TryHackMe](https://tryhackme.com/)
+
+3. **Microsoft Learn – Security**
+   - Security and cloud-security learning resources.
+   - [Microsoft Security Learning](https://learn.microsoft.com/security/)
+
+> **Safety Note:** Cybersecurity exercises should only be performed in systems, platforms, or environments where the student has explicit authorization.
+
+---
+
+### 6.10 Git and GitHub Resources
+
+1. **GitHub Skills**
+   - Interactive learning for GitHub workflows and collaboration.
+   - [GitHub Skills](https://skills.github.com/)
+
+2. **Git Documentation**
+   - Official Git documentation and reference material.
+   - [Git Documentation](https://git-scm.com/doc)
+
+3. **GitHub Documentation**
+   - Documentation covering repositories, branches, commits, pull requests, issues, and collaboration.
+   - [GitHub Documentation](https://docs.github.com/)
+
+---
+
+### 6.11 Core Computer Science Resources
+
+Students can use structured courses, documentation, and learning platforms to revise important computer science subjects.
+
+Important subjects include:
+
+- Object-Oriented Programming
+- Data Structures and Algorithms
+- Database Management Systems
+- Operating Systems
+- Computer Networks
+- Software Engineering
+- Computer Architecture
+- Compiler fundamentals
+
+Recommended resources include:
+
+1. **NPTEL**
+   - [NPTEL](https://nptel.ac.in/)
+
+2. **SWAYAM**
+   - [SWAYAM](https://swayam.gov.in/)
+
+3. **GeeksforGeeks**
+   - [GeeksforGeeks](https://www.geeksforgeeks.org/)
+
+4. **Git Documentation**
+   - [Git Documentation](https://git-scm.com/doc)
+
+---
+
+### 6.12 Resume and Career Development Resources
+
+1. **LinkedIn**
+   - Professional networking, career research, job opportunities, and professional profiles.
+   - [LinkedIn](https://www.linkedin.com/)
+
+2. **Naukri**
+   - Job and internship search platform.
+   - [Naukri](https://www.naukri.com/)
+
+3. **Internshala**
+   - Internship and entry-level opportunity platform.
+   - [Internshala](https://internshala.com/)
+
+4. **Company Career Portals**
+   - Students should use the official career pages of organizations to verify job descriptions, eligibility criteria, application deadlines, and recruitment information.
+
+---
+
+### 6.13 Reference Usage Guidelines
+
+Students should follow these guidelines when using external resources:
+
+- Prefer official sources for company-specific information.
+- Check the publication or update date where available.
+- Verify eligibility requirements before applying.
+- Use multiple reliable resources when learning a technical topic.
+- Do not rely on outdated placement information.
+- Follow the terms of use of each platform.
+- Use authorized environments for technical and cybersecurity practice.
+- Maintain accurate information on resumes and applications.
+- Verify information obtained from third-party websites against the relevant official source.
+
+---
+
+### 6.14 Source Verification Statement
+
+The resources listed in this document are intended to support placement preparation and career development. The inclusion of a website or platform does not imply endorsement, guarantee of employment, or guarantee of selection.
+
+Company eligibility criteria, job descriptions, course availability, platform features, and recruitment processes may change over time. Students should therefore verify the latest information directly from the relevant official organization or platform before making application or career decisions.
+
+---
+
+### 6.15 Document Maintenance
+
+This document should be reviewed periodically to:
+
+- Remove outdated resources.
+- Update broken or changed links.
+- Add relevant new learning resources.
+- Update placement eligibility examples when required.
+- Review company-specific information.
+- Keep technical learning resources relevant to current industry practices.
+
+**Last Reviewed:** September 2026
