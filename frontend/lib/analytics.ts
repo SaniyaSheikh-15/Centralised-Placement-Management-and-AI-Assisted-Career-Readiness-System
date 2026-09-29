@@ -1,17 +1,205 @@
-import { apiRequest } from "./api";
+/* =========================================================
+   ANALYTICS API
+========================================================= */
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:8000";
 
 /* =========================================================
-   OVERVIEW
+   API REQUEST HELPER
 ========================================================= */
+
+async function apiRequest<T>(
+  endpoint: string,
+  options?: RequestInit
+): Promise<T> {
+  const response = await fetch(
+    `${API_BASE_URL}${endpoint}`,
+    {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options?.headers || {}),
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    let message =
+      `API request failed: ${response.status} ${response.statusText}`;
+
+    try {
+      const errorData = await response.json();
+
+      if (errorData?.detail) {
+        message =
+          typeof errorData.detail === "string"
+            ? errorData.detail
+            : JSON.stringify(errorData.detail);
+      }
+    } catch {
+      // Keep default error message
+    }
+
+    throw new Error(message);
+  }
+
+  return response.json();
+}
+
+/* =========================================================
+   TYPES
+========================================================= */
+
+/* -------------------------
+   OVERVIEW
+------------------------- */
 
 export type AnalyticsOverview = {
   total_students: number;
   eligible_students: number;
-  active_drives: number;
   total_applications: number;
   students_placed: number;
   placement_rate: number;
+  active_drives: number;
 };
+
+/* -------------------------
+   PLACEMENTS
+------------------------- */
+
+export type PlacementSummary = {
+  students_placed: number;
+  placement_rate: number;
+  average_package?: number | null;
+  highest_package?: number | null;
+  lowest_package?: number | null;
+};
+
+/* -------------------------
+   APPLICATIONS
+------------------------- */
+
+export type ApplicationSummary = {
+  total_applications: number;
+  shortlisted: number;
+  selected: number;
+  rejected: number;
+  pending: number;
+};
+
+/* -------------------------
+   HIRING TRENDS
+------------------------- */
+
+export type HiringTrend = {
+  month: string;
+  applications: number;
+  selections: number;
+};
+
+/* -------------------------
+   DEPARTMENT-WISE
+------------------------- */
+
+export type DepartmentPlacement = {
+  department: string;
+  total_students: number;
+  students_placed: number;
+  placement_rate: number;
+};
+
+/* -------------------------
+   BRANCH-WISE
+------------------------- */
+
+export type BranchPlacement = {
+  branch: string;
+  total_students: number;
+  students_placed: number;
+  placement_rate: number;
+};
+
+/* -------------------------
+   YEAR-WISE
+------------------------- */
+
+export type YearPlacement = {
+  graduation_year: number;
+  total_students: number;
+  students_placed: number;
+  placement_rate: number;
+};
+
+/* -------------------------
+   COMPANY-WISE
+------------------------- */
+
+export type CompanyHiring = {
+  company_name: string;
+  students_placed: number;
+};
+
+/* -------------------------
+   SALARY DISTRIBUTION
+------------------------- */
+
+export type SalaryDistribution = {
+  salary_range: string;
+  students: number;
+};
+
+/* -------------------------
+   ROLE OFFERS
+------------------------- */
+
+export type RoleOffer = {
+  role: string;
+  offers: number;
+};
+
+/* -------------------------
+   COMPANY RECRUITMENT TRENDS
+------------------------- */
+
+export type CompanyRecruitmentTrend = {
+  month: string;
+  company_name: string;
+  students_placed: number;
+};
+
+/* -------------------------
+   HIRING UPDATES
+------------------------- */
+
+export type HiringUpdate = {
+  company: string;
+  selected: number;
+};
+
+/* -------------------------
+   ELIGIBLE STUDENTS
+------------------------- */
+
+export type EligibleStudent = {
+  student_id: number | string;
+  student_name: string;
+  department: string;
+  branch: string;
+  cgpa: number;
+  eligible_drives: number;
+  applications: number;
+  interview_status: string;
+  placement_status: string;
+  company?: string | null;
+  academic_year?: string | null;
+};
+
+/* =========================================================
+   OVERVIEW
+========================================================= */
 
 export async function getOverview(): Promise<AnalyticsOverview> {
   return apiRequest<AnalyticsOverview>(
@@ -23,14 +211,6 @@ export async function getOverview(): Promise<AnalyticsOverview> {
    PLACEMENTS
 ========================================================= */
 
-export type PlacementSummary = {
-  students_placed: number;
-  placement_rate: number;
-  average_package?: number | null;
-  highest_package?: number | null;
-  lowest_package?: number | null;
-};
-
 export async function getPlacements(): Promise<PlacementSummary> {
   return apiRequest<PlacementSummary>(
     "/analytics/placements"
@@ -40,12 +220,6 @@ export async function getPlacements(): Promise<PlacementSummary> {
 /* =========================================================
    APPLICATIONS
 ========================================================= */
-
-export type ApplicationSummary = {
-  total_applications: number;
-  selected_applications: number;
-  selection_rate: number;
-};
 
 export async function getApplications(): Promise<ApplicationSummary> {
   return apiRequest<ApplicationSummary>(
@@ -57,12 +231,6 @@ export async function getApplications(): Promise<ApplicationSummary> {
    HIRING TRENDS
 ========================================================= */
 
-export type HiringTrend = {
-  month: string;
-  applications: number;
-  selections: number;
-};
-
 export async function getHiringTrends(): Promise<HiringTrend[]> {
   return apiRequest<HiringTrend[]>(
     "/analytics/hiring-trends"
@@ -70,15 +238,8 @@ export async function getHiringTrends(): Promise<HiringTrend[]> {
 }
 
 /* =========================================================
-   DEPARTMENT-WISE
+   DEPARTMENT-WISE PLACEMENT
 ========================================================= */
-
-export type DepartmentPlacement = {
-  department: string;
-  total_students: number;
-  students_placed: number;
-  placement_rate: number;
-};
 
 export async function getDepartmentWise(): Promise<
   DepartmentPlacement[]
@@ -89,33 +250,36 @@ export async function getDepartmentWise(): Promise<
 }
 
 /* =========================================================
-   YEAR-WISE
+   BRANCH-WISE PLACEMENT
 ========================================================= */
 
-export type YearPlacement = {
-  graduation_year: number;
-  total_students: number;
-  students_placed: number;
-  placement_rate: number;
-};
+export async function getBranchWise(): Promise<
+  BranchPlacement[]
+> {
+  return apiRequest<BranchPlacement[]>(
+    "/analytics/branch-wise"
+  );
+}
 
-export async function getYearWise(): Promise<YearPlacement[]> {
+/* =========================================================
+   YEAR-WISE PLACEMENT
+========================================================= */
+
+export async function getYearWise(): Promise<
+  YearPlacement[]
+> {
   return apiRequest<YearPlacement[]>(
     "/analytics/year-wise"
   );
 }
 
 /* =========================================================
-   COMPANY-WISE
+   COMPANY-WISE HIRING
 ========================================================= */
 
-export type CompanyHiring = {
-  company_name: string;
-  students_placed: number;
-  average_package?: number | null;
-};
-
-export async function getCompanyWise(): Promise<CompanyHiring[]> {
+export async function getCompanyWise(): Promise<
+  CompanyHiring[]
+> {
   return apiRequest<CompanyHiring[]>(
     "/analytics/company-wise"
   );
@@ -124,11 +288,6 @@ export async function getCompanyWise(): Promise<CompanyHiring[]> {
 /* =========================================================
    SALARY DISTRIBUTION
 ========================================================= */
-
-export type SalaryDistribution = {
-  salary_range: string;
-  students: number;
-};
 
 export async function getSalaryDistribution(): Promise<
   SalaryDistribution[]
@@ -142,12 +301,9 @@ export async function getSalaryDistribution(): Promise<
    ROLE OFFERS
 ========================================================= */
 
-export type RoleOffer = {
-  role: string;
-  offers: number;
-};
-
-export async function getRoleOffers(): Promise<RoleOffer[]> {
+export async function getRoleOffers(): Promise<
+  RoleOffer[]
+> {
   return apiRequest<RoleOffer[]>(
     "/analytics/role-offers"
   );
@@ -156,12 +312,6 @@ export async function getRoleOffers(): Promise<RoleOffer[]> {
 /* =========================================================
    COMPANY RECRUITMENT TRENDS
 ========================================================= */
-
-export type CompanyRecruitmentTrend = {
-  month: string;
-  company_name: string;
-  recruitments: number;
-};
 
 export async function getCompanyRecruitmentTrends(): Promise<
   CompanyRecruitmentTrend[]
@@ -175,30 +325,11 @@ export async function getCompanyRecruitmentTrends(): Promise<
    HIRING UPDATES
 ========================================================= */
 
-export type HiringUpdate = {
-  company: string;
-  selected: number;
-};
-
-export async function getHiringUpdates(): Promise<HiringUpdate[]> {
+export async function getHiringUpdates(): Promise<
+  HiringUpdate[]
+> {
   return apiRequest<HiringUpdate[]>(
     "/analytics/hiring-updates"
-  );
-}
-
-/* =========================================================
-   PLACEMENT INSIGHTS
-========================================================= */
-
-export type PlacementInsights = {
-  placement_performance: string[];
-  attention_required: string[];
-  recommendations: string[];
-};
-
-export async function getPlacementInsights(): Promise<PlacementInsights> {
-  return apiRequest<PlacementInsights>(
-    "/analytics/placement-insights"
   );
 }
 
@@ -206,72 +337,10 @@ export async function getPlacementInsights(): Promise<PlacementInsights> {
    ELIGIBLE STUDENTS
 ========================================================= */
 
-export type EligibleStudent = {
-  student_id: string;
-  student_name: string;
-  department: string;
-  branch?: string | null;
-  cgpa?: number | null;
-  company?: string | null;
-  academic_year?: string | null;
-  eligible_drives: number;
-  applications: number;
-  interview_status?: string | null;
-  placement_status?: string | null;
-};
-
-/* =========================================================
-   ELIGIBLE STUDENT FILTERS
-========================================================= */
-
-export interface EligibleStudentFilters {
-  department?: string;
-  min_cgpa?: number;
-  company?: string;
-  branch?: string;
-  placement_status?: string;
-  academic_year?: string;
-}
-
-/* =========================================================
-   GET ELIGIBLE STUDENTS
-========================================================= */
-
-export async function getEligibleStudents(
-  filters: EligibleStudentFilters = {}
-): Promise<EligibleStudent[]> {
-  const params = new URLSearchParams();
-
-  if (filters.department) {
-    params.set("department", filters.department);
-  }
-
-  if (filters.min_cgpa !== undefined) {
-    params.set("min_cgpa", String(filters.min_cgpa));
-  }
-
-  if (filters.company) {
-    params.set("company", filters.company);
-  }
-
-  if (filters.branch) {
-    params.set("branch", filters.branch);
-  }
-
-  if (filters.placement_status) {
-    params.set("placement_status", filters.placement_status);
-  }
-
-  if (filters.academic_year) {
-    params.set("academic_year", filters.academic_year);
-  }
-
-  const queryString = params.toString();
-
-  const endpoint =
-    queryString.length > 0
-      ? `/analytics/eligible-students?${queryString}`
-      : "/analytics/eligible-students";
-
-  return apiRequest<EligibleStudent[]>(endpoint);
+export async function getEligibleStudents(): Promise<
+  EligibleStudent[]
+> {
+  return apiRequest<EligibleStudent[]>(
+    "/analytics/eligible-students"
+  );
 }

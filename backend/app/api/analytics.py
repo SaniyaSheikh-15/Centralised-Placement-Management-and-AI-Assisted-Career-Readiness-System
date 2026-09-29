@@ -8,6 +8,7 @@ from app.db.database import get_db
 from app.schemas.analytics import (
     AnalyticsOverview,
     ApplicationSummary,
+    BranchPlacement,
     CompanyHiring,
     CompanyRecruitmentTrend,
     DepartmentPlacement,
@@ -15,7 +16,6 @@ from app.schemas.analytics import (
     EligibleStudent,
     HiringTrend,
     HiringUpdate,
-    PlacementInsights,
     PlacementSummary,
     RoleOffer,
     SalaryDistribution,
@@ -24,6 +24,7 @@ from app.schemas.analytics import (
 
 from app.services.analytics_service import (
     get_applications,
+    get_branch_wise,
     get_company_recruitment_trends,
     get_company_wise,
     get_department_wise,
@@ -33,7 +34,6 @@ from app.services.analytics_service import (
     get_hiring_updates,
     get_overview,
     get_placements,
-    get_placement_insights,
     get_role_offers,
     get_salary_distribution,
     get_year_wise,
@@ -119,6 +119,21 @@ def department_wise(
     db: Session = Depends(get_db),
 ):
     return get_department_wise(db)
+
+
+# ---------------------------------------------------------
+# BRANCH-WISE
+# ---------------------------------------------------------
+
+@router.get(
+    "/branch-wise",
+    response_model=List[BranchPlacement],
+    summary="Get branch-wise placement statistics",
+)
+def branch_wise(
+    db: Session = Depends(get_db),
+):
+    return get_branch_wise(db)
 
 
 # ---------------------------------------------------------
@@ -274,18 +289,3 @@ def drive_statistics(
     db: Session = Depends(get_db),
 ):
     return get_drive_statistics(db)
-
-
-# ---------------------------------------------------------
-# PLACEMENT INSIGHTS
-# ---------------------------------------------------------
-
-@router.get(
-    "/placement-insights",
-    response_model=PlacementInsights,
-    summary="Generate rule-based placement insights",
-)
-def placement_insights(
-    db: Session = Depends(get_db),
-):
-    return get_placement_insights(db)

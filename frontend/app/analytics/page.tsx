@@ -9,7 +9,6 @@ import {
   ChevronDown,
   Filter,
   GraduationCap,
-  Lightbulb,
   Search,
   TrendingUp,
   Users,
@@ -21,14 +20,12 @@ import {
   Bar,
   LineChart,
   Line,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
+  LabelList,
 } from "recharts";
 
 import {
@@ -48,19 +45,18 @@ import {
   getApplications,
   getHiringTrends,
   getDepartmentWise,
+  getBranchWise,
   getYearWise,
   getCompanyWise,
   getSalaryDistribution,
   getRoleOffers,
   getCompanyRecruitmentTrends,
   getHiringUpdates,
-  getPlacementInsights,
   getEligibleStudents,
 } from "@/lib/analytics";
 
 import type {
   EligibleStudent as ApiEligibleStudent,
-  PlacementInsights,
 } from "@/lib/analytics";
 
 /* =========================================================
@@ -76,6 +72,13 @@ type KPI = {
 
 type DepartmentPlacement = {
   department: string;
+  placed: number;
+  eligible: number;
+  rate: number;
+};
+
+type BranchPlacement = {
+  branch: string;
   placed: number;
   eligible: number;
   rate: number;
@@ -197,18 +200,6 @@ const kpiConfig: KPI[] = [
     icon: Activity,
     description: "Currently active",
   },
-];
-
-/* =========================================================
-   CHART COLORS
-========================================================= */
-
-const chartColors = [
-  "#1683FF",
-  "#7C5CFF",
-  "#22C55E",
-  "#F59E0B",
-  "#EF4444",
 ];
 
 /* =========================================================
@@ -410,43 +401,6 @@ function KPIIcon({
 }
 
 /* =========================================================
-   INSIGHT LIST
-========================================================= */
-
-function InsightList({
-  items,
-  emptyMessage,
-}: {
-  items: string[];
-  emptyMessage: string;
-}) {
-  if (items.length === 0) {
-    return (
-      <p className="mt-2 text-sm leading-6 text-slate-500">
-        {emptyMessage}
-      </p>
-    );
-  }
-
-  return (
-    <ul className="mt-3 space-y-3">
-      {items.map((item, index) => (
-        <li
-          key={`${item}-${index}`}
-          className="flex items-start gap-2"
-        >
-          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-current" />
-
-          <span className="text-sm leading-6 text-slate-400">
-            {item}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/* =========================================================
    MAIN DASHBOARD
 ========================================================= */
 
@@ -462,6 +416,11 @@ export default function PlacementOfficerDashboard() {
     departmentPlacementData,
     setDepartmentPlacementData,
   ] = useState<DepartmentPlacement[]>([]);
+
+  const [
+    branchPlacementData,
+    setBranchPlacementData,
+  ] = useState<BranchPlacement[]>([]);
 
   const [
     yearPlacementData,
@@ -511,11 +470,6 @@ export default function PlacementOfficerDashboard() {
 
   const [hiringUpdates, setHiringUpdates] =
     useState<HiringUpdate[]>([]);
-
-  const [
-    placementInsights,
-    setPlacementInsights,
-  ] = useState<PlacementInsights | null>(null);
 
   /* =======================================================
      LOADING / ERROR STATE
@@ -582,26 +536,26 @@ export default function PlacementOfficerDashboard() {
           applications,
           hiringTrends,
           departmentWise,
+          branchWise,
           yearWise,
           companyWise,
           salaryDistribution,
           roleOffers,
           companyRecruitmentTrends,
           hiringUpdatesResponse,
-          insights,
         ] = await Promise.all([
           getOverview(),
           getPlacements(),
           getApplications(),
           getHiringTrends(),
           getDepartmentWise(),
+          getBranchWise(),
           getYearWise(),
           getCompanyWise(),
           getSalaryDistribution(),
           getRoleOffers(),
           getCompanyRecruitmentTrends(),
           getHiringUpdates(),
-          getPlacementInsights(),
         ]);
 
         if (cancelled) {
@@ -671,12 +625,30 @@ export default function PlacementOfficerDashboard() {
 
         /* =================================================
            DEPARTMENT-WISE PLACEMENT
+           Used for the Placement Rate chart.
         ================================================= */
 
         setDepartmentPlacementData(
           departmentWise.map((item) => ({
             department:
               item.department,
+            placed:
+              item.students_placed,
+            eligible:
+              item.total_students,
+            rate:
+              item.placement_rate,
+          }))
+        );
+
+        /* =================================================
+           BRANCH-WISE PLACEMENT
+        ================================================= */
+
+        setBranchPlacementData(
+          branchWise.map((item) => ({
+            branch:
+              item.branch,
             placed:
               item.students_placed,
             eligible:
@@ -883,12 +855,6 @@ export default function PlacementOfficerDashboard() {
             })
           )
         );
-
-        /* =================================================
-           PLACEMENT INSIGHTS
-        ================================================= */
-
-        setPlacementInsights(insights);
 
         /*
          * Applications endpoint is still loaded as part
@@ -1451,7 +1417,7 @@ export default function PlacementOfficerDashboard() {
             </h2>
 
             <p className="text-sm text-slate-500">
-              Analyze placement performance across departments,
+              Analyze placement performance across branches,
               companies, years and compensation.
             </p>
           </div>
@@ -1500,21 +1466,32 @@ export default function PlacementOfficerDashboard() {
                       dataKey="rate"
                       stroke="#22C55E"
                       strokeWidth={3}
-                    />
+                    >
+                      <LabelList
+                        dataKey="rate"
+                        position="top"
+                        formatter={(value: number | string) =>
+                          `${Number(value).toFixed(1)}%`
+                        }
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Line>
                   </LineChart>
                 </ResponsiveContainer>
               )}
             </ChartCard>
 
-            {/* Department */}
+            {/* Branch-wise */}
 
             <ChartCard
-              title="Department-wise Placement"
-              description="Placement distribution by department"
+              title="Branch-wise Placement"
+              description="Placement distribution by branch"
             >
-              {departmentPlacementData.length === 0 ? (
+              {branchPlacementData.length === 0 ? (
                 <EmptyChart
-                  title="No department data"
+                  title="No branch data"
                   description="Data will appear when API data is available."
                 />
               ) : (
@@ -1524,7 +1501,7 @@ export default function PlacementOfficerDashboard() {
                 >
                   <BarChart
                     data={
-                      departmentPlacementData
+                      branchPlacementData
                     }
                   >
                     <CartesianGrid
@@ -1533,7 +1510,7 @@ export default function PlacementOfficerDashboard() {
                     />
 
                     <XAxis
-                      dataKey="department"
+                      dataKey="branch"
                       stroke="#64748B"
                     />
 
@@ -1546,7 +1523,15 @@ export default function PlacementOfficerDashboard() {
                     <Bar
                       dataKey="placed"
                       fill="#22C55E"
-                    />
+                    >
+                      <LabelList
+                        dataKey="placed"
+                        position="top"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -1594,7 +1579,15 @@ export default function PlacementOfficerDashboard() {
                       dataKey="placed"
                       stroke="#22C55E"
                       strokeWidth={3}
-                    />
+                    >
+                      <LabelList
+                        dataKey="placed"
+                        position="top"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Line>
                   </LineChart>
                 </ResponsiveContainer>
               )}
@@ -1640,7 +1633,15 @@ export default function PlacementOfficerDashboard() {
                     <Bar
                       dataKey="students"
                       fill="#7C5CFF"
-                    />
+                    >
+                      <LabelList
+                        dataKey="students"
+                        position="top"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -1649,7 +1650,7 @@ export default function PlacementOfficerDashboard() {
             {/* Salary */}
 
             <ChartCard
-              title="Salary Distribution"
+              title="Distribution of Offered Salary Packages"
               description="Distribution of offered salary packages"
             >
               {salaryDistributionData.length === 0 ? (
@@ -1686,7 +1687,15 @@ export default function PlacementOfficerDashboard() {
                     <Bar
                       dataKey="students"
                       fill="#22C55E"
-                    />
+                    >
+                      <LabelList
+                        dataKey="students"
+                        position="top"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -1732,7 +1741,18 @@ export default function PlacementOfficerDashboard() {
                       dataKey="value"
                       stroke="#F59E0B"
                       strokeWidth={3}
-                    />
+                    >
+                      <LabelList
+                        dataKey="value"
+                        position="top"
+                        formatter={(value: number | string) =>
+                          `${Number(value).toFixed(2)} LPA`
+                        }
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Line>
                   </LineChart>
                 </ResponsiveContainer>
               )}
@@ -1754,36 +1774,53 @@ export default function PlacementOfficerDashboard() {
                   width="100%"
                   height={280}
                 >
-                  <PieChart>
-                    <Pie
-                      data={
-                        roleOffersData
-                      }
-                      dataKey="offers"
-                      nameKey="role"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={90}
-                    >
-                      {roleOffersData.map(
-                        (_, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={
-                              chartColors[
-                                index %
-                                  chartColors.length
-                              ]
-                            }
-                          />
-                        )
-                      )}
-                    </Pie>
+                  <BarChart
+                    data={roleOffersData}
+                    layout="vertical"
+                    margin={{
+                      top: 8,
+                      right: 24,
+                      left: 24,
+                      bottom: 8,
+                    }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#1E3045"
+                    />
+
+                    <XAxis
+                      type="number"
+                      stroke="#64748B"
+                    />
+
+                    <YAxis
+                      type="category"
+                      dataKey="role"
+                      width={120}
+                      stroke="#64748B"
+                      tick={{
+                        fontSize: 12,
+                        fill: "#94A3B8",
+                      }}
+                    />
 
                     <Tooltip />
 
-                    <Legend />
-                  </PieChart>
+                    <Bar
+                      dataKey="offers"
+                      fill="#1683FF"
+                      radius={[0, 4, 4, 0]}
+                    >
+                      <LabelList
+                        dataKey="offers"
+                        position="right"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
               )}
             </ChartCard>
@@ -2265,7 +2302,15 @@ export default function PlacementOfficerDashboard() {
                       dataKey="hired"
                       stroke="#22C55E"
                       strokeWidth={3}
-                    />
+                    >
+                      <LabelList
+                        dataKey="hired"
+                        position="top"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Line>
 
                   </LineChart>
                 </ResponsiveContainer>
@@ -2316,12 +2361,28 @@ export default function PlacementOfficerDashboard() {
                     <Bar
                       dataKey="applications"
                       fill="#1683FF"
-                    />
+                    >
+                      <LabelList
+                        dataKey="applications"
+                        position="top"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Bar>
 
                     <Bar
                       dataKey="selections"
                       fill="#22C55E"
-                    />
+                    >
+                      <LabelList
+                        dataKey="selections"
+                        position="top"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Bar>
 
                   </BarChart>
                 </ResponsiveContainer>
@@ -2372,7 +2433,18 @@ export default function PlacementOfficerDashboard() {
                       dataKey="rate"
                       stroke="#22C55E"
                       strokeWidth={3}
-                    />
+                    >
+                      <LabelList
+                        dataKey="rate"
+                        position="top"
+                        formatter={(value: number | string) =>
+                          `${Number(value).toFixed(1)}%`
+                        }
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Line>
 
                   </LineChart>
                 </ResponsiveContainer>
@@ -2423,138 +2495,20 @@ export default function PlacementOfficerDashboard() {
                       dataKey="recruitments"
                       stroke="#7C5CFF"
                       strokeWidth={3}
-                    />
+                    >
+                      <LabelList
+                        dataKey="recruitments"
+                        position="top"
+                        fill="#F8FAFC"
+                        fontSize={12}
+                        fontWeight={600}
+                      />
+                    </Line>
 
                   </LineChart>
                 </ResponsiveContainer>
               )}
             </ChartCard>
-
-          </div>
-
-        </section>
-
-        {/* =================================================
-            PLACEMENT INSIGHTS
-        ================================================= */}
-
-        <section className="pb-8">
-
-          <div className="mb-4">
-
-            <h2 className="text-lg font-semibold text-white">
-              Placement Insights
-            </h2>
-
-            <p className="text-sm text-slate-500">
-              Automated insights generated from PostgreSQL placement analytics.
-            </p>
-
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-
-            {/* =================================================
-                PLACEMENT PERFORMANCE
-            ================================================= */}
-
-            <div className="rounded-xl border border-[#1E3045] bg-[#101C2C] p-5">
-
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1683FF]/10">
-
-                <TrendingUp className="h-5 w-5 text-[#1683FF]" />
-
-              </div>
-
-              <p className="mt-5 text-sm font-medium text-slate-300">
-                Placement Performance
-              </p>
-
-              {loading ? (
-                <p className="mt-2 text-sm leading-6 text-slate-500">
-                  Generating placement performance insights...
-                </p>
-              ) : (
-                <div className="text-[#1683FF]">
-                  <InsightList
-                    items={
-                      placementInsights?.placement_performance ??
-                      []
-                    }
-                    emptyMessage="No placement performance insights are available."
-                  />
-                </div>
-              )}
-
-            </div>
-
-            {/* =================================================
-                ATTENTION REQUIRED
-            ================================================= */}
-
-            <div className="rounded-xl border border-[#1E3045] bg-[#101C2C] p-5">
-
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#F59E0B]/10">
-
-                <AlertTriangle className="h-5 w-5 text-[#F59E0B]" />
-
-              </div>
-
-              <p className="mt-5 text-sm font-medium text-slate-300">
-                Attention Required
-              </p>
-
-              {loading ? (
-                <p className="mt-2 text-sm leading-6 text-slate-500">
-                  Checking placement risks and student gaps...
-                </p>
-              ) : (
-                <div className="text-[#F59E0B]">
-                  <InsightList
-                    items={
-                      placementInsights?.attention_required ??
-                      []
-                    }
-                    emptyMessage="No major attention items were detected."
-                  />
-                </div>
-              )}
-
-            </div>
-
-            {/* =================================================
-                RECOMMENDATIONS
-            ================================================= */}
-
-            <div className="rounded-xl border border-[#1E3045] bg-[#101C2C] p-5">
-
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#7C5CFF]/10">
-
-                <Lightbulb className="h-5 w-5 text-[#7C5CFF]" />
-
-              </div>
-
-              <p className="mt-5 text-sm font-medium text-slate-300">
-                Recommendation
-              </p>
-
-              {loading ? (
-                <p className="mt-2 text-sm leading-6 text-slate-500">
-                  Generating recommendations...
-                </p>
-              ) : (
-                <div className="text-[#7C5CFF]">
-                  <InsightList
-                    items={
-                      placementInsights?.recommendations ??
-                      []
-                    }
-                    emptyMessage="No recommendations are currently available."
-                  />
-                </div>
-              )}
-
-            </div>
 
           </div>
 

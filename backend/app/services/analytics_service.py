@@ -637,6 +637,96 @@ def get_department_wise(db: Session):
 
 
 # =========================================================
+# BRANCH-WISE PLACEMENT
+# =========================================================
+
+def get_branch_wise(db: Session):
+    """
+    Returns placement statistics branch-wise.
+
+    Each branch is calculated using:
+    - Total students belonging to the branch
+    - Students selected through placement results
+    - Placement rate
+    """
+
+    query = """
+        SELECT
+            b.branch_code AS branch,
+
+            COUNT(
+                DISTINCT sp.student_id
+            ) AS total_students,
+
+            COUNT(
+                DISTINCT CASE
+                    WHEN pr.final_status =
+                         'SELECTED'
+                    THEN sp.student_id
+                END
+            ) AS students_placed
+
+        FROM student_profiles sp
+
+        JOIN branches b
+            ON b.branch_id =
+               sp.branch_id
+
+        LEFT JOIN applications a
+            ON a.student_id =
+               sp.student_id
+
+        LEFT JOIN placement_results pr
+            ON pr.application_id =
+               a.application_id
+
+        GROUP BY
+            b.branch_code
+
+        ORDER BY
+            b.branch_code
+    """
+
+    result = _execute_active(
+        db,
+        query,
+    )
+
+    response = []
+
+    for row in result:
+
+        total_students = int(
+            row.total_students or 0
+        )
+
+        students_placed = int(
+            row.students_placed or 0
+        )
+
+        response.append(
+            {
+                "branch":
+                    row.branch,
+
+                "total_students":
+                    total_students,
+
+                "students_placed":
+                    students_placed,
+
+                "placement_rate":
+                    _percentage(
+                        students_placed,
+                        total_students,
+                    ),
+            }
+        )
+
+    return response
+
+
+# =========================================================
 # YEAR-WISE PLACEMENT
 # =========================================================
 
@@ -999,19 +1089,15 @@ def get_eligible_students(
 
             END AS placement_status
 
-
         FROM student_profiles sp
-
 
         JOIN users u
             ON u.user_id =
                sp.user_id
 
-
         JOIN branches b
             ON b.branch_id =
                sp.branch_id
-
 
         WHERE EXISTS (
 
@@ -1673,457 +1759,3 @@ def get_drive_statistics(db: Session):
         )
 
     return response
-
-
-# =========================================================
-# PLACEMENT INSIGHTS
-# =========================================================
-
-def get_placement_insights(db: Session):
-    """
-    Generates rule-based placement insights from
-    PostgreSQL analytics.
-
-    No external AI or OpenAI API is used.
-
-    The function combines existing analytics results
-    and applies predefined business rules to generate:
-
-    1. Placement Performance
-    2. Attention Required
-    3. Recommendations
-    """
-
-    # -----------------------------------------------------
-    # Fetch existing analytics
-    # -----------------------------------------------------
-
-    overview = get_overview(db)
-
-    placements = get_placements(db)
-
-    applications = get_applications(db)
-
-    departments = get_department_wise(db)
-
-    companies = get_company_wise(db)
-
-    eligible_students = get_eligible_students(db)
-
-    hiring_trends = get_hiring_trends(db)
-
-    # -----------------------------------------------------
-    # Result containers
-    # -----------------------------------------------------
-
-    placement_performance = []
-
-    attention_required = []
-
-    recommendations = []
-
-    # =====================================================
-    # 1. PLACEMENT PERFORMANCE
-    # =====================================================
-
-    total_students = overview["total_students"]
-
-    students_placed = overview["students_placed"]
-
-    placement_rate = overview["placement_rate"]
-
-    average_package = placements["average_package"]
-
-    highest_package = placements["highest_package"]
-
-    lowest_package = placements["lowest_package"]
-
-    total_applications = applications["total_applications"]
-
-    selection_rate = applications["selection_rate"]
-
-    # Overall placement performance
-
-    if total_students == 0:
-
-        placement_performance.append(
-            "No student placement data is currently available."
-        )
-
-    else:
-
-        placement_performance.append(
-            f"Overall placement rate is "
-            f"{placement_rate:.2f}% with "
-            f"{students_placed} students placed out of "
-            f"{total_students} students."
-        )
-
-    # Package performance
-
-    if average_package is not None:
-
-        package_message = (
-            f"The average offered package is "
-            f"{average_package:.2f} LPA"
-        )
-
-        if highest_package is not None:
-
-            package_message += (
-                f", with the highest package at "
-                f"{highest_package:.2f} LPA"
-            )
-
-        if lowest_package is not None:
-
-            package_message += (
-                f" and the lowest package at "
-                f"{lowest_package:.2f} LPA."
-            )
-
-        else:
-
-            package_message += "."
-
-        placement_performance.append(
-            package_message
-        )
-
-    # Application performance
-
-    if total_applications > 0:
-
-        placement_performance.append(
-            f"There are {total_applications} total "
-            f"applications with a selection rate of "
-            f"{selection_rate:.2f}%."
-        )
-
-    # Department performance
-
-    departments_with_students = [
-        department
-        for department in departments
-        if department["total_students"] > 0
-    ]
-
-    if departments_with_students:
-
-        strongest_department = max(
-            departments_with_students,
-            key=lambda item: (
-                item["placement_rate"],
-                item["students_placed"],
-            ),
-        )
-
-        weakest_department = min(
-            departments_with_students,
-            key=lambda item: (
-                item["placement_rate"],
-                item["students_placed"],
-            ),
-        )
-
-        placement_performance.append(
-            f"{strongest_department['department']} "
-            f"has the highest department placement rate "
-            f"at {strongest_department['placement_rate']:.2f}%."
-        )
-
-        if (
-            weakest_department["department"]
-            != strongest_department["department"]
-        ):
-
-            placement_performance.append(
-                f"{weakest_department['department']} "
-                f"has the lowest department placement rate "
-                f"at {weakest_department['placement_rate']:.2f}%."
-            )
-
-    # Company performance
-
-    if companies:
-
-        top_company = companies[0]
-
-        placement_performance.append(
-            f"{top_company['company_name']} currently has "
-            f"the highest number of student placements "
-            f"with {top_company['students_placed']} "
-            f"selected students."
-        )
-
-    # =====================================================
-    # 2. ATTENTION REQUIRED
-    # =====================================================
-
-    # Eligible students without applications
-
-    inactive_eligible_students = [
-        student
-        for student in eligible_students
-        if student["applications"] == 0
-    ]
-
-    inactive_count = len(
-        inactive_eligible_students
-    )
-
-    if inactive_count > 0:
-
-        attention_required.append(
-            f"{inactive_count} eligible student"
-            f"{'s' if inactive_count != 1 else ''} "
-            f"{'have' if inactive_count != 1 else 'has'} "
-            f"eligible placement opportunities but "
-            f"no application activity."
-        )
-
-    # Eligible students who are not selected
-
-    unplaced_eligible_students = [
-        student
-        for student in eligible_students
-        if student["placement_status"]
-        != "SELECTED"
-    ]
-
-    unplaced_count = len(
-        unplaced_eligible_students
-    )
-
-    if unplaced_count > 0:
-
-        attention_required.append(
-            f"{unplaced_count} eligible student"
-            f"{'s' if unplaced_count != 1 else ''} "
-            f"{'are' if unplaced_count != 1 else 'is'} "
-            f"currently not placed."
-        )
-
-    # Rejected eligible students
-
-    rejected_students = [
-        student
-        for student in eligible_students
-        if student["placement_status"]
-        == "REJECTED"
-    ]
-
-    rejected_count = len(
-        rejected_students
-    )
-
-    if rejected_count > 0:
-
-        attention_required.append(
-            f"{rejected_count} eligible student"
-            f"{'s' if rejected_count != 1 else ''} "
-            f"{'have' if rejected_count != 1 else 'has'} "
-            f"experienced a rejected placement outcome "
-            f"and may benefit from additional preparation."
-        )
-
-    # Low-performing departments
-
-    low_performing_departments = [
-        department
-        for department in departments_with_students
-        if department["placement_rate"] < 50
-    ]
-
-    for department in low_performing_departments:
-
-        attention_required.append(
-            f"{department['department']} has a "
-            f"placement rate of "
-            f"{department['placement_rate']:.2f}%, "
-            f"which requires attention."
-        )
-
-    # Applications vs selections
-
-    if (
-        total_applications > 0
-        and selection_rate < 50
-    ):
-
-        attention_required.append(
-            f"The application selection rate is only "
-            f"{selection_rate:.2f}%, indicating a potential "
-            f"gap in resume quality, interview readiness, "
-            f"or role matching."
-        )
-
-    # No issues found
-
-    if not attention_required:
-
-        attention_required.append(
-            "No major placement attention areas "
-            "were identified from the current analytics."
-        )
-
-    # =====================================================
-    # 3. RECOMMENDATIONS
-    # =====================================================
-
-    # Low placement rate
-
-    if placement_rate < 50:
-
-        recommendations.append(
-            "Conduct targeted placement preparation "
-            "programs covering aptitude, technical skills, "
-            "resume building, and interview preparation."
-        )
-
-    elif placement_rate < 75:
-
-        recommendations.append(
-            "Strengthen placement preparation and employer "
-            "engagement to improve the current placement rate."
-        )
-
-    else:
-
-        recommendations.append(
-            "Maintain the current placement strategy while "
-            "expanding opportunities with additional employers."
-        )
-
-    # Inactive eligible students
-
-    if inactive_count > 0:
-
-        recommendations.append(
-            "Encourage eligible students with no applications "
-            "to actively participate in suitable placement drives."
-        )
-
-    # Low-performing departments
-
-    if low_performing_departments:
-
-        recommendations.append(
-            "Provide department-specific training and "
-            "career-readiness support to departments with "
-            "placement rates below 50%."
-        )
-
-    # Low selection rate
-
-    if (
-        total_applications > 0
-        and selection_rate < 50
-    ):
-
-        recommendations.append(
-            "Improve resume screening, mock interviews, "
-            "technical preparation, and interview readiness "
-            "to increase application-to-selection conversion."
-        )
-
-    # Rejected students
-
-    if rejected_count > 0:
-
-        recommendations.append(
-            "Provide personalized feedback and mock interview "
-            "sessions for students with rejected applications."
-        )
-
-    # Active drives
-
-    active_drives = overview["active_drives"]
-
-    if active_drives == 0:
-
-        recommendations.append(
-            "Increase employer outreach because there are "
-            "currently no published or ongoing placement drives."
-        )
-
-    elif active_drives < 3:
-
-        recommendations.append(
-            "Increase the number of active placement drives "
-            "to provide students with more opportunities."
-        )
-
-    else:
-
-        recommendations.append(
-            "Continue maintaining a healthy pipeline of "
-            "active placement drives across departments."
-        )
-
-    # Company engagement
-
-    if len(companies) > 0:
-
-        recommendations.append(
-            "Prioritize employer relationships with companies "
-            "showing strong hiring outcomes and explore similar "
-            "roles from additional companies."
-        )
-
-    else:
-
-        recommendations.append(
-            "Increase employer outreach to build a stronger "
-            "company placement pipeline."
-        )
-
-    # Hiring trend
-
-    if len(hiring_trends) >= 2:
-
-        latest_trend = hiring_trends[-1]
-
-        previous_trend = hiring_trends[-2]
-
-        if (
-            latest_trend["applications"]
-            < previous_trend["applications"]
-        ):
-
-            recommendations.append(
-                "Recent application activity is declining. "
-                "Promote upcoming placement drives and improve "
-                "student awareness of available opportunities."
-            )
-
-    # Remove accidental duplicates while preserving order
-
-    placement_performance = list(
-        dict.fromkeys(
-            placement_performance
-        )
-    )
-
-    attention_required = list(
-        dict.fromkeys(
-            attention_required
-        )
-    )
-
-    recommendations = list(
-        dict.fromkeys(
-            recommendations
-        )
-    )
-
-    return {
-        "placement_performance":
-            placement_performance,
-
-        "attention_required":
-            attention_required,
-
-        "recommendations":
-            recommendations,
-    }

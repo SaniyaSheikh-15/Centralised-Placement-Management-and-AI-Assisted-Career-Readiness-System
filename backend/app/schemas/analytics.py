@@ -53,6 +53,17 @@ class DepartmentPlacement(BaseModel):
     placement_rate: float
 
 
+class BranchPlacement(BaseModel):
+
+    branch: str
+
+    total_students: int
+
+    students_placed: int
+
+    placement_rate: float
+
+
 class YearPlacement(BaseModel):
 
     graduation_year: int
@@ -154,16 +165,3 @@ class DriveStatistics(BaseModel):
     selection_rate: float
 
     vacancies: Optional[int] = None
-
-
-# =========================================================
-# PLACEMENT INSIGHTS
-# =========================================================
-
-class PlacementInsights(BaseModel):
-
-    placement_performance: List[str]
-
-    attention_required: List[str]
-
-    recommendations: List[str]
