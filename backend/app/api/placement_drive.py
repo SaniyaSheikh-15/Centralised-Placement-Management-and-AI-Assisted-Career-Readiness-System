@@ -13,6 +13,8 @@ from sqlalchemy.orm import Session
 from backend.app.core.dependencies import get_current_user, require_roles
 from backend.app.db.session import get_db
 from backend.app.models.auth import User
+from backend.app.schemas.eligibility import EligibilityEvaluationResponse
+from backend.app.services.eligibility_service import EligibilityService
 from backend.app.schemas.placement_drive import (
     DriveBranchCreate,
     DriveBranchResponse,
@@ -129,6 +131,35 @@ def get_placement_drive(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
         )
+
+
+
+@router.post(
+    "/{drive_id}/eligibility/evaluate",
+    response_model=EligibilityEvaluationResponse,
+    summary="Evaluate Student Eligibility",
+)
+def evaluate_student_eligibility(
+    drive_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        return EligibilityService.evaluate(
+            db=db,
+            drive_id=drive_id,
+            user_id=current_user.user_id,
+        )
+    except ValueError as exc:
+        if str(exc) in {
+            "Placement drive not found",
+            "Student profile not found",
+        }:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=str(exc),
+            ) from exc
+        raise
 
 
 # ---------------------------------------------------------
