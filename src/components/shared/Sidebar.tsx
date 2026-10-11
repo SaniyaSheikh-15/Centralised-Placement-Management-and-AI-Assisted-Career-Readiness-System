@@ -10,6 +10,8 @@ import {
   FolderKanban,
   Award,
   ChevronRight,
+  ShieldCheck,
+  Briefcase,
 } from 'lucide-react';
 
 const navItems = [
@@ -20,6 +22,9 @@ const navItems = [
   { href: '/profile/skills', label: 'Skills', icon: Code2 },
   { href: '/profile/projects', label: 'Projects', icon: FolderKanban },
   { href: '/profile/certifications', label: 'Certifications', icon: Award },
+  { label: 'DRIVES & PLACEMENT', section: true },
+  { href: '/profile/eligibility', label: 'Drive Eligibility', icon: ShieldCheck },
+  { href: '/profile/drives', label: 'Placement Drives', icon: Briefcase },
 ];
 
 export default function Sidebar() {

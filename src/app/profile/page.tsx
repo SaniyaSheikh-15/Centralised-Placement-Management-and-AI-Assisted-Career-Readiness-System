@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
 import ProfileHeaderBlock from '@/components/student-profile/overview/ProfileHeaderBlock';
+import EligibilityBanner from '@/components/student-profile/overview/EligibilityBanner';
 import PersonalInfoCard from '@/components/student-profile/overview/PersonalInfoCard';
 import AcademicInfoCard from '@/components/student-profile/overview/AcademicInfoCard';
 import PlacementReadinessCard from '@/components/student-profile/overview/PlacementReadinessCard';
@@ -28,6 +29,9 @@ export default function ProfileOverviewPage() {
     <div className="animate-fade-in">
       {/* Profile Header */}
       <ProfileHeaderBlock />
+
+      {/* Placement Eligibility Banner */}
+      <EligibilityBanner />
 
       {/* Row 1: Personal + Academic */}
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

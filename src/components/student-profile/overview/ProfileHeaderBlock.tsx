@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, ShieldCheck } from 'lucide-react';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
 
 export default function ProfileHeaderBlock() {
   const { profile } = useStudentProfile();
   const p = profile.personalInfo;
+  const a = profile.academicInfo;
 
   const initials = p.fullName
     ? p.fullName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -30,21 +31,36 @@ export default function ProfileHeaderBlock() {
           <h2 className="text-xl font-bold text-[#F1F5F9]">
             {p.fullName || 'Unnamed Student'}
           </h2>
-          <p className="text-sm font-semibold text-[#1683FF]">{p.branch || 'No branch set'}</p>
-          <p className="text-xs text-[#94A3B8]">
-            {profile.academicInfo.degree} ({profile.academicInfo.academicYear}) · {profile.academicInfo.college}
+          <div className="flex flex-wrap items-center gap-2 max-md:justify-center">
+            <span className="text-sm font-semibold text-[#1683FF]">{p.branch || 'No branch set'}</span>
+            <span className="inline-flex items-center rounded-full border border-[rgba(22,131,255,0.3)] bg-[rgba(22,131,255,0.1)] px-2.5 py-0.5 text-[11px] font-semibold text-[#1683FF]">
+              Class of {a.graduationYear || '2026'}
+            </span>
+          </div>
+          <p className="mt-0.5 text-xs text-[#94A3B8]">
+            {a.degree} ({a.academicYear}) · {a.college}
           </p>
         </div>
       </div>
 
-      {/* Right — Edit Button */}
-      <Link
-        href="/profile/edit"
-        className="inline-flex items-center gap-2 rounded-lg bg-[#1683FF] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#0D6FE0]"
-      >
-        <Plus className="h-4 w-4" />
-        Edit Profile
-      </Link>
+      {/* Right — Action Buttons */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Link
+          href="/profile/eligibility"
+          id="btn-check-eligibility"
+          className="inline-flex items-center gap-2 rounded-lg border border-[rgba(22,131,255,0.4)] bg-[rgba(22,131,255,0.12)] px-4 py-2 text-sm font-semibold text-[#1683FF] transition-all hover:bg-[rgba(22,131,255,0.22)] hover:border-[#1683FF]"
+        >
+          <ShieldCheck className="h-4 w-4" />
+          Check Eligibility
+        </Link>
+        <Link
+          href="/profile/edit"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#1683FF] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#0D6FE0]"
+        >
+          <Plus className="h-4 w-4" />
+          Edit Profile
+        </Link>
+      </div>
     </div>
   );
 }

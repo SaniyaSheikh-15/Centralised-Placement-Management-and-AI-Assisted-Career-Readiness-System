@@ -29,7 +29,7 @@ export default function TabAcademic() {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2">
             <Label htmlFor="department">Department</Label>
             <Input id="department" value={a.department} onChange={(e) => updateAcademicInfo({ department: e.target.value })} placeholder="Department" />
@@ -51,6 +51,18 @@ export default function TabAcademic() {
                 {YEARS.map((y) => <SelectItem key={y} value={y}>{y}</SelectItem>)}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="gradYear">Graduation Year <span className="text-[var(--color-danger)]">*</span></Label>
+            <Input
+              id="gradYear"
+              type="number"
+              min="2020"
+              max="2035"
+              value={a.graduationYear}
+              onChange={(e) => updateAcademicInfo({ graduationYear: e.target.value ? Number(e.target.value) : '' })}
+              placeholder="e.g. 2026"
+            />
           </div>
         </div>
       </fieldset>

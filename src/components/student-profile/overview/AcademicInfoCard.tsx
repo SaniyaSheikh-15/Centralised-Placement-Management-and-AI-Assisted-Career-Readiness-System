@@ -30,6 +30,7 @@ export default function AcademicInfoCard() {
         <InfoRow label="Department" value={a.department} />
         <InfoRow label="Degree" value={a.degree} />
         <InfoRow label="Current Semester" value={a.academicYear} />
+        <InfoRow label="Graduation Year (Batch)" value={a.graduationYear || '2026'} />
         <InfoRow label="10th Percentage" value={a.sscPercentage ? `${a.sscPercentage}%` : '—'} />
         <InfoRow label="10th Passing Year" value={a.sscPassingYear} />
         <InfoRow label="12th Percentage" value={a.hscDiplomaPercentage ? `${a.hscDiplomaPercentage}%` : '—'} />
