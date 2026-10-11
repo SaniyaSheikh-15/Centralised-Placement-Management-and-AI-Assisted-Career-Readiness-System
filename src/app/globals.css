@@ -1,0 +1,189 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * ─── Design System Tokens ────────────────────────────────────────────────
+ * Exact hex-mapped dark theme palette for the CampusConnect design spec.
+ * These CSS variables are used by shadcn/ui and our custom classes.
+ */
+@theme inline {
+  --color-background: #050B14;
+  --color-foreground: #F1F5F9;
+  --color-card: #0E1B2E;
+  --color-card-foreground: #F1F5F9;
+  --color-popover: #0E1B2E;
+  --color-popover-foreground: #F1F5F9;
+  --color-primary: #1683FF;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #0E1B2E;
+  --color-secondary-foreground: #F1F5F9;
+  --color-muted: #122238;
+  --color-muted-foreground: #64748B;
+  --color-accent: #122238;
+  --color-accent-foreground: #F1F5F9;
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #1A2B42;
+  --color-input: #1A2B42;
+  --color-ring: #1683FF;
+  --color-chart-1: #1683FF;
+  --color-chart-2: #10B981;
+  --color-chart-3: #F59E0B;
+  --color-chart-4: #7C5CFC;
+  --color-chart-5: #06B6D4;
+  --color-sidebar: #09111E;
+  --color-sidebar-foreground: #F1F5F9;
+  --color-sidebar-primary: #1683FF;
+  --color-sidebar-primary-foreground: #FFFFFF;
+  --color-sidebar-accent: #122238;
+  --color-sidebar-accent-foreground: #F1F5F9;
+  --color-sidebar-border: #1A2B42;
+  --color-sidebar-ring: #1683FF;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * ─── Custom Design Variables ─────────────────────────────────────────────
+ * Exact hex palette matching the design specification.
+ */
+:root {
+  /* Canvas & surfaces */
+  --bg-primary: #050B14;
+  --bg-sidebar: #09111E;
+  --bg-card: #0E1B2E;
+  --bg-card-hover: #122238;
+  --bg-inner: #0A1524;
+  --border-card: #1A2B42;
+
+  /* Text hierarchy */
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  /* Accent colors */
+  --accent-primary: #1683FF;
+  --accent-primary-hover: #0D6FE0;
+  --accent-primary-subtle: rgba(22, 131, 255, 0.10);
+  --accent-secondary: #7C5CFC;
+
+  /* Status colors */
+  --color-success: #10B981;
+  --color-success-subtle: rgba(16, 185, 129, 0.08);
+  --color-warning: #F59E0B;
+  --color-warning-subtle: rgba(245, 158, 11, 0.08);
+  --color-danger: #EF4444;
+  --color-danger-subtle: rgba(239, 68, 68, 0.08);
+
+  /* Shadows */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.35);
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --navbar-height: 60px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+}
+
+/*
+ * ─── Base Styles ─────────────────────────────────────────────────────────
+ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-card);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+  }
+}
+
+/*
+ * ─── Animations ──────────────────────────────────────────────────────────
+ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes skeleton-pulse {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/*
+ * ─── Utility Classes ─────────────────────────────────────────────────────
+ */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease forwards;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.35s ease forwards;
+  }
+  .animate-slide-in-left {
+    animation: slideInLeft 0.25s ease forwards;
+  }
+  .animate-skeleton {
+    background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.5s infinite;
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
