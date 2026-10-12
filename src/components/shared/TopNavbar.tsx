@@ -11,6 +11,7 @@ const pageTitles: Record<string, string> = {
   "/profile/projects": "Projects",
   "/profile/certifications": "Certifications",
   "/profile/resume": "Resume Upload",
+  "/profile/eligibility": "Eligibility Check",
 };
 
 export default function TopNavbar() {

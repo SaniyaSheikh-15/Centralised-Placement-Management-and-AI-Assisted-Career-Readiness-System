@@ -52,6 +52,21 @@ export default function TabAcademic() {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="graduationYear">Expected Graduation Year</Label>
+            <Input
+              id="graduationYear"
+              type="number"
+              min={2010}
+              max={2035}
+              step={1}
+              value={a.graduationYear}
+              onChange={(e) =>
+                updateAcademicInfo({ graduationYear: e.target.value })
+              }
+              placeholder="e.g. 2027"
+            />
+          </div>
         </div>
       </fieldset>
 

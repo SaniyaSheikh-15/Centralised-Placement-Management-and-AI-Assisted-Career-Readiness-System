@@ -77,7 +77,19 @@ export default function TabSkills() {
 
       {/* Modals */}
       <AddSkillModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onSubmit={(s) => addSkill(s)} />
-      <AddSkillModal isOpen={!!editingSkill} onClose={() => setEditingSkill(null)} onSubmit={(s) => { if (editingSkill) updateSkillProficiency(editingSkill.id, s.proficiency); setEditingSkill(null); }} editingSkill={editingSkill} />
-    </div>
+      
+    <AddSkillModal
+      isOpen={!!editingSkill}
+      onClose={() => setEditingSkill(null)}
+      onSubmit={async (s) => {
+        if (editingSkill) {
+          updateSkillProficiency(editingSkill.id, s.proficiency);
+        }
+        setEditingSkill(null);
+      }}
+      editingSkill={editingSkill}
+    />
+    ```
+        </div>
   );
 }

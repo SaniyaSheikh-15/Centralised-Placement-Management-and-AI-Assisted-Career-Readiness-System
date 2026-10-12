@@ -89,6 +89,7 @@ const EMPTY_PROFILE: StudentProfile = {
     department: "",
     degree: "",
     academicYear: "",
+    graduationYear: "",
     sscPercentage: "",
     sscPassingYear: "",
     hscDiplomaPercentage: "",
@@ -385,10 +386,11 @@ function mapBackendProfileToStudentProfile(
       degree:
         backendProfile.degree || "",
 
-      academicYear:
-        backendProfile.graduation_year
+      academicYear: previousProfile.academicInfo.academicYear,
+      graduationYear:
+        backendProfile.graduation_year != null
           ? String(backendProfile.graduation_year)
-          : previousProfile.academicInfo.academicYear,
+          : "",
 
       sscPercentage:
         backendProfile.ssc_percentage ?? "",
@@ -2106,12 +2108,12 @@ const saveDraft = useCallback(
           editDraft.academicInfo.degree ||
           undefined,
 
+        
         graduation_year:
-          editDraft.academicInfo.academicYear !== ""
-            ? Number(
-                editDraft.academicInfo.academicYear
-              )
-            : undefined,
+            editDraft.academicInfo.graduationYear !== ""
+              ? Number(editDraft.academicInfo.graduationYear)
+              : undefined,
+          
 
         ssc_percentage:
           editDraft.academicInfo.sscPercentage !== ""

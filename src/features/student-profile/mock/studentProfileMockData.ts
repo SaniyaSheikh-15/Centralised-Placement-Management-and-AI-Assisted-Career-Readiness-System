@@ -26,8 +26,10 @@ const personalInfo: StudentProfile['personalInfo'] = {
   category: 'OBC',
   panNumber: 'ABCDE1234F',
   aadhaarNumber: '234567891012',
+  
   abcId: 'ABC-2023-00456',
   branch: 'Computer Science Engineering',
+  branchId: "",
 };
 
 // ─── 6.2 Academic Information ─────────────────────────────────────────────
@@ -44,6 +46,7 @@ const academicInfo: StudentProfile['academicInfo'] = {
   btechAggregate: 78.32,
   cgpaCurrent: 8.42,
   hasLiveBacklogs: 'No',
+  graduationYear: "2027",
   backlogDetails: '',
 };
 
@@ -221,6 +224,7 @@ export const emptyMockProfile: StudentProfile = {
     aadhaarNumber: '',
     abcId: '',
     branch: '',
+    branchId: "",
   },
   academicInfo: {
     universityEnrollmentNo: '',
@@ -236,6 +240,7 @@ export const emptyMockProfile: StudentProfile = {
     cgpaCurrent: '',
     hasLiveBacklogs: '',
     backlogDetails: '',
+    graduationYear: "2027",
   },
   placementReadiness: {
     interestedInTpActivities: '',

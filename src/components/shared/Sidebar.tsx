@@ -10,6 +10,7 @@ import {
   FolderKanban,
   Award,
   ChevronRight,
+  ClipboardCheck,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -21,6 +22,11 @@ const navItems = [
   { href: "/profile/skills", label: "Skills", icon: Code2 },
   { href: "/profile/projects", label: "Projects", icon: FolderKanban },
   { href: "/profile/certifications", label: "Certifications", icon: Award },
+  {
+  href: "/profile/eligibility",
+  label: "Eligibility Check",
+  icon: ClipboardCheck,
+},
 ];
 
 export default function Sidebar() {

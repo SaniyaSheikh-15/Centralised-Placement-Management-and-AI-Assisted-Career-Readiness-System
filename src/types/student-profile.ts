@@ -44,6 +44,7 @@ export interface AcademicInfo {
   department: string;
   degree: string;
   academicYear: string;
+  graduationYear: string;
 
   // 6.2.2 Schooling & Aggregate
   sscPercentage: number | string;
