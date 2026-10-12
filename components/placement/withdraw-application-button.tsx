@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiRequest, ApplicationResponse } from "@/lib/application-management-client";
+import type { ApplicationRecord } from "@/types/placement";
 
 interface WithdrawApplicationButtonProps {
   applicationId: string;
   disabled?: boolean;
+  onWithdraw?: (application: ApplicationRecord) => void;
 }
 
-export function WithdrawApplicationButton({ applicationId, disabled }: WithdrawApplicationButtonProps) {
+export function WithdrawApplicationButton({ applicationId, disabled, onWithdraw }: WithdrawApplicationButtonProps) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,19 +20,15 @@ export function WithdrawApplicationButton({ applicationId, disabled }: WithdrawA
     setBusy(true);
     setError(null);
 
-    const response = await fetch(`/api/v1/applications/${applicationId}/withdraw`, {
-      method: "PATCH"
-    });
-    const payload = await response.json();
-
-    if (!response.ok) {
-      setError(payload?.message ?? "Could not withdraw application.");
+    try {
+      const payload = await apiRequest<ApplicationResponse>(`/api/v1/applications/${applicationId}/withdraw`, { method: "PATCH" });
+      onWithdraw?.(payload.application);
+      router.refresh();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not withdraw application.");
+    } finally {
       setBusy(false);
-      return;
     }
-
-    router.refresh();
-    setBusy(false);
   }
 
   return (

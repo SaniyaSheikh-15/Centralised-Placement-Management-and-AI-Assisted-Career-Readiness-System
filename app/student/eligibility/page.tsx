@@ -7,11 +7,12 @@ import { getEligibility, listDrives } from "@/lib/placement-store";
 import { humanizeEligibilityStatus } from "@/lib/placement-utils";
 
 interface PageProps {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default function EligibilityPage({ searchParams = {} }: PageProps) {
-  const params = searchParams;
+export default async function EligibilityPage({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams;
+  const params = resolvedSearchParams ?? {};
   const driveId = typeof params.driveId === "string" ? params.driveId : listDrives()[0]?.id;
   const drive = listDrives().find((item) => item.id === driveId);
   if (!drive) {

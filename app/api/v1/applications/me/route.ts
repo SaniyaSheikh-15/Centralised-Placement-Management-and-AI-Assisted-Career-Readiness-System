@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStudentApplications } from "@/lib/application-management-service";
+import { getStudentApplications } from "../../../../../lib/application-management-service";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);

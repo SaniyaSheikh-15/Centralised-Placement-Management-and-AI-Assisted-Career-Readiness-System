@@ -1,0 +1,69 @@
+from backend.app.models.auth import (
+    Company,
+    OTPCode,
+    Recruiter,
+    Role,
+    TPAccessRequest,
+    User,
+    UserRole,
+)
+
+from backend.app.models.student import (
+    Branch,
+    JobRole,
+    Certification,
+    Project,
+    ProjectSkill,
+    Resume,
+    Skill,
+    StudentProfile,
+    StudentSkill,
+    StudentInternship,
+    StudentAchievement,
+    StudentSocialLink,
+)
+
+from backend.app.models.placement_drive import (
+    PlacementDrive,
+    EligibilityRule,
+    DriveBranch,
+    DriveSkill,
+    DriveDocument,
+)
+
+from backend.app.models.application import Application, ApplicationStatusHistory
+
+
+__all__ = [
+    # Auth
+    "Role",
+    "User",
+    "UserRole",
+    "Company",
+    "Recruiter",
+    "TPAccessRequest",
+    "OTPCode",
+
+    # Student
+    "Branch",
+    "Skill",
+    "JobRole",
+    "StudentProfile",
+    "StudentSkill",
+    "Project",
+    "ProjectSkill",
+    "Certification",
+    "Resume",
+    "StudentInternship",
+    "StudentAchievement",
+    "StudentSocialLink",
+
+    # Placement Drives
+    "PlacementDrive",
+    "EligibilityRule",
+    "DriveBranch",
+    "DriveSkill",
+    "DriveDocument",
+    "Application",
+    "ApplicationStatusHistory",
+]

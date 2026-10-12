@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ApplicationServiceError, getApplicationOrThrow } from "@/lib/application-management-service";
+import { ApplicationServiceError, getApplicationOrThrow } from "../../../../../../lib/application-management-service";
 
 interface RouteContext { params: Promise<{ applicationId: string }>; }
 

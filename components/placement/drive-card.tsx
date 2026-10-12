@@ -82,7 +82,7 @@ export function DriveCard({ drive, eligibilityLabel, actionHref, actionLabel, ac
             {actionLabel}
           </button>
         ) : (
-          <Link href={actionHref} className="inline-flex flex-1 items-center justify-center rounded-[20px] bg-sky-500 px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-sky-400">
+          <Link href={actionHref as never} className="inline-flex flex-1 items-center justify-center rounded-[20px] bg-sky-500 px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-sky-400">
             {actionLabel}
           </Link>
         )}

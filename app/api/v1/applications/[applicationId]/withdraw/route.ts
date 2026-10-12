@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ApplicationServiceError, withdrawApplication } from "@/lib/application-management-service";
+import { ApplicationServiceError, withdrawApplication } from "../../../../../../lib/application-management-service";
 
 interface RouteContext { params: Promise<{ applicationId: string }>; }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { listApplications, listDrives } from "@/lib/placement-store";
-import { filterDrives } from "@/lib/placement-queries";
+import { listApplications, listDrives } from "../../../../lib/placement-store";
+import { filterDrives } from "../../../../lib/placement-queries";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);

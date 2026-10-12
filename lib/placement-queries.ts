@@ -3,7 +3,7 @@ import {
   PlacementDrive
 } from "@/types/placement";
 import { isClosingSoon, isDeadlineClosed } from "@/lib/placement-utils";
-import { getEligibility } from "@/lib/placement-store";
+import { EligibilityResult } from "@/types/placement";
 
 export interface DriveFilters {
   search?: string;
@@ -16,7 +16,7 @@ export interface DriveFilters {
   sort?: string;
 }
 
-export function filterDrives(drives: PlacementDrive[], applications: ApplicationRecord[], filters: DriveFilters) {
+export function filterDrives(drives: PlacementDrive[], applications: ApplicationRecord[], filters: DriveFilters, eligibilityByDrive: Record<string, EligibilityResult> = {}) {
   const search = (filters.search ?? "").trim().toLowerCase();
 
   let filtered = drives.filter((drive) => {
@@ -40,7 +40,7 @@ export function filterDrives(drives: PlacementDrive[], applications: Application
 
     const application = applications.find((item) => item.driveId === drive.id);
     const closed = isDeadlineClosed(drive.applicationDeadline) || drive.status === "REGISTRATION_CLOSED" || drive.status === "CANCELLED";
-    const eligible = getEligibility(drive.id)?.status === "ELIGIBLE";
+    const eligible = eligibilityByDrive[drive.id]?.status === "ELIGIBLE";
 
     const matchesEligibility =
       !filters.eligibility ||

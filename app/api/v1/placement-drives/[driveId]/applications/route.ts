@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createApplication, ApplicationServiceError } from "@/lib/application-management-service";
-import { parseApplyRequest, RequestValidationError } from "@/lib/application-management-schemas";
+import { createApplication, ApplicationServiceError } from "../../../../../../lib/application-management-service";
+import { parseApplyRequest, RequestValidationError } from "../../../../../../lib/application-management-schemas";
 
 interface RouteContext { params: Promise<{ driveId: string }>; }
 

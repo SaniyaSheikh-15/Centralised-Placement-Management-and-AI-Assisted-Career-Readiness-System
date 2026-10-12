@@ -1,7 +1,7 @@
-import { getDrive, getApplication, getApplicationByStudentAndDrive, listApplications, addApplication, updateApplication } from "@/lib/placement-store";
-import { isDeadlineClosed, humanizeApplicationStatus } from "@/lib/placement-utils";
-import { ApplicationHistoryItem, ApplicationRecord, ApplicationStatus, ApplicationTimelineItem } from "@/types/placement";
-import { ApplyRequest, StatusUpdateRequest } from "@/lib/application-management-schemas";
+import { getDrive, getApplication, getApplicationByStudentAndDrive, listApplications, addApplication, updateApplication } from "./placement-store";
+import { isDeadlineClosed, humanizeApplicationStatus } from "./placement-utils";
+import { ApplicationHistoryItem, ApplicationRecord, ApplicationStatus, ApplicationTimelineItem } from "../types/placement";
+import { ApplyRequest, StatusUpdateRequest } from "./application-management-schemas";
 
 const lifecycle: ApplicationStatus[] = ["APPLIED", "ELIGIBILITY_VERIFIED", "SHORTLISTED", "ASSESSMENT", "TECHNICAL_INTERVIEW", "HR_INTERVIEW", "SELECTED"];
 const terminalStatuses: ApplicationStatus[] = ["SELECTED", "REJECTED", "WITHDRAWN"];

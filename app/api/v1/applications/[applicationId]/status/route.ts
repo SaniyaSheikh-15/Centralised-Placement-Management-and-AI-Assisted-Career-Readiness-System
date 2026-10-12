@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { ApplicationServiceError, getApplicationStatus, updateStatus } from "@/lib/application-management-service";
-import { parseStatusUpdateRequest, RequestValidationError } from "@/lib/application-management-schemas";
+import { ApplicationServiceError, getApplicationStatus, updateStatus } from "../../../../../../lib/application-management-service";
+import { parseStatusUpdateRequest, RequestValidationError } from "../../../../../../lib/application-management-schemas";
 
 interface RouteContext { params: Promise<{ applicationId: string }>; }
 

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 const navigation = [
@@ -19,6 +20,34 @@ const navigation = [
 
 export function StudentShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [studentName, setStudentName] = useState("Student");
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setAuthenticated(Boolean(localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")));
+    const onAuthExpired = () => setAuthenticated(false);
+    window.addEventListener("campusconnect:auth-expired", onAuthExpired);
+    const rawUser = localStorage.getItem("authUser") || sessionStorage.getItem("authUser");
+    if (rawUser) {
+      try {
+        const user = JSON.parse(rawUser) as { first_name?: string; last_name?: string | null };
+        setStudentName([user.first_name, user.last_name].filter(Boolean).join(" ") || "Student");
+      } catch {
+        setStudentName("Student");
+      }
+    }
+    return () => window.removeEventListener("campusconnect:auth-expired", onAuthExpired);
+  }, []);
+
+  function signOut() {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("authUser");
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("authUser");
+    setAuthenticated(false);
+    router.replace("/auth/login");
+  }
 
   return (
     <div className="min-h-screen text-slate-100">
@@ -41,7 +70,7 @@ export function StudentShell({ children }: { children: ReactNode }) {
                 return (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={item.href as never}
                     className={[
                       "group flex items-center gap-3 rounded-[8px] border px-3 py-2.5 text-[13px] font-medium transition",
                       active
@@ -65,7 +94,7 @@ export function StudentShell({ children }: { children: ReactNode }) {
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-500 text-xs font-bold text-white">AP</div>
                 <div>
-                  <p className="text-[13px] font-semibold text-white">Aafreen Khan</p>
+                  <p className="text-[13px] font-semibold text-white">{studentName}</p>
                   <p className="text-[10px] text-slate-400">Student</p>
                 </div>
               </div>
@@ -102,9 +131,10 @@ export function StudentShell({ children }: { children: ReactNode }) {
                 <div className="flex items-center gap-3 rounded-full border border-slate-800/60 bg-slate-950/45 px-2 py-1.5">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-500 text-xs font-bold text-white">AP</div>
                   <div className="pr-2 leading-tight">
-                    <p className="text-[13px] font-semibold text-white">Arjun Patil</p>
+                  <p className="text-[13px] font-semibold text-white">{studentName}</p>
                     <p className="text-[10px] text-slate-400">Student</p>
                   </div>
+                {authenticated ? <button type="button" onClick={signOut} className="rounded-full border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-sky-400 hover:text-white">Sign out</button> : <Link href="/auth/login" className="rounded-full border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-sky-400 hover:text-white">Sign in</Link>}
                 </div>
               </div>
             </div>

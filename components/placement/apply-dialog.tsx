@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { apiRequest, ApplicationResponse } from "@/lib/application-management-client";
 
 interface ApplyDialogProps {
   driveId: string;
@@ -17,6 +18,7 @@ export function ApplyDialog({ driveId, companyName, role, resumeName, deadlineLa
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const buttonLabel = useMemo(() => {
@@ -28,26 +30,23 @@ export function ApplyDialog({ driveId, companyName, role, resumeName, deadlineLa
 
   async function submitApplication() {
     setError(null);
-
-    const response = await fetch(`/api/v1/placement-drives/${driveId}/applications`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ resumeId: "resume_123" })
-    });
-
-    const payload = await response.json();
-    if (!response.ok) {
-      setError(payload?.message ?? "Application could not be submitted.");
-      return;
+    setSubmitting(true);
+    try {
+      const payload = await apiRequest<ApplicationResponse>(`/api/v1/placement-drives/${driveId}/applications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      });
+      setOpen(false);
+      startTransition(() => {
+        router.push(`/student/applications/${payload.application.id}`);
+        router.refresh();
+      });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Application could not be submitted.");
+    } finally {
+      setSubmitting(false);
     }
-
-    setOpen(false);
-    startTransition(() => {
-      router.push(`/student/applications/${payload.application.id}`);
-      router.refresh();
-    });
   }
 
   if (disabled) {
@@ -86,7 +85,7 @@ export function ApplyDialog({ driveId, companyName, role, resumeName, deadlineLa
             <div className="mt-6 grid gap-3 text-sm text-slate-300">
               <div className="panel-soft p-4">
                 <span className="block text-[10px] uppercase tracking-[0.3em] text-slate-500">Resume</span>
-                {resumeName ?? "Resume unavailable"}
+                {resumeName ?? "Your saved default resume will be attached"}
               </div>
               <div className="panel-soft p-4">
                 <span className="block text-[10px] uppercase tracking-[0.3em] text-slate-500">Deadline</span>
@@ -106,11 +105,11 @@ export function ApplyDialog({ driveId, companyName, role, resumeName, deadlineLa
               </button>
               <button
                 type="button"
-                disabled={isPending}
+                disabled={isPending || submitting}
                 onClick={submitApplication}
                 className="rounded-[18px] bg-sky-500 px-5 py-3 text-[13px] font-semibold text-white transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:bg-slate-600"
               >
-                {isPending ? "Submitting..." : "Confirm Application"}
+                {isPending || submitting ? "Submitting..." : "Confirm Application"}
               </button>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { ApplicationStatus } from "@/types/placement";
+import { ApplicationStatus } from "../types/placement";
 
 const statuses: ApplicationStatus[] = [
   "APPLIED", "ELIGIBILITY_VERIFIED", "SHORTLISTED", "ASSESSMENT",
