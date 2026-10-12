@@ -10,6 +10,7 @@ from backend.app.models.auth import (
 
 from backend.app.models.student import (
     Branch,
+    JobRole,
     Certification,
     Project,
     ProjectSkill,
@@ -21,6 +22,16 @@ from backend.app.models.student import (
     StudentAchievement,
     StudentSocialLink,
 )
+
+from backend.app.models.placement_drive import (
+    PlacementDrive,
+    EligibilityRule,
+    DriveBranch,
+    DriveSkill,
+    DriveDocument,
+)
+
+from backend.app.models.application import Application, ApplicationStatusHistory
 
 
 __all__ = [
@@ -36,6 +47,7 @@ __all__ = [
     # Student
     "Branch",
     "Skill",
+    "JobRole",
     "StudentProfile",
     "StudentSkill",
     "Project",
@@ -45,4 +57,13 @@ __all__ = [
     "StudentInternship",
     "StudentAchievement",
     "StudentSocialLink",
+
+    # Placement Drives
+    "PlacementDrive",
+    "EligibilityRule",
+    "DriveBranch",
+    "DriveSkill",
+    "DriveDocument",
+    "Application",
+    "ApplicationStatusHistory",
 ]

@@ -19,6 +19,34 @@ from backend.app.db.base import Base
 from backend.app.models.auth import User
 
 
+
+class JobRole(Base):
+    __tablename__ = "job_roles"
+
+    job_role_id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+    )
+
+    role_title: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
+
+    category: Mapped[str | None] = mapped_column(
+        String(100),
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        Text,
+    )
+
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+    )
+
+
+
+
 class Branch(Base):
     __tablename__ = "branches"
 

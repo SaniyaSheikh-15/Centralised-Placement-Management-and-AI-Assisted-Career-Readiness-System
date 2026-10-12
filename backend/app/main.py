@@ -5,10 +5,10 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
 import backend.app.models  # noqa: F401
-from backend.app.api import auth, master_data, student
-from backend.app.db.session import SessionLocal, get_db
+from backend.app.api import application, auth, master_data, placement_drive, student
+from backend.app.db.base import Base
+from backend.app.db.session import SessionLocal, engine, get_db
 from backend.app.repositories.role_repository import RoleRepository
 
 
@@ -66,6 +66,8 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(student.router)
 app.include_router(master_data.router)
+app.include_router(placement_drive.router)
+app.include_router(application.router)
 
 
 # ============================================================
