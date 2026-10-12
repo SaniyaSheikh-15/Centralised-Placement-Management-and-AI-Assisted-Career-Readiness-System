@@ -1,0 +1,34 @@
+# =====================================================================
+# CampusConnect AI Modules - Backend dependencies
+# Python 3.14 compatible (verified: all wheels resolve on win_amd64/3.14)
+# =====================================================================
+#
+# --- Web framework ---------------------------------------------------
+fastapi==0.143.0
+uvicorn==0.54.0
+python-multipart==0.0.32        # form-data parsing (OAuth2 password flow / file uploads)
+
+# --- Settings & validation ------------------------------------------
+pydantic==2.14.1
+pydantic-settings==2.15.0
+email-validator==2.3.0
+
+# --- Database --------------------------------------------------------
+# SQLAlchemy 2.x uses the modern typed ORM API; greenlet powers asyncio.
+SQLAlchemy==2.1.4
+greenlet==3.5.6
+aiosqlite==0.22.1               # async driver for the local/dev SQLite fallback
+psycopg[binary]==3.3.6          # async-capable PostgreSQL driver (production)
+
+# --- Security --------------------------------------------------------
+# PyJWT validates the tokens issued by the existing CampusConnect auth service.
+PyJWT==2.15.1
+
+# --- AI --------------------------------------------------------------
+# Google Gemini SDK (the PRD-mandated provider). The code abstracts this
+# behind an AIProvider interface so the vendor can be swapped (e.g. future
+# Whisper speech-to-text) without touching business logic.
+google-genai==2.29.0
+
+# --- HTTP ------------------------------------------------------------
+httpx==0.28.1
