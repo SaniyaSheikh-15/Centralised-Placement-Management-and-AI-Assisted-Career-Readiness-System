@@ -56,7 +56,7 @@ class EmailService:
     ) -> None:
         """
         Deliver a 6-digit OTP verification code to the recipient.
-
+        
         - If SMTP is configured: sends a formatted email via SMTP with STARTTLS.
         - If SMTP is not configured: logs the OTP to backend server logs (development fallback).
         """
@@ -132,3 +132,4 @@ class EmailService:
         log_message = f"[DEV EMAIL SERVICE] OTP generated for {to_email} [{purpose}]: {otp_code}"
         print(f"\n======================================================\n{log_message}\n======================================================\n", flush=True)
         logger.info(log_message)
+

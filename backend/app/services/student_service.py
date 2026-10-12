@@ -250,7 +250,7 @@ class StudentService:
             }
             for student_skill, skill in rows
         ]
-
+    
     @staticmethod
     def create_skill(
         db: Session,

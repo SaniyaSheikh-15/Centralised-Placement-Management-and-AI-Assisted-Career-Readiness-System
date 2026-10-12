@@ -352,4 +352,4 @@ class OTPCode(Base):
         nullable=False,
     )
 
-    user: Mapped["User | None"] = relationship()
+    user: Mapped["User | None"] = relationship()

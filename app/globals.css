@@ -1,6 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #050b14;
+  --color-panel: #101c2c;
+  --color-panelAlt: #0b1422;
+  --color-border: #1e3045;
+  --color-primary: #1683ff;
+  --color-secondary: #7c5cff;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-text: #f8fafc;
+  --color-muted: #94a3b8;
+  --color-subtle: #64748b;
+  --shadow-glow: 0 0 0 1px rgba(22, 131, 255, 0.18), 0 18px 40px rgba(2, 6, 23, 0.55);
+}
 
 :root {
   color-scheme: dark;
