@@ -11,7 +11,7 @@
 * **Collaborator Account**: [mohduzaifahkhan](https://github.com/mohduzaifahkhan) (`uzaifkhan015@gmail.com`)
 * **Assigned Module**: **Student Profile Builder**
 * **Assigned Branch**: `feature/student-profile`
-* **Current Active Pull Request**: [Pull Request #5](https://github.com/SaniyaSheikh-15/Centralised-Placement-Management-and-AI-Assisted-Career-Readiness-System/pull/5)
+* **Current Active Pull Request**: [Pull Request #13](https://github.com/SaniyaSheikh-15/Centralised-Placement-Management-and-AI-Assisted-Career-Readiness-System/pull/13)
 
 ---
 
