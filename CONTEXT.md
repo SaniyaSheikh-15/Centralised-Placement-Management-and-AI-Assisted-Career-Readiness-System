@@ -87,74 +87,71 @@ The overall system is designed with a frozen v1.0 schema consisting of 29 Postgr
 
 ## 4. Student Profile Builder — Frontend Architecture
 
-* **Framework**: React 19 + Vite 8 + React Router DOM v7
-* **Styling**: Vanilla CSS Design System with dark mode, glassmorphism, and responsive tokens (`src/index.css`)
-* **State Management**: `StudentProfileContext.jsx` with full mock data (`studentProfileMockData.js`)
+* **Framework**: Next.js 16.3.3 (App Router with Turbopack) + React 19 + TypeScript 5
+* **Styling**: Tailwind CSS v4 (`@tailwindcss/postcss`) + `src/app/globals.css` with dark mode tokens
+* **State Management**: `StudentProfileContext.tsx` with full mock data (`studentProfileMockData.ts`)
 
-### Directory Breakdown (`src/features/student-profile/`):
+### Directory Breakdown:
 ```
 src/
-├── App.jsx (Root router & layout frame)
-├── main.jsx (Entry point)
-├── index.css (Core design tokens & theme)
+├── app/
+│   ├── globals.css                # Master dark-theme CSS & Tailwind v4
+│   ├── layout.tsx                 # Root layout with Provider & Inter font
+│   ├── page.tsx                   # Redirect -> /profile
+│   └── profile/
+│       ├── layout.tsx             # Sidebar + Navbar shell
+│       ├── page.tsx               # Dashboard Overview (3 card rows with dividers)
+│       ├── edit/page.tsx          # 9-step Edit wizard
+│       ├── drives/page.tsx        # Placement Drives
+│       ├── applications/page.tsx  # My Applications Tracker
+│       ├── eligibility/page.tsx   # Drive Eligibility Checker
+│       ├── resume/page.tsx        # Resume Analyzer & ATS checklist
+│       ├── placement-match/page.tsx # AI Placement Match Scores
+│       ├── skill-gap/page.tsx     # Skill Gap Analysis
+│       ├── assistant/page.tsx     # AI Career Assistant
+│       ├── mock-interview/page.tsx # Mock Interview Studio
+│       ├── analytics/page.tsx     # Placement Readiness Analytics
+│       ├── skills/page.tsx        # Skills management
+│       ├── projects/page.tsx      # Projects showcase
+│       └── certifications/page.tsx # Certifications
 ├── components/
-│   └── shared/ (Sidebar.jsx, TopNavbar.jsx)
-└── features/student-profile/
-    ├── context/
-    │   └── StudentProfileContext.jsx (Global profile state & draft persistence)
-    ├── mock/
-    │   └── studentProfileMockData.js (Realistic student dataset)
-    ├── utils/
-    │   └── profileValidation.js (Form validations for CGPA, URLs, dates)
-    ├── pages/
-    │   ├── StudentProfileOverviewPage.jsx (/profile)
-    │   ├── EditProfilePage.jsx (/profile/edit - 9-step tabbed wizard)
-    │   ├── ResumeUploadPage.jsx (/profile/resume - Drag & drop uploader)
-    │   ├── SkillsManagementPage.jsx (/profile/skills - Skill chips & proficiencies)
-    │   ├── ProjectsPage.jsx (/profile/projects - Project showcase modals)
-    │   └── CertificationsPage.jsx (/profile/certifications - Credential cards)
-    └── components/
-        ├── overview/ (AcademicInfoCard, PersonalInfoCard, PlacementReadinessCard, ProfessionalSummaryCard, OnlinePresenceCard, ProfileHeaderBlock, ResumeSummaryCard)
-        ├── edit/ (TabPersonal, TabAcademic, TabSkills, TabProjects, TabInternships, TabCertifications, TabAchievements, TabSocialLinks, TabResume)
-        ├── skills/ (AddSkillModal, SkillChip, SkillProficiencyBadge)
-        ├── projects/ (ProjectCard, ProjectModal)
-        ├── resume/ (ResumeUploader)
-        ├── certifications/ (CertificationItem, CertificationModal)
-        └── common/ (DeleteConfirmModal, ProfileEmptyState, ProfileErrorState, ProfileSkeletonLoader)
+│   ├── shared/
+│   │   ├── Sidebar.tsx            # Left nav (CampusConnect logo, user card, 11 links, logout)
+│   │   └── TopNavbar.tsx          # Top bar with route title, search, notifications, avatar
+│   ├── student-profile/
+│   │   ├── common/                # DeleteModal, Empty, Error, Skeleton (4 variants)
+│   │   ├── overview/              # 7 Overview cards + HeaderBlock + EligibilityBanner
+│   │   ├── edit/                  # 9 Tab components (Personal -> Resume)
+│   │   ├── skills/                # AddSkillModal, SkillChip, ProficiencyBadge
+│   │   ├── projects/              # ProjectCard, ProjectModal
+│   │   ├── certifications/        # CertificationItem, CertificationModal
+│   │   └── resume/                # ResumeUploader (drag-drop, progress, preview)
+│   └── ui/                        # 17 Base-UI/shadcn primitives
+├── features/
+│   └── student-profile/
+│       ├── context/               # StudentProfileContext.tsx (CRUD + draft + tabs)
+│       ├── mock/                  # studentProfileMockData.ts (default + empty)
+│       └── utils/                 # profileValidation.ts (validators + masks)
+├── lib/
+│   └── utils.ts                   # cn() helper
+└── types/
+    └── student-profile.ts         # Complete domain TypeScript types
 ```
 
 ---
 
-## 5. Active Git Status & Pull Request Log
-
-* **Current Branch**: `feature/student-profile`
-* **Tracking**: `origin/feature/student-profile`
-* **Base**: `origin/develop`
-* **Merge Conflicts with develop**: **Zero (0)**
-
-### Commit History on Feature Branch:
-1. `3d798ba` — `feat(student-profile): add complete student profile builder module, components, and pages`
-   - Added all 58 core files and 6,289 lines of code.
-2. `6cf3056` — `fix(student-profile): add react dependencies, client-side routing links, and save draft on step navigation`
-   - Resolved Copilot review points:
-     - Added explicit `"react": "^19.2.0"` and `"react-dom": "^19.2.0"` in `package.json`.
-     - Replaced internal `<a>` tags with React Router `<Link>` components across overview cards.
-     - Updated `handleNext` in `EditProfilePage.jsx` to execute `saveDraft()` before tab transitions.
-
----
-
-## 6. Development & Run Commands
+## 5. Development & Run Commands
 
 ```bash
-# Start local development server (runs on http://localhost:5173)
+# Start local development server (runs on http://localhost:3000)
 npm run dev
 
+# Run TypeScript type check
+npx tsc --noEmit
+
 # Run production build validation
-npx vite build
+npm run build
 
 # Check git status
 git status
-
-# Push any future changes to the active PR
-git push origin feature/student-profile
 ```
