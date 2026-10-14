@@ -8,6 +8,7 @@ Maps to: placement_drives, eligibility_rules, drive_branches,
 from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
+from backend.app.models.auth import Company, Recruiter
 
 from sqlalchemy import (
     DateTime,

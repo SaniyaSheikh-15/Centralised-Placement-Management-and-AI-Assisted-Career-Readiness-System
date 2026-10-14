@@ -30,6 +30,7 @@ from backend.app.models.placement_drive import (
     DriveSkill,
     DriveDocument,
 )
+from backend.app.models.application import Application
 
 
 __all__ = [
@@ -62,4 +63,7 @@ __all__ = [
     "DriveBranch",
     "DriveSkill",
     "DriveDocument",
+
+    # Application Management
+    "Application",
 ]

@@ -484,3 +484,86 @@ export async function getStudentResumeFile(
 
   return response.blob();
 }
+
+
+/* ============================================================
+   APPLICATION MANAGEMENT
+============================================================ */
+
+export function applyForPlacementDrive(
+  driveId: string,
+  resumeId?: string | null
+) {
+  return apiRequest(
+    `/placement-drives/${driveId}/applications`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        resume_id: resumeId ?? null,
+      }),
+    }
+  );
+}
+
+export function getMyApplications(
+  filters?: {
+    status?: string;
+    company?: string;
+    role?: string;
+  }
+) {
+  const params = new URLSearchParams();
+
+  if (filters?.status) params.set("status", filters.status);
+  if (filters?.company) params.set("company", filters.company);
+  if (filters?.role) params.set("role", filters.role);
+
+  const query = params.toString();
+
+  return apiRequest(
+    `/applications/me${query ? `?${query}` : ""}`
+  );
+}
+
+export function getMyApplicationDetails(
+  applicationId: string
+) {
+  return apiRequest(`/applications/${applicationId}`);
+}
+
+export function getMyApplicationStatus(
+  applicationId: string
+) {
+  return apiRequest(
+    `/applications/${applicationId}/status`
+  );
+}
+
+export function withdrawMyApplication(
+  applicationId: string
+) {
+  return apiRequest(
+    `/applications/${applicationId}/withdraw`,
+    {
+      method: "PATCH",
+    }
+  );
+}
+
+export function updateApplicationStatus(
+  applicationId: string,
+  newStatus:
+    | "SHORTLISTED"
+    | "SELECTED"
+    | "REJECTED"
+) {
+  return apiRequest(
+    `/applications/${applicationId}/status`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        status: newStatus,
+      }),
+    }
+  );
+}

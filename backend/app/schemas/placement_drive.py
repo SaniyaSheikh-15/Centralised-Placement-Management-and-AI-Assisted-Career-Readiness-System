@@ -172,7 +172,7 @@ class PlacementDriveCreate(BaseModel):
         ge=1,
     )
 
-    registration_deadline: datetime | None = None
+    registration_deadline: datetime
     drive_date: datetime | None = None
 
     status: str | None = Field(default="upcoming")
@@ -211,6 +211,13 @@ class PlacementDriveCreate(BaseModel):
                 f"{', '.join(sorted(VALID_DRIVE_STATUSES))}"
             )
         return v
+
+    @field_validator("registration_deadline")
+    @classmethod
+    def validate_registration_deadline(cls, value: datetime) -> datetime:
+        if value <= datetime.now():
+            raise ValueError("Registration deadline must be in the future")
+        return value
 
     @model_validator(mode="after")
     def validate_package_range(self) -> "PlacementDriveCreate":
