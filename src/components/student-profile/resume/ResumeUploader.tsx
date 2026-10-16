@@ -10,10 +10,11 @@ import { Progress } from '@/components/ui/progress';
 import { UploadCloud, Download, RefreshCw, FileText, Upload } from 'lucide-react';
 import { validateResumeFile } from '@/features/student-profile/utils/profileValidation';
 import { useStudentProfile } from '@/features/student-profile/context/StudentProfileContext';
-import { getStudentResumeFile } from '@/lib/student-profile-api';
+import {getStudentResumes, getStudentResumeFile,} from '@/lib/student-profile-api';
+
 
 export default function ResumeUploader() {
-  const { profile, setResume, deleteResume } = useStudentProfile();
+const { profile, studentId, setResume, deleteResume } = useStudentProfile();
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -54,14 +55,66 @@ export default function ResumeUploader() {
   const handleDragLeave = useCallback(() => setDragOver(false), []);
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => { const file = e.target.files?.[0]; if (file) handleFile(file); e.target.value = ''; }, [handleFile]);
 
-  const handleDownload = useCallback(() => {
+  const handleDownload = useCallback(async () => {
+  let objectUrl: string | null = null;
+
+  try {
+    let blob: Blob;
+
     if (profile.resume.uploadedResume) {
-      const url = URL.createObjectURL(profile.resume.uploadedResume);
-      const a = document.createElement('a');
-      a.href = url; a.download = profile.resume.fileName; a.click();
-      URL.revokeObjectURL(url);
+      // Use the local file when it is available.
+      blob = profile.resume.uploadedResume;
+    } else {
+      // Retrieve the saved resume from the backend.
+      if (!studentId) {
+        throw new Error("Student ID is unavailable. Please refresh the page.");
+      }
+
+      const resumes = await getStudentResumes(studentId);
+
+      if (!Array.isArray(resumes) || resumes.length === 0) {
+        throw new Error("No uploaded resume was found.");
+      }
+
+      const savedResume =
+        resumes.find(
+          (resume: { resume_file_name?: string }) =>
+            resume.resume_file_name === profile.resume.fileName
+        ) ?? resumes[0];
+
+      if (!savedResume?.resume_id) {
+        throw new Error("Resume ID is unavailable.");
+      }
+
+      blob = await getStudentResumeFile(
+        studentId,
+        savedResume.resume_id
+      );
     }
-  }, [profile.resume]);
+
+    objectUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = profile.resume.fileName || "resume.pdf";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setError("");
+  } catch (err) {
+    setError(
+      err instanceof Error
+        ? err.message
+        : "Failed to download your resume."
+    );
+  } finally {
+    if (objectUrl) {
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl!), 1000);
+    }
+  }
+}, [profile.resume, studentId]);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';

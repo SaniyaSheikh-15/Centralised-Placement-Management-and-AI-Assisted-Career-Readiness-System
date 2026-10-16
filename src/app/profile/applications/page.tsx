@@ -31,7 +31,7 @@ const terminalStatuses = ["WITHDRAWN", "REJECTED", "SELECTED"];
 const statusStyles: Record<string, string> = {
   APPLIED: "bg-blue-500/10 text-blue-300 ring-blue-400/20",
   ELIGIBILITY_VERIFIED: "bg-cyan-500/10 text-cyan-300 ring-cyan-400/20",
-  SHORTLISTED: "bg-purple-500/10 text-purple-300 ring-purple-400/20",
+  SHORTLISTED: "bg-[#1683FF]/10 text-[#93C5FD] ring-purple-400/20",
   ASSESSMENT: "bg-amber-500/10 text-amber-300 ring-amber-400/20",
   TECHNICAL_INTERVIEW: "bg-indigo-500/10 text-indigo-300 ring-indigo-400/20",
   HR_INTERVIEW: "bg-orange-500/10 text-orange-300 ring-orange-400/20",
@@ -221,7 +221,7 @@ export default function ApplicationsPage() {
   );
 
   const inputClass =
-    "w-full rounded-xl border border-slate-700 bg-slate-800 px-3 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20";
+    "w-full rounded-xl border border-slate-700 bg-slate-800 px-3 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-[#1683FF] focus:ring-2 focus:ring-[#1683FF]/20";
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
@@ -229,7 +229,7 @@ export default function ApplicationsPage() {
         {/* Page heading */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-400">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#60A5FA]">
               Placement portal
             </p>
 
@@ -246,7 +246,7 @@ export default function ApplicationsPage() {
             type="button"
             onClick={() => void loadApplications(appliedFilters)}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-violet-500/50 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-[#1E4C8A] hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span aria-hidden="true">↻</span>
             Refresh
@@ -263,7 +263,7 @@ export default function ApplicationsPage() {
               label: "Applications shown",
               value: applications.length,
               symbol: "▤",
-              color: "bg-violet-500/10 text-violet-300",
+              color: "bg-[#1683FF]/10 text-[#93C5FD]",
             },
             {
               label: "Applied",
@@ -275,7 +275,7 @@ export default function ApplicationsPage() {
               label: "Shortlisted",
               value: shortlistedCount,
               symbol: "✦",
-              color: "bg-purple-500/10 text-purple-300",
+              color: "bg-[#1683FF]/10 text-[#93C5FD]",
             },
             {
               label: "Selected",
@@ -399,7 +399,7 @@ export default function ApplicationsPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-950/30 transition hover:bg-violet-500 disabled:opacity-50"
+                className="rounded-xl bg-[#2563EB] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#1E3A8A]/30 transition hover:bg-[#3B82F6] disabled:opacity-50"
               >
                 Apply filters
               </button>
@@ -486,7 +486,7 @@ export default function ApplicationsPage() {
         {/* Empty state */}
         {!loading && !error && applications.length === 0 && (
           <div className="mt-5 rounded-2xl border border-dashed border-slate-700 bg-slate-900 px-6 py-12 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-500/10 text-2xl text-violet-300">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1683FF]/10 text-2xl text-[#93C5FD]">
               ▤
             </div>
 
@@ -504,7 +504,7 @@ export default function ApplicationsPage() {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="mt-5 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500"
+                className="mt-5 rounded-xl bg-[#2563EB] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3B82F6]"
               >
                 Clear filters
               </button>
@@ -530,7 +530,7 @@ export default function ApplicationsPage() {
                   <div className="p-5 sm:p-6">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-400">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#60A5FA]">
                           {application.drive_title || "Placement drive"}
                         </p>
 
@@ -581,7 +581,7 @@ export default function ApplicationsPage() {
                         onClick={() =>
                           void toggleDetails(application.application_id)
                         }
-                        className="rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-violet-500/50 hover:bg-slate-700"
+                        className="rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-[#1E4C8A] hover:bg-slate-700"
                       >
                         {isExpanded ? "Hide details" : "View details"}
                       </button>

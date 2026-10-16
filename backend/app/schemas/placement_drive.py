@@ -212,11 +212,15 @@ class PlacementDriveCreate(BaseModel):
             )
         return v
 
+   
     @field_validator("registration_deadline")
     @classmethod
     def validate_registration_deadline(cls, value: datetime) -> datetime:
-        if value <= datetime.now():
+        now = datetime.now(value.tzinfo) if value.tzinfo else datetime.now()
+
+        if value <= now:
             raise ValueError("Registration deadline must be in the future")
+
         return value
 
     @model_validator(mode="after")

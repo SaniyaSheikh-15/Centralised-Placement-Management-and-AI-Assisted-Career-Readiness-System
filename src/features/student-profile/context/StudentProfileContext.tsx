@@ -143,6 +143,7 @@ interface StudentProfileContextType {
   activeEditTab: number;
   isLoading: boolean;
   error: string | null;
+  studentId: string | null;
 
   setActiveEditTab: (tab: number) => void;
   setEditDraft: Dispatch<SetStateAction<StudentProfile>>;
@@ -2422,6 +2423,7 @@ const saveDraft = useCallback(
     profile,
     editDraft,
     activeEditTab,
+    studentId,
 
     isLoading:
       isLoading || authLoading,
