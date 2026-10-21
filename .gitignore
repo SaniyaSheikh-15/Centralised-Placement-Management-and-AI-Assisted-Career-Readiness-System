@@ -110,3 +110,5 @@ backend/storage/
 
 .DS_Store
 *.pem
+
+database/test-backups/
