@@ -232,12 +232,15 @@ class TestCreatePlacementDrive:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
 
@@ -257,12 +260,15 @@ class TestCreatePlacementDrive:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         del payload["drive_title"]
@@ -280,12 +286,14 @@ class TestCreatePlacementDrive:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         payload["minimum_package_lpa"] = "15.00"
@@ -331,13 +339,15 @@ class TestGetPlacementDrives:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         # Create a drive first
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         client.post(
@@ -377,13 +387,15 @@ class TestGetPlacementDrives:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         # Create a drive
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         create_resp = client.post(
@@ -429,12 +441,14 @@ class TestUpdatePlacementDrive:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         create_resp = client.post(
@@ -473,12 +487,14 @@ class TestDeletePlacementDrive:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         create_resp = client.post(
@@ -522,12 +538,14 @@ class TestDriveStatusTransitions:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         create_resp = client.post(
@@ -606,12 +624,14 @@ class TestEligibilityRules:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         create_resp = client.post(
@@ -646,12 +666,14 @@ class TestEligibilityRules:
         try:
             user, token, company, recruiter = create_recruiter_with_company(db)
             job_role_id = get_or_create_job_role(db)
+            company_id = company.company_id
+            recruiter_id = recruiter.recruiter_id
         finally:
             db.close()
 
         payload = create_drive_payload(
-            company.company_id,
-            recruiter.recruiter_id,
+            company_id,
+            recruiter_id,
             job_role_id,
         )
         create_resp = client.post(
