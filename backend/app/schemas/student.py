@@ -10,8 +10,8 @@ from pydantic import BaseModel, ConfigDict, model_validator
 # =========================================================
 
 class StudentProfileBase(BaseModel):
-    branch_id: UUID
-    enrollment_no: str
+    branch_id: UUID | None = None
+    enrollment_no: str | None = None
     semester: int | None = None
     cgpa: Decimal | None = None
     graduation_year: int | None = None

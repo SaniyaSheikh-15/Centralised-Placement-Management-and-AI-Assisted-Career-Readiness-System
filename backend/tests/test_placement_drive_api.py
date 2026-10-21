@@ -213,7 +213,11 @@ def create_drive_payload(
         "minimum_package_lpa": "6.00",
         "maximum_package_lpa": "12.00",
         "vacancies": 25,
+        "registration_deadline": (
+            datetime.now(timezone.utc) + timedelta(days=7)
+        ).isoformat(),
         "status": "upcoming",
+
     }
 
 
@@ -242,7 +246,6 @@ class TestCreatePlacementDrive:
             json=payload,
             headers=get_auth_header(token),
         )
-
         assert response.status_code == 201
         data = response.json()
         assert data["drive_title"] == payload["drive_title"]

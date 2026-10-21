@@ -116,15 +116,15 @@ class StudentProfile(Base):
         foreign_keys=[user_id],
     )
 
-    branch_id: Mapped[UUID] = mapped_column(
+    branch_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("branches.branch_id"),
-        nullable=False,
+        nullable=True,
     )
 
-    enrollment_no: Mapped[str] = mapped_column(
+    enrollment_no: Mapped[str | None] = mapped_column(
         String(30),
         unique=True,
-        nullable=False,
+        nullable=True,
     )
 
     semester: Mapped[int | None] = mapped_column(

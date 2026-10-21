@@ -871,18 +871,29 @@ export function StudentProfileProvider({
           authenticatedUser.user_id
         );
 
-        const backendProfile =
-          await getStudentProfileByUserId(
+        let backendProfile;
+
+        try {
+          backendProfile = await getStudentProfileByUserId(
             authenticatedUser.user_id
           );
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "";
+
+          if (message !== "Student profile not found") {
+            throw error;
+          }
+
+          backendProfile = await createStudentProfile({});
+        }
+
 
         if (cancelled) {
           return;
         }
 
-        if (
-          !backendProfile?.student_id
-        ) {
+        if (!backendProfile?.student_id) {
           throw new Error(
             "Student profile was not found for this account."
           );

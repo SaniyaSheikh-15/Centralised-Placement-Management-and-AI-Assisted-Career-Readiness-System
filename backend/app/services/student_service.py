@@ -99,19 +99,21 @@ class StudentService:
                 "Student profile already exists for this user"
             )
 
-        existing_enrollment = (
-            db.query(StudentProfile)
-            .filter(
-                StudentProfile.enrollment_no
-                == request.enrollment_no
+        if request.enrollment_no is not None:
+            existing_enrollment = (
+                db.query(StudentProfile)
+                .filter(
+                    StudentProfile.enrollment_no
+                    == request.enrollment_no
+                )
+                .first()
             )
-            .first()
-        )
 
-        if existing_enrollment:
-            raise ValueError(
-                "Enrollment number already exists"
-            )
+            if existing_enrollment:
+                raise ValueError(
+                    "Enrollment number already exists"
+                )
+
 
         now = datetime.utcnow()
 

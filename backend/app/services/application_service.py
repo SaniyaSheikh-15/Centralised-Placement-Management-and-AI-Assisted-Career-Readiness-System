@@ -15,6 +15,7 @@ from backend.app.repositories.application_repository import (
     ApplicationRepository,
 )
 from backend.app.repositories.resume_repository import ResumeRepository
+from backend.app.services.eligibility_service import EligibilityService
 
 
 
@@ -62,6 +63,28 @@ class ApplicationService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Applications are not open for this drive",
+            )
+
+        # Check placement eligibility before accepting the application.
+        evaluation = EligibilityService.evaluate(
+            db=db,
+            drive_id=drive_id,
+            user_id=current_user.user_id,
+        )
+
+        if not evaluation.is_eligible:
+            failed_reasons = [
+                item.message
+                for item in evaluation.results
+                if not item.passed
+            ]
+
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "message": "You are not eligible for this placement drive.",
+                    "failed_criteria": failed_reasons,
+                },
             )
 
         existing = ApplicationRepository.get_by_student_and_drive(
