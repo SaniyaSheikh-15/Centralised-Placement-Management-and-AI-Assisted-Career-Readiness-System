@@ -7,6 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 import backend.app.models  # noqa: F401
 from backend.app.api import (
+    analytics,
     application,
     auth,
     master_data,
@@ -74,7 +75,7 @@ app.include_router(student.router)
 app.include_router(master_data.router)
 app.include_router(placement_drive.router)
 app.include_router(application.router)
-
+app.include_router(analytics.router)
 
 # ============================================================
 # ROOT
