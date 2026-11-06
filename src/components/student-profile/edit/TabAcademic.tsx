@@ -210,6 +210,27 @@ export default function TabAcademic() {
         </div>
       </fieldset>
 
+      <div className="space-y-2">
+  <Label>Semester</Label>
+  <Select
+    value={a.semester ?? ""}
+    onValueChange={(v: string | null) =>
+      updateAcademicInfo({ semester: v ?? "" })
+    }
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select semester" />
+    </SelectTrigger>
+    <SelectContent>
+      {Array.from({ length: 8 }, (_, i) => i + 1).map((semester) => (
+        <SelectItem key={semester} value={String(semester)}>
+          Semester {semester}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
       {/* ─── Schooling & Aggregate ──────────────── */}
       <fieldset className="space-y-4">
         <legend className="text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">

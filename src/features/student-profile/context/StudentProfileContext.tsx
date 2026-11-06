@@ -98,6 +98,7 @@ const EMPTY_PROFILE: StudentProfile = {
     cgpaCurrent: "",
     hasLiveBacklogs: "",
     backlogDetails: "",
+    semester: "",
   },
 
   placementReadiness: {
@@ -339,10 +340,14 @@ function mapBackendProfileToStudentProfile(
         backendProfile.alternate_email || "",
 
       permanentAddress:
-        previousProfile.personalInfo.permanentAddress,
+        backendProfile.permanent_address ??
+        previousProfile.personalInfo.permanentAddress ??
+        "",
 
       presentAddress:
-        previousProfile.personalInfo.presentAddress,
+        backendProfile.present_address ??
+        previousProfile.personalInfo.presentAddress ??
+        "",
 
       fatherName:
         backendProfile.father_name || "",
@@ -388,6 +393,12 @@ function mapBackendProfileToStudentProfile(
         backendProfile.degree || "",
 
       academicYear: previousProfile.academicInfo.academicYear,
+
+      semester:
+        backendProfile.semester != null
+          ? String(backendProfile.semester)
+          : "",
+
       graduationYear:
         backendProfile.graduation_year != null
           ? String(backendProfile.graduation_year)
@@ -2120,6 +2131,10 @@ const saveDraft = useCallback(
           editDraft.academicInfo.degree ||
           undefined,
 
+        semester:
+          editDraft.academicInfo.semester !== ""
+            ? Number(editDraft.academicInfo.semester)
+            : undefined,
         
         graduation_year:
             editDraft.academicInfo.graduationYear !== ""
